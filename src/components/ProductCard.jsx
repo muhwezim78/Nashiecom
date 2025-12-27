@@ -18,11 +18,16 @@ const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  const images = product.images || [product.image];
+  const images =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => (typeof img === "object" ? img.url : img))
+      : [product.image];
   const intervalRef = useRef(null);
   const isDiscounted = product.originalPrice > product.price;
-  const discountPercentage = isDiscounted 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = isDiscounted
+    ? Math.round(
+        ((product.originalPrice - product.price) / product.originalPrice) * 100
+      )
     : 0;
 
   // Auto-scroll with pause on hover
@@ -46,17 +51,25 @@ const ProductCard = ({ product }) => {
   }, [startAutoScroll, stopAutoScroll]);
 
   // Handle image navigation
-  const goToNextImage = useCallback((e) => {
-    e?.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    restartAutoScroll();
-  }, [images.length]);
+  const goToNextImage = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      restartAutoScroll();
+    },
+    [images.length]
+  );
 
-  const goToPrevImage = useCallback((e) => {
-    e?.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    restartAutoScroll();
-  }, [images.length]);
+  const goToPrevImage = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + images.length) % images.length
+      );
+      restartAutoScroll();
+    },
+    [images.length]
+  );
 
   const restartAutoScroll = useCallback(() => {
     stopAutoScroll();
@@ -64,16 +77,19 @@ const ProductCard = ({ product }) => {
   }, [startAutoScroll, stopAutoScroll]);
 
   // Handle add to cart with feedback
-  const handleAddToCart = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    addToCart(product);
-    setIsAdded(true);
-    
-    // Reset feedback after 2 seconds
-    setTimeout(() => setIsAdded(false), 2000);
-  }, [addToCart, product]);
+  const handleAddToCart = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      addToCart(product);
+      setIsAdded(true);
+
+      // Reset feedback after 2 seconds
+      setTimeout(() => setIsAdded(false), 2000);
+    },
+    [addToCart, product]
+  );
 
   // Handle image click for mobile
   const handleImageClick = useCallback(() => {
@@ -86,19 +102,21 @@ const ProductCard = ({ product }) => {
   const renderStars = () => {
     const fullStars = Math.floor(product.rating);
     const hasHalfStar = product.rating % 1 >= 0.5;
-    
+
     return (
       <div className="flex items-center gap-0.5">
         {[...Array(5)].map((_, i) => {
           if (i < fullStars) {
-            return <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />;
+            return (
+              <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+            );
           } else if (i === fullStars && hasHalfStar) {
             return (
               <div key={i} className="relative">
                 <Star className="w-4 h-4 text-gray-700" />
-                <Star 
+                <Star
                   className="w-4 h-4 fill-amber-400 text-amber-400 absolute inset-0 overflow-hidden"
-                  style={{ clipPath: 'inset(0 50% 0 0)' }}
+                  style={{ clipPath: "inset(0 50% 0 0)" }}
                 />
               </div>
             );
@@ -209,7 +227,10 @@ const ProductCard = ({ product }) => {
           {/* Category */}
           <div className="flex justify-center align-center">
             <span className="inline-block text-xs font-bold tracking-wider text-cyan-400 uppercase px-3 py-1.5 bg-cyan-500/10 rounded-full border border-cyan-500/20">
-              {product.category}
+              {product.category?.name ||
+                (typeof product.category === "string"
+                  ? product.category
+                  : "Product")}
             </span>
           </div>
 
@@ -230,10 +251,12 @@ const ProductCard = ({ product }) => {
             <div className="flex items-center gap-1">
               {renderStars()}
               <span className="text-sm font-semibold text-white ml-2">
-                {product.rating.toFixed(1)}
+                {product.rating?.toFixed(1) || "0.0"}
               </span>
             </div>
-            <span className="text-xs text-gray-500">({product.reviews})</span>
+            <span className="text-xs text-gray-500">
+              ({product.reviews?.length || product.reviews || 0})
+            </span>
           </div>
 
           {/* Price */}
@@ -258,34 +281,34 @@ const ProductCard = ({ product }) => {
           {/* Add to Cart Button */}
           <div className="mt-6 align-center pt-4 border-t border-gray-800">
             <div className="flex justify-center">
-            <motion.button
-              onClick={handleAddToCart}
-              whileTap={{ scale: 0.95 }}
-              disabled={isAdded}
-              className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${
-                isAdded
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
-              }`}
-            >
-              <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-              
-              {isAdded ? (
-                <>
-                  <Check className="w-5 h-5 relative z-10" />
-                  <span className="relative z-10">Added to Cart</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-5 h-5 relative z-10" />
-                  <span className="relative z-10">
-                    {isInCart?.(product.id) ? "Add More" : "Add to Cart"}
-                  </span>
-                </>
-              )}
-            </motion.button>
+              <motion.button
+                onClick={handleAddToCart}
+                whileTap={{ scale: 0.95 }}
+                disabled={isAdded}
+                className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${
+                  isAdded
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+                }`}
+              >
+                <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+
+                {isAdded ? (
+                  <>
+                    <Check className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">Added to Cart</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">
+                      {isInCart?.(product.id) ? "Add More" : "Add to Cart"}
+                    </span>
+                  </>
+                )}
+              </motion.button>
             </div>
-            
+
             {/* Quick View */}
             <Link
               to={`/products/${product.id}`}

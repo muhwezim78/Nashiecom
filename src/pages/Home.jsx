@@ -10,25 +10,37 @@ import {
   Trophy,
   ChevronRight,
   Play,
+  Monitor,
+  Wrench,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Space, Spin } from "antd";
 import HeroSection from "../components/HeroSection";
 import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
 import Newsletter from "../components/Newsletter";
-import {
-  getFeaturedProducts,
-  categories,
-  getProductsByCategory,
-} from "../data/products";
-import { Space } from "antd";
+import { useFeaturedProducts, useProducts } from "../hooks/useProducts";
+import { categories as staticCategories } from "../data/products";
 
 const Home = () => {
   const { scrollYProgress } = useScroll();
-  const featuredProducts = getFeaturedProducts();
-  const gamingProducts = getProductsByCategory("gaming")?.slice(0, 3) || [];
 
-  const highlightCategories = categories.filter(
+  // Fetch Data using Hooks
+  const { data: featuredData, isLoading: featuredLoading } =
+    useFeaturedProducts(6);
+  const { data: gamingData, isLoading: gamingLoading } = useProducts({
+    search: "gaming",
+    limit: 3,
+  });
+
+  const featuredProducts = featuredData?.data?.products || [];
+  const gamingProducts = gamingData?.data?.products || [];
+  const loading = featuredLoading || gamingLoading;
+
+  // Still use static categories for now but we could fetch them too
+  // keeping the static highlighting logic
+  const highlightCategories = staticCategories.filter(
     (cat) =>
       cat.id !== "all" &&
       ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
@@ -118,6 +130,71 @@ const Home = () => {
                   </span>
                 ))}
               </motion.div>
+            </div>
+          </section>
+        </div>
+
+        {/* Services Section */}
+        <div className="w-full">
+          <section className="py-24 bg-white/[0.02] border-y border-white/5">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-16">
+                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em]">
+                  Our Expertise
+                </span>
+                <h2 className="text-4xl md:text-5xl font-black text-white mt-4 tracking-tighter">
+                  COMPREHENSIVE <span className="text-blue-500">SOLUTIONS</span>
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  {
+                    title: "Accessories",
+                    subtitle: "Computer & Laptop",
+                    icon: Monitor,
+                    color: "text-cyan-400",
+                  },
+                  {
+                    title: "IT Services",
+                    subtitle: "Delivered at your comfort",
+                    icon: Globe,
+                    color: "text-blue-400",
+                  },
+                  {
+                    title: "Repair & Maintenance",
+                    subtitle: "Expert Diagnostics",
+                    icon: Wrench,
+                    color: "text-purple-400",
+                  },
+                  {
+                    title: "Installations",
+                    subtitle: "Software & Systems",
+                    icon: Zap,
+                    color: "text-yellow-400",
+                  },
+                ].map((service, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                    className="p-8 bg-black/20 border border-white/5 rounded-[2rem] hover:border-cyan-500/30 transition-all text-center group"
+                  >
+                    <div
+                      className={`w-14 h-14 mx-auto mb-6 bg-white/5 rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
+                    >
+                      <service.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-white font-bold text-lg mb-1">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm font-medium">
+                      {service.subtitle}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </section>
         </div>
@@ -218,24 +295,30 @@ const Home = () => {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {featuredProducts.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.8 }}
-                    className={index === 1 ? "lg:-mt-12 lg:mb-12" : ""}
-                  >
-                    <div className="relative group p-1 rounded-[2.8rem] bg-gradient-to-b from-white/10 to-white/0 hover:from-blue-500/30 transition-all duration-500">
-                      <div className="relative bg-[#0a0a0f] rounded-[2.5rem] overflow-hidden">
-                        <ProductCard product={product} />
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <Spin size="large" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                  {featuredProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1, duration: 0.8 }}
+                      className={index === 1 ? "lg:-mt-12 lg:mb-12" : ""}
+                    >
+                      <div className="relative group p-1 rounded-[2.8rem] bg-gradient-to-b from-white/10 to-white/0 hover:from-blue-500/30 transition-all duration-500">
+                        <div className="relative bg-[#0a0a0f] rounded-[2.5rem] overflow-hidden">
+                          <ProductCard product={product} />
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         </div>
@@ -268,7 +351,16 @@ const Home = () => {
                         className="flex items-center gap-6 p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:bg-white/[0.05] hover:border-purple-500/30 transition-all group"
                       >
                         <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                          {product.icon || "🎮"}
+                          {/* Use image instead of icon if available */}
+                          {product.image ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-10 h-10 object-contain"
+                            />
+                          ) : (
+                            "🎮"
+                          )}
                         </div>
                         <div className="flex-1">
                           <h4 className="text-white font-bold text-lg">

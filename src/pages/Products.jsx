@@ -16,110 +16,132 @@ import {
   Star,
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { products, categories } from "../data/products";
+import { useProducts } from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
 import { formatCurrency } from "../utils/currency";
-import { Space, Menu } from "antd";
+import { Space, Menu, Spin, Pagination } from "antd";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // Get filter values from URL
   const activeCategory = searchParams.get("category") || "all";
   const searchQuery = searchParams.get("search") || "";
-  const [priceRange, setPriceRange] = useState(20000000);
+  const page = parseInt(searchParams.get("page") || "1");
+  const priceMax = parseInt(searchParams.get("priceMax") || "20000000");
+
+  const [priceRange, setPriceRange] = useState(priceMax);
   const [sortBy, setSortBy] = useState("featured");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
+  // Debounce search update
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+    const handler = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        const params = new URLSearchParams(searchParams);
+        if (localSearch) {
+          params.set("search", localSearch);
+        } else {
+          params.delete("search");
+        }
+        params.set("page", "1"); // Reset to page 1 on search
+        setSearchParams(params);
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [localSearch, searchQuery, searchParams, setSearchParams]);
 
-  // Update local search when URL changes
+  // Debounced price range state for query
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange);
   useEffect(() => {
-    setLocalSearch(searchQuery);
-  }, [searchQuery]);
+    const handler = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [priceRange]);
 
-  const filteredProducts = useMemo(() => {
-    let result = products;
+  // Prepare Query Params
+  const queryParams = useMemo(() => {
+    const params = {
+      page,
+      limit: 12,
+      minPrice: 0,
+      maxPrice: debouncedPriceRange,
+    };
 
-    // Filter by category
     if (activeCategory !== "all") {
-      const lowerCat = activeCategory.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.category.toLowerCase() === lowerCat ||
-          p.subcategory?.toLowerCase() === lowerCat
-      );
+      params.category = activeCategory;
     }
 
-    // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-      );
+      params.search = searchQuery;
     }
 
-    // Filter by price range
-    result = result.filter((p) => p.price <= priceRange);
-
-    // Sort products
     switch (sortBy) {
       case "price-low":
-        result = [...result].sort((a, b) => a.price - b.price);
+        params.sortBy = "price";
+        params.sortOrder = "asc";
         break;
       case "price-high":
-        result = [...result].sort((a, b) => b.price - a.price);
+        params.sortBy = "price";
+        params.sortOrder = "desc";
         break;
       case "rating":
-        result = [...result].sort((a, b) => b.rating - a.rating);
+        params.sortBy = "rating";
+        params.sortOrder = "desc";
         break;
       case "newest":
-        result = [...result].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        params.sortBy = "createdAt";
+        params.sortOrder = "desc";
         break;
       default:
-        // featured - keep original order or sort by featured flag
-        result = result
-          .filter((p) => p.featured)
-          .concat(result.filter((p) => !p.featured));
+        params.featured = sortBy === "featured" ? true : undefined;
         break;
     }
+    return params;
+  }, [page, debouncedPriceRange, activeCategory, searchQuery, sortBy]);
 
-    return result;
-  }, [activeCategory, searchQuery, priceRange, sortBy]);
+  // Data Fetching Hooks
+  const { data: productsData, isLoading: isProductsLoading } =
+    useProducts(queryParams);
+  const { data: categoriesData } = useCategories();
+
+  const products = productsData?.data?.products || [];
+  const totalProducts = productsData?.data?.pagination?.total || 0;
+  const isLoading = isProductsLoading;
+
+  // Process Categories
+  const categories = useMemo(() => {
+    if (!categoriesData?.data?.categories) return [];
+    return [
+      { id: "all", name: "All Categories", icon: "🔍", slug: "all" },
+      ...categoriesData.data.categories.map((c) => ({
+        ...c,
+        id: c.slug,
+        icon: c.icon || "💻",
+      })),
+    ];
+  }, [categoriesData]);
 
   const handleCategoryChange = useCallback(
     (catId) => {
       const params = new URLSearchParams(searchParams);
       params.set("category", catId);
+      params.set("page", "1"); // Reset page
       setSearchParams(params);
       setIsMobileFilterOpen(false);
     },
     [searchParams, setSearchParams]
   );
 
-  const handleSearch = useCallback(
-    (e) => {
-      e.preventDefault();
-      const params = new URLSearchParams(searchParams);
-      if (localSearch) {
-        params.set("search", localSearch);
-      } else {
-        params.delete("search");
-      }
-      setSearchParams(params);
-    },
-    [localSearch, searchParams, setSearchParams]
-  );
+  const handleSearch = useCallback((e) => {
+    e.preventDefault();
+    // Triggered by effect via localSearch state
+  }, []);
 
   const clearFilters = useCallback(() => {
     setSearchParams({});
@@ -141,25 +163,22 @@ const Products = () => {
     return category?.icon || "💻";
   };
 
-  // Prepare menu items for Ant Design Menu
   const categoryMenuItems = categories.map((cat) => ({
     key: cat.id,
     icon: <span className="text-xl">{cat.icon}</span>,
     label: (
       <div className="flex justify-between items-center w-full">
         <span>{cat.name}</span>
-        <span className="text-xs text-gray-500">
-          {
-            products.filter(
-              (p) =>
-                p.category.toLowerCase() === cat.id.toLowerCase() ||
-                p.subcategory?.toLowerCase() === cat.id.toLowerCase()
-            ).length
-          }
-        </span>
       </div>
     ),
   }));
+
+  const handlePageChange = (newPage) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    setSearchParams(params);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900">
@@ -214,7 +233,7 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <div className="px-3 py-1.5 bg-white/5 rounded-lg">
               <span className="text-sm font-medium text-white">
-                {filteredProducts.length} Products
+                {totalProducts} Products
               </span>
             </div>
             {activeCategory !== "all" && (
@@ -238,9 +257,7 @@ const Products = () => {
                 </span>
                 <button
                   onClick={() => {
-                    const params = new URLSearchParams(searchParams);
-                    params.delete("search");
-                    setSearchParams(params);
+                    setLocalSearch("");
                   }}
                   className="text-gray-400 hover:text-white"
                 >
@@ -361,13 +378,15 @@ const Products = () => {
                   <h3 className="text-lg font-bold text-white mb-4 pb-3 border-b border-gray-800">
                     Categories
                   </h3>
-                  <Menu
-                    mode="vertical"
-                    selectedKeys={[activeCategory]}
-                    onSelect={({ key }) => handleCategoryChange(key)}
-                    items={categoryMenuItems}
-                    className="bg-transparent border-0 custom-menu"
-                  />
+                  {categories.length > 0 && (
+                    <Menu
+                      mode="vertical"
+                      selectedKeys={[activeCategory]}
+                      onSelect={({ key }) => handleCategoryChange(key)}
+                      items={categoryMenuItems}
+                      className="bg-transparent border-0 custom-menu"
+                    />
+                  )}
                 </div>
 
                 {/* Price Range */}
@@ -411,24 +430,7 @@ const Products = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Total Products</span>
                       <span className="text-white font-bold">
-                        {products.length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Categories</span>
-                      <span className="text-white font-bold">
-                        {categories.length - 1}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Average Rating</span>
-                      <span className="text-white font-bold flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        {Math.round(
-                          (products.reduce((acc, p) => acc + p.rating, 0) /
-                            products.length) *
-                            10
-                        ) / 10}
+                        {totalProducts}
                       </span>
                     </div>
                   </Space>
@@ -598,25 +600,55 @@ const Products = () => {
                     />
                   ))}
               </div>
-            ) : filteredProducts.length > 0 ? (
-              <div
-                className={`grid gap-8 ${
-                  viewMode === "grid"
-                    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-2"
-                    : "grid-cols-1"
-                }`}
-              >
-                {filteredProducts.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
+            ) : products.length > 0 ? (
+              <>
+                <div
+                  className={`grid gap-8 ${
+                    viewMode === "grid"
+                      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                      : "grid-cols-1"
+                  }`}
+                >
+                  {products.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex justify-center mt-12">
+                  <Pagination
+                    current={page}
+                    pageSize={12}
+                    total={totalProducts}
+                    onChange={handlePageChange}
+                    showSizeChanger={false}
+                    theme="dark" // AntD doesn't support theme prop directly on Pagination like this, but we'll style it or rely on ConfigProvider
+                    className="ant-pagination-white"
+                  />
+                </div>
+                <style>{`
+                   .ant-pagination-white .ant-pagination-item a {
+                     color: #fff;
+                   }
+                   .ant-pagination-white .ant-pagination-item-active {
+                     background: #06b6d4;
+                     border-color: #06b6d4;
+                   }
+                   .ant-pagination-white .ant-pagination-prev .ant-pagination-item-link,
+                   .ant-pagination-white .ant-pagination-next .ant-pagination-item-link {
+                     color: #fff;
+                     background: rgba(255,255,255,0.1);
+                     border: none;
+                   }
+                  `}</style>
+              </>
             ) : (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -642,11 +674,10 @@ const Products = () => {
             )}
 
             {/* Results Info */}
-            {!isLoading && filteredProducts.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-gray-800 text-center">
+            {!isLoading && products.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-gray-800 text-center">
                 <p className="text-gray-500">
-                  Showing {filteredProducts.length} of {products.length}{" "}
-                  products
+                  Showing {products.length} of {totalProducts} products
                 </p>
               </div>
             )}

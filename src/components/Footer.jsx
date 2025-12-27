@@ -153,10 +153,20 @@ const Footer = () => {
                 Global Presence
               </span>
               <div className="flex gap-4">
-                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+                {[
+                  { Icon: Facebook, url: "#" },
+                  { Icon: Twitter, url: "#" },
+                  {
+                    Icon: Instagram,
+                    url: "https://www.instagram.com/nashiecom_tecnologies_store?igsh=Nnd2a2owd2FuZndh",
+                  },
+                  { Icon: Linkedin, url: "#" },
+                ].map(({ Icon, url }, i) => (
                   <a
                     key={i}
-                    href="#"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-500/30 transition-all duration-300 group"
                   >
                     <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -255,7 +265,7 @@ const Footer = () => {
                 HQ Distribution
               </p>
               <p className="text-sm font-bold text-white">
-                NewPioneer Mall, Kampala
+                New Pioneer Mall shop PH-38
               </p>
             </div>
           </div>
@@ -267,7 +277,7 @@ const Footer = () => {
               <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
                 Direct Line
               </p>
-              <p className="text-sm font-bold text-white">+256 700 000000</p>
+              <p className="text-sm font-bold text-white">+256 786 400 713</p>
             </div>
           </div>
           <div className="flex items-center gap-6 group">

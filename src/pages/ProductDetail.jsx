@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
-import { products } from "../data/products";
+import { useProduct } from "../hooks/useProducts";
 import {
   Star,
   Truck,
@@ -13,23 +13,47 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import { formatCurrency } from "../utils/currency";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const product = products.find((p) => p.id === parseInt(id));
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
 
-  if (!product) {
+  const { data: productData, isLoading: loading, isError } = useProduct(id);
+  const product = productData?.data?.product;
+  const error = isError ? "Product not found or failed to load." : null;
+
+  if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center text-white">
-        Product not found
+      <div className="min-h-screen grid place-items-center bg-[#0a0a0f] text-white">
+        <Spin size="large" />
       </div>
     );
   }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-[#0a0a0f] text-white">
+        {error || "Product not found"}
+      </div>
+    );
+  }
+
+  // Handle images - if product has images array use it, else fallback to single image repeated or formatted
+  // The API response might normalize this, but let's assume standard object
+  const images =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => (typeof img === "object" ? img.url : img))
+      : [product.image];
+  // Ensure we have 4 images for the grid if possible, or repeat
+  const displayImages =
+    images.length >= 4
+      ? images.slice(0, 4)
+      : [...images, ...Array(4 - images.length).fill(images[0])];
+  const mainImage = images[activeImage] || product.image;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pb-12">
@@ -43,7 +67,7 @@ const ProductDetail = () => {
               className="aspect-[4/3] rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#12121a] relative group shadow-2xl"
             >
               <img
-                src={product.image}
+                src={mainImage}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
@@ -51,25 +75,23 @@ const ProductDetail = () => {
             </motion.div>
 
             <div className="grid grid-cols-4 gap-4">
-              {[product.image, product.image, product.image, product.image].map(
-                (img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImage(idx)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                      activeImage === idx
-                        ? "border-cyan-500"
-                        : "border-white/10 hover:border-white/30"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                )
-              )}
+              {displayImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(idx)}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
+                    activeImage === idx
+                      ? "border-cyan-500"
+                      : "border-white/10 hover:border-white/30"
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           </div>
 
@@ -82,11 +104,11 @@ const ProductDetail = () => {
                 className="flex items-center gap-2 mb-4"
               >
                 <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-full text-sm font-medium border border-cyan-500/20">
-                  {product.category}
+                  {product.category?.name || product.category || "Product"}
                 </span>
-                {product.inStock ? (
+                {product.stock > 0 ? (
                   <span className="flex items-center gap-1 text-green-400 text-sm font-medium">
-                    <Check className="w-4 h-4" /> In Stock
+                    <Check className="w-4 h-4" /> In Stock ({product.stock})
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-red-400 text-sm font-medium">
@@ -105,14 +127,16 @@ const ProductDetail = () => {
                     <Star
                       key={i}
                       className={`w-5 h-5 ${
-                        i < Math.floor(product.rating)
+                        i < Math.floor(product.rating || 5)
                           ? "fill-current"
                           : "text-gray-600"
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-gray-400">{product.reviews} reviews</span>
+                <span className="text-gray-400">
+                  {product.reviews?.length || 0} reviews
+                </span>
               </div>
 
               <div className="flex items-end gap-4 mb-8">
@@ -134,27 +158,46 @@ const ProductDetail = () => {
             <div className="h-px bg-white/10" />
 
             {/* Specs */}
-            <div className="py-2">
-              <h3 className="font-semibold text-white mb-6 text-lg">
-                Technical Specifications
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {product.specs &&
-                  Object.entries(product.specs).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="bg-[#12121a] rounded-[2rem] p-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 shadow-lg"
-                    >
-                      <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
-                        {key}
-                      </span>
-                      <span className="block text-white font-bold text-lg">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
+            {product.specs && (
+              <div className="py-2">
+                <h3 className="font-semibold text-white mb-6 text-lg">
+                  Technical Specifications
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {Array.isArray(product.specs)
+                    ? product.specs.map((spec, index) => (
+                        <div
+                          key={spec.id || index}
+                          className="bg-[#12121a] rounded-[2rem] p-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 shadow-lg"
+                        >
+                          <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                            {spec.name}
+                          </span>
+                          <span className="block text-white font-bold text-lg">
+                            {spec.value}
+                          </span>
+                        </div>
+                      ))
+                    : typeof product.specs === "object"
+                    ? Object.entries(product.specs).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="bg-[#12121a] rounded-[2rem] p-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 shadow-lg"
+                        >
+                          <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                            {key}
+                          </span>
+                          <span className="block text-white font-bold text-lg">
+                            {typeof value === "object"
+                              ? JSON.stringify(value)
+                              : value}
+                          </span>
+                        </div>
+                      ))
+                    : null}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-6 pt-4">
@@ -169,7 +212,9 @@ const ProductDetail = () => {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity((q) => q + 1)}
+                  onClick={() =>
+                    setQuantity((q) => Math.min(q + 1, product.stock || 100))
+                  }
                   className="p-4 text-gray-400 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
                 >
                   <Plus className="w-5 h-5" />
@@ -183,10 +228,13 @@ const ProductDetail = () => {
                     `Added ${quantity} x ${product.name} to cart`
                   );
                 }}
-                className="btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl"
+                disabled={product.stock === 0}
+                className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${
+                  product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <ShoppingCart className="w-6 h-6 mr-2" />
-                Add to Cart
+                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </button>
             </div>
 

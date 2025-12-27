@@ -31,7 +31,7 @@ const Contact = () => {
     {
       icon: <Phone className="w-5 h-5" />,
       title: "Phone Support",
-      details: ["+1 (555) 123-4567", "Mon-Fri from 9am to 6pm PST"],
+      details: ["+256 786 400 713", "Mon-Sat from 8am to 8pm"],
       color: "text-purple-400",
       bgColor: "bg-purple-500/10",
       borderColor: "border-purple-500/20",
@@ -39,7 +39,7 @@ const Contact = () => {
     {
       icon: <MapPin className="w-5 h-5" />,
       title: "Our Location",
-      details: ["New Pioneer Mall near Mapeera House", "Kampala, Uganda"],
+      details: ["New Pioneer Mall shop PH-38", "Kampala, Uganda"],
       color: "text-blue-400",
       bgColor: "bg-blue-500/10",
       borderColor: "border-blue-500/20",
@@ -102,24 +102,26 @@ const Contact = () => {
 
             {/* Features Strip */}
             <div className="w-full max-w-4xl">
-            <Space direction="vertical" size={16} className="w-full">
-              <Row gutter={[35, 35]} justify="center">
-                {supportFeatures.map((feature, index) => (
-                  <Col xs={16} sm={12} key={index}>
-                    <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
-                      <div className="flex flex-col items-center text-center">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 flex items-center justify-center mb-3">
-                          <div className="text-cyan-400">{feature.icon}</div>
+              <Space direction="vertical" size={16} className="w-full">
+                <Row gutter={[35, 35]} justify="center">
+                  {supportFeatures.map((feature, index) => (
+                    <Col xs={16} sm={12} key={index}>
+                      <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                        <div className="flex flex-col items-center text-center">
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 flex items-center justify-center mb-3">
+                            <div className="text-cyan-400">{feature.icon}</div>
+                          </div>
+                          <h4 className="text-white font-semibold text-sm mb-1">
+                            {feature.title}
+                          </h4>
+                          <p className="text-gray-400 text-xs">
+                            {feature.desc}
+                          </p>
                         </div>
-                        <h4 className="text-white font-semibold text-sm mb-1">
-                          {feature.title}
-                        </h4>
-                        <p className="text-gray-400 text-xs">{feature.desc}</p>
                       </div>
-                    </div>
-                  </Col>
-                ))}
-              </Row>
+                    </Col>
+                  ))}
+                </Row>
               </Space>
             </div>
           </Space>

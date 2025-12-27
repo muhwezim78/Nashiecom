@@ -1,0 +1,408 @@
+// Product data for Nashiecom Technologies
+export const products = [
+  // Laptops
+  {
+    id: 1,
+    name: "ASUS ROG Strix G16",
+    category: "Laptops",
+    subcategory: "Gaming",
+    price: 1899000.99,
+    originalPrice: 2199000.99,
+    rating: 4.8,
+    reviews: 245,
+    images: [
+      "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800",
+      "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800",
+      "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800",
+    ],
+    inStock: true,
+    featured: true,
+  },
+  {
+    id: 2,
+    name: 'MacBook Pro 16"',
+    category: "Laptops",
+    subcategory: "Professional",
+    price: 2499000.99,
+    originalPrice: 2699000.99,
+    rating: 4.9,
+    reviews: 512,
+    images: [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
+      "https://images.unsplash.com/photo-1611186871348-b1ec696e523f?w=800",
+      "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800",
+    ],
+    inStock: true,
+    featured: true,
+  },
+  {
+    id: 3,
+    name: "Dell XPS 15",
+    category: "Laptops",
+    subcategory: "Ultrabook",
+    price: 1599000.99,
+    originalPrice: 1799000.99,
+    rating: 4.7,
+    reviews: 389,
+    image: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500",
+    description: "Premium ultrabook with OLED display, Intel Core i7, 32GB RAM",
+    specs: {
+      processor: "Intel Core i7-13700H",
+      graphics: "NVIDIA RTX 4060 6GB",
+      ram: "32GB DDR5",
+      storage: "1TB NVMe SSD",
+      display: '15.6" 3.5K OLED',
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 4,
+    name: "Lenovo ThinkPad X1 Carbon",
+    category: "Laptops",
+    subcategory: "Business",
+    price: 1449000.99,
+    originalPrice: 1649000.99,
+    rating: 4.6,
+    reviews: 278,
+    image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500",
+    description:
+      'Ultra-light business laptop with Intel vPro, 14" 2.8K display',
+    specs: {
+      processor: "Intel Core i7-1365U vPro",
+      graphics: "Intel Iris Xe",
+      ram: "16GB LPDDR5",
+      storage: "512GB SSD",
+      display: '14" 2.8K OLED',
+    },
+    inStock: true,
+    featured: false,
+  },
+  // Desktop Computers
+  {
+    id: 5,
+    name: "Nashiecom Titan Pro",
+    category: "Desktops",
+    subcategory: "Gaming",
+    price: 2999000.99,
+    originalPrice: 3299000.99,
+    rating: 4.9,
+    reviews: 156,
+    images: [
+      "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800",
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800",
+      "https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?w=800",
+    ],
+    inStock: true,
+    featured: true,
+  },
+  {
+    id: 6,
+    name: "Nashiecom Workstation X",
+    category: "Desktops",
+    subcategory: "Workstation",
+    price: 3499000.99,
+    originalPrice: 3899000.99,
+    rating: 4.8,
+    reviews: 89,
+    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500",
+    description: "Professional workstation for 3D rendering and video editing",
+    specs: {
+      processor: "AMD Ryzen 9 7950X",
+      graphics: "NVIDIA RTX 4090 24GB",
+      ram: "128GB DDR5",
+      storage: "4TB NVMe SSD",
+      cooling: "360mm AIO Liquid",
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 7,
+    name: "Nashiecom Office Plus",
+    category: "Desktops",
+    subcategory: "Office",
+    price: 799000.99,
+    originalPrice: 899000.99,
+    rating: 4.5,
+    reviews: 234,
+    image: "https://images.unsplash.com/photo-1625842268584-8f3296236761?w=500",
+    description: "Reliable office desktop for everyday productivity",
+    specs: {
+      processor: "Intel Core i5-13400",
+      graphics: "Intel UHD 730",
+      ram: "16GB DDR4",
+      storage: "512GB SSD",
+      wifi: "Wi-Fi 6",
+    },
+    inStock: true,
+    featured: false,
+  },
+  // Monitors
+  {
+    id: 8,
+    name: 'LG UltraGear 27" 4K',
+    category: "Monitors",
+    subcategory: "Gaming",
+    price: 699000.99,
+    originalPrice: 799000.99,
+    rating: 4.7,
+    reviews: 423,
+    images: [
+      "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+      "https://images.unsplash.com/photo-1547119957-637f8679db1e?w=800",
+      "https://images.unsplash.com/photo-1551645120-d70bfe84c826?w=800",
+    ],
+    inStock: true,
+    featured: true,
+  },
+  {
+    id: 9,
+    name: "Samsung Odyssey G9",
+    category: "Monitors",
+    subcategory: "Ultrawide",
+    price: 1299000.99,
+    originalPrice: 1499000.99,
+    rating: 4.8,
+    reviews: 189,
+    image: "https://images.unsplash.com/photo-1616763355548-1b606f439f86?w=500",
+    description: '49" Super Ultrawide curved gaming monitor',
+    specs: {
+      size: "49 inches",
+      resolution: "5120 x 1440",
+      refreshRate: "240Hz",
+      panelType: "VA Curved",
+      responseTime: "1ms",
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 10,
+    name: 'Dell UltraSharp 32" 4K',
+    category: "Monitors",
+    subcategory: "Professional",
+    price: 899000.99,
+    originalPrice: 999000.99,
+    rating: 4.9,
+    reviews: 312,
+    image: "https://images.unsplash.com/photo-1551645120-d70bfe84c826?w=500",
+    description: '32" 4K USB-C Hub monitor for professionals',
+    specs: {
+      size: "32 inches",
+      resolution: "3840 x 2160",
+      colorAccuracy: "100% sRGB, 98% DCI-P3",
+      panelType: "IPS Black",
+      connectivity: "USB-C 90W",
+    },
+    inStock: true,
+    featured: false,
+  },
+  // Keyboards
+  {
+    id: 11,
+    name: "Logitech G Pro X",
+    category: "Accessories",
+    subcategory: "Keyboards",
+    price: 149000.99,
+    originalPrice: 179000.99,
+    rating: 4.7,
+    reviews: 567,
+    image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=500",
+    description:
+      "Pro-grade TKL mechanical keyboard with hot-swappable switches",
+    specs: {
+      type: "Mechanical TKL",
+      switches: "GX Red (Hot-Swap)",
+      lighting: "LIGHTSYNC RGB",
+      connection: "USB-C Detachable",
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 12,
+    name: "Keychron Q1 Pro",
+    category: "Accessories",
+    subcategory: "Keyboards",
+    price: 199000.99,
+    originalPrice: 229000.99,
+    rating: 4.8,
+    reviews: 234,
+    image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500",
+    description: "Premium wireless mechanical keyboard with QMK/VIA support",
+    specs: {
+      type: "75% Mechanical",
+      switches: "Gateron G Pro",
+      lighting: "South-facing RGB",
+      connection: "Bluetooth 5.1 / USB-C",
+    },
+    inStock: true,
+    featured: true,
+  },
+  // Mice
+  {
+    id: 13,
+    name: "Logitech G Pro X Superlight 2",
+    category: "Accessories",
+    subcategory: "Mice",
+    price: 159000.99,
+    originalPrice: 179000.99,
+    rating: 4.9,
+    reviews: 789,
+    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500",
+    description: "Ultra-lightweight wireless gaming mouse (60g)",
+    specs: {
+      sensor: "HERO 2",
+      dpi: "32,000 DPI",
+      weight: "60g",
+      battery: "95 hours",
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 14,
+    name: "Razer DeathAdder V3 Pro",
+    category: "Accessories",
+    subcategory: "Mice",
+    price: 149000.99,
+    originalPrice: 169000.99,
+    rating: 4.8,
+    reviews: 456,
+    image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500",
+    description: "Ergonomic wireless gaming mouse with Focus Pro 30K sensor",
+    specs: {
+      sensor: "Focus Pro 30K",
+      dpi: "30,000 DPI",
+      weight: "64g",
+      battery: "90 hours",
+    },
+    inStock: true,
+    featured: false,
+  },
+  // Headsets
+  {
+    id: 15,
+    name: "SteelSeries Arctis Nova Pro",
+    category: "Accessories",
+    subcategory: "Headsets",
+    price: 349000.99,
+    originalPrice: 399000.99,
+    rating: 4.8,
+    reviews: 345,
+    image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500",
+    description: "Premium wireless gaming headset with ANC",
+    specs: {
+      drivers: "40mm Neodymium",
+      anc: "4-mic Hybrid ANC",
+      battery: "22 hours",
+      connection: "2.4GHz / Bluetooth",
+    },
+    inStock: true,
+    featured: true,
+  },
+  // Laptop Bags
+  {
+    id: 16,
+    name: "Peak Design Everyday Backpack",
+    category: "Accessories",
+    subcategory: "Bags",
+    price: 289000.99,
+    originalPrice: 299000.99,
+    rating: 4.9,
+    reviews: 678,
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",
+    description: "Premium laptop backpack with weatherproof design",
+    specs: {
+      capacity: "30L",
+      laptopSize: 'Up to 16"',
+      material: "Recycled Nylon",
+      waterproof: "DWR Coating",
+    },
+    inStock: true,
+    featured: false,
+  },
+  // Cables & Adapters
+  {
+    id: 17,
+    name: "Anker USB-C Hub 8-in-1",
+    category: "Accessories",
+    subcategory: "Adapters",
+    price: 69000.99,
+    originalPrice: 79000.99,
+    rating: 4.6,
+    reviews: 1234,
+    image: "https://images.unsplash.com/photo-1625723044792-44de16ccb4e9?w=500",
+    description: "8-in-1 USB-C hub with 4K HDMI and 100W Power Delivery",
+    specs: {
+      ports: "8 Ports",
+      hdmi: "4K@60Hz",
+      powerDelivery: "100W",
+      cardReader: "SD/microSD",
+    },
+    inStock: true,
+    featured: false,
+  },
+  {
+    id: 18,
+    name: "Belkin Thunderbolt 4 Dock",
+    category: "Accessories",
+    subcategory: "Docks",
+    price: 349000.99,
+    originalPrice: 399000.99,
+    rating: 4.7,
+    reviews: 189,
+    image: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=500",
+    description: "Professional Thunderbolt 4 docking station",
+    specs: {
+      ports: "12 Ports",
+      displays: "Dual 4K@60Hz",
+      charging: "90W Laptop Charging",
+      speed: "40Gbps",
+    },
+    inStock: true,
+    featured: false,
+  },
+];
+
+export const categories = [
+  { id: "all", name: "All Products", icon: "🛍️" },
+  { id: "laptops", name: "Laptops", icon: "💻" },
+  { id: "desktops", name: "Desktop PCs", icon: "🖥️" },
+  { id: "monitors", name: "Monitors", icon: "📺" },
+  { id: "accessories", name: "Accessories", icon: "🎧" },
+  { id: "gaming", name: "Gaming Gear", icon: "🎮" },
+];
+
+export const subcategories = {
+  Laptops: ["Gaming", "Professional", "Ultrabook", "Business"],
+  Desktops: ["Gaming", "Workstation", "Office"],
+  Monitors: ["Gaming", "Ultrawide", "Professional"],
+  Accessories: ["Keyboards", "Mice", "Headsets", "Bags", "Adapters", "Docks"],
+};
+
+export const getFeaturedProducts = () => products.filter((p) => p.featured);
+
+export const getProductsByCategory = (categoryId) => {
+  if (categoryId === "all") return products;
+  const lowerCategory = categoryId.toLowerCase();
+  return products.filter(
+    (p) =>
+      p.category.toLowerCase() === lowerCategory ||
+      p.subcategory?.toLowerCase() === lowerCategory
+  );
+};
+
+export const getProductById = (id) =>
+  products.find((p) => p.id === parseInt(id));
+
+export const searchProducts = (query) => {
+  const lowerQuery = query.toLowerCase();
+  return products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(lowerQuery) ||
+      p.description?.toLowerCase().includes(lowerQuery) ||
+      p.category.toLowerCase().includes(lowerQuery)
+  );
+};

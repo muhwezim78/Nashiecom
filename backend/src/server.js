@@ -74,6 +74,9 @@ app.use(
   })
 );
 
+// Static Files (for uploaded images)
+app.use("/api/uploads", express.static(path.join(__dirname, "../uploads")));
+
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
@@ -103,9 +106,6 @@ if (process.env.NODE_ENV === "development") {
     })
   );
 }
-
-// Static Files (for uploaded images)
-app.use("/api/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Health Check Endpoint
 app.get("/api/health", async (req, res) => {

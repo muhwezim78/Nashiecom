@@ -1,10 +1,8 @@
-FROM node:18-alpine
+FROM node:18-bullseye-slim
 
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN apk add --no-cache openssl
 
 RUN npm install
 

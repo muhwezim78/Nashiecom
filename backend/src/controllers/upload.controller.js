@@ -13,7 +13,8 @@ exports.uploadImage = async (req, res, next) => {
     }
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const imageUrl = `${baseUrl}/api/uploads/${req.file.filename}`;
+    const apiPath = process.env.API_PUBLIC_PATH || "/api/uploads";
+    const imageUrl = `${baseUrl}${apiPath}/${req.file.filename}`;
 
     res.status(200).json({
       success: true,
@@ -38,11 +39,11 @@ exports.uploadMultipleImages = async (req, res, next) => {
       return next(new AppError("No files uploaded", 400));
     }
 
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const apiPath = process.env.API_PUBLIC_PATH || "/api/uploads";
 
     const images = req.files.map((file) => ({
       filename: file.filename,
-      url: `${baseUrl}/api/uploads/${file.filename}`,
+      url: `${baseUrl}${apiPath}/${file.filename}`,
       size: file.size,
       mimetype: file.mimetype,
     }));

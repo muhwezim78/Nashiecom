@@ -2,6 +2,7 @@
 const prisma = require("../config/database");
 const { AppError } = require("../middleware/errorHandler");
 const slugify = require("slugify");
+const { invalidateProductCache } = require("../utils/cache");
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -448,6 +449,9 @@ exports.createProduct = async (req, res, next) => {
       success: true,
       data: { product: completeProduct },
     });
+
+    // Invalidate cache after successful creation
+    invalidateProductCache();
   } catch (error) {
     next(error);
   }
@@ -478,6 +482,7 @@ exports.updateProduct = async (req, res, next) => {
       metaTitle,
       metaDescription,
       specs,
+      images,
     } = req.body;
 
     // Check if product exists
@@ -548,10 +553,41 @@ exports.updateProduct = async (req, res, next) => {
       });
     }
 
+    // Update images if provided
+    if (images && Array.isArray(images)) {
+      // Delete existing images
+      await prisma.productImage.deleteMany({ where: { productId: id } });
+      // Create new images
+      if (images.length > 0) {
+        await prisma.productImage.createMany({
+          data: images.map((img, index) => ({
+            productId: id,
+            url: img.url,
+            alt: img.alt || name || existing.name,
+            isPrimary: img.isPrimary || index === 0,
+            sortOrder: index,
+          })),
+        });
+      }
+    }
+
+    // Fetch updated product with all relations
+    const updatedProduct = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: { select: { id: true, name: true } },
+        images: { orderBy: { sortOrder: "asc" } },
+        specs: { orderBy: { sortOrder: "asc" } },
+      },
+    });
+
     res.status(200).json({
       success: true,
-      data: { product },
+      data: { product: updatedProduct },
     });
+
+    // Invalidate cache after successful update
+    invalidateProductCache();
   } catch (error) {
     next(error);
   }
@@ -570,6 +606,9 @@ exports.deleteProduct = async (req, res, next) => {
       success: true,
       message: "Product deleted successfully",
     });
+
+    // Invalidate cache after successful deletion
+    invalidateProductCache();
   } catch (error) {
     next(error);
   }
@@ -596,6 +635,9 @@ exports.toggleFeatured = async (req, res, next) => {
       success: true,
       data: { product: updated },
     });
+
+    // Invalidate cache after toggling featured
+    invalidateProductCache();
   } catch (error) {
     next(error);
   }
@@ -622,6 +664,9 @@ exports.toggleStatus = async (req, res, next) => {
       success: true,
       data: { product: updated },
     });
+
+    // Invalidate cache after toggling status
+    invalidateProductCache();
   } catch (error) {
     next(error);
   }

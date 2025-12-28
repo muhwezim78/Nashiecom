@@ -414,7 +414,7 @@ export const couponsAPI = {
 
 // ============== CONTACT API ==============
 export const contactAPI = {
-  send: async (messageData) => {
+  create: async (messageData) => {
     return apiFetch("/contact", {
       method: "POST",
       body: JSON.stringify(messageData),
@@ -638,6 +638,63 @@ export const chatAPI = {
   },
 };
 
+// ============== NOTIFICATIONS API ==============
+export const notificationsAPI = {
+  // User endpoints
+  getAll: async (params = {}) => {
+    const searchParams = new URLSearchParams(params);
+    return apiFetch(`/notifications?${searchParams.toString()}`);
+  },
+
+  getUnreadCount: async () => {
+    return apiFetch("/notifications/unread-count");
+  },
+
+  markAsRead: async (id) => {
+    return apiFetch(`/notifications/${id}/read`, {
+      method: "PATCH",
+    });
+  },
+
+  markAllAsRead: async () => {
+    return apiFetch("/notifications/read-all", {
+      method: "PATCH",
+    });
+  },
+
+  // Admin endpoints
+  getAllAdmin: async (params = {}) => {
+    const searchParams = new URLSearchParams(params);
+    return apiFetch(`/notifications/admin?${searchParams.toString()}`);
+  },
+
+  create: async (notificationData) => {
+    return apiFetch("/notifications", {
+      method: "POST",
+      body: JSON.stringify(notificationData),
+    });
+  },
+
+  update: async (id, notificationData) => {
+    return apiFetch(`/notifications/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(notificationData),
+    });
+  },
+
+  delete: async (id) => {
+    return apiFetch(`/notifications/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  sendNow: async (id) => {
+    return apiFetch(`/notifications/${id}/send`, {
+      method: "POST",
+    });
+  },
+};
+
 // ============== COMMON/SEARCH API ==============
 export const commonAPI = {
   globalSearch: async (q, limit = 5) => {
@@ -661,4 +718,5 @@ export default {
   upload: uploadAPI,
   search: commonAPI,
   chat: chatAPI,
+  notifications: notificationsAPI,
 };

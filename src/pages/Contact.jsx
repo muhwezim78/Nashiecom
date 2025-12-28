@@ -8,15 +8,30 @@ import {
   Clock,
   Shield,
 } from "lucide-react";
-import { Input, Button, Select, Form, Card, Row, Col } from "antd"; // Removed Space
+import { useState } from "react";
+import { Input, Button, Select, Form, Card, Row, Col, message } from "antd"; // Removed Space
+import api from "../services/api";
 const { TextArea } = Input;
 
 const Contact = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log("Form values:", values);
-    // Handle form submission
+  const [loading, setLoading] = useState(false);
+
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      await api.contact.create(values);
+      message.success(
+        "Message sent successfully! We will get back to you soon."
+      );
+      form.resetFields();
+    } catch (error) {
+      console.error("Contact Error:", error);
+      message.error(error.message || "Failed to send message");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactInfo = [
@@ -245,11 +260,11 @@ const Contact = () => {
                       </Row>
 
                       <Form.Item
-                        name="subject"
+                        name="inquiryType"
                         rules={[
                           {
                             required: true,
-                            message: "Please select a subject",
+                            message: "Please select an inquiry type",
                           },
                         ]}
                       >
@@ -264,6 +279,22 @@ const Contact = () => {
                             { value: "returns", label: "Returns/Warranty" },
                             { value: "technical", label: "Technical Support" },
                           ]}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="subject"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter a subject",
+                          },
+                        ]}
+                      >
+                        <Input
+                          size="large"
+                          placeholder="Subject"
+                          className="bg-white/5 border border-white/10 text-white placeholder-gray-500 hover:border-cyan-500/30 focus:border-cyan-500"
                         />
                       </Form.Item>
 
@@ -288,6 +319,7 @@ const Contact = () => {
                           type="primary"
                           htmlType="submit"
                           size="large"
+                          loading={loading}
                           icon={<Send className="w-4 h-4" />}
                           className="w-full h-12 bg-gradient-to-r from-cyan-600 to-blue-600 border-none hover:from-cyan-500 hover:to-blue-500"
                         >

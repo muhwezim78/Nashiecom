@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import MyOrders from "./pages/MyOrders";
+import Notifications from "./pages/Notifications";
 
 // Admin Pages
 import AdminLayout from "./admin/layouts/AdminLayout";
@@ -38,6 +39,7 @@ import CouponsPage from "./admin/pages/CouponsPage";
 import MessagesPage from "./admin/pages/MessagesPage";
 import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
+import NotificationsPage from "./admin/pages/NotificationsPage";
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -148,6 +150,16 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/notifications"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerLayout>
+                          <Notifications />
+                        </CustomerLayout>
+                      </ProtectedRoute>
+                    }
+                  />
 
                   {/* Auth Routes */}
                   <Route path="/login" element={<Login />} />
@@ -167,6 +179,10 @@ function App() {
                     <Route path="messages" element={<MessagesPage />} />
                     <Route path="analytics" element={<AnalyticsPage />} />
                     <Route path="settings" element={<SettingsPage />} />
+                    <Route
+                      path="notifications"
+                      element={<NotificationsPage />}
+                    />
                   </Route>
                 </Routes>
               </NotificationProvider>

@@ -33,6 +33,7 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const uploadRoutes = require("./routes/upload.routes");
 const searchRoutes = require("./routes/search.routes");
 const chatRoutes = require("./routes/chat.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 // Initialize Express App
 const app = express();
@@ -140,6 +141,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // API Documentation Route
 app.get("/api", (req, res) => {

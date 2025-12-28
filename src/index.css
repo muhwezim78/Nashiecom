@@ -153,11 +153,11 @@ img {
 }
 
 .section {
-  padding: var(--space-3xl) 0;
+  padding: 5rem 0;
 }
 
 .section-lg {
-  padding: 10rem 0;
+  padding: 8rem 0;
 }
 
 .section-title {

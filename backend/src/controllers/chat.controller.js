@@ -117,22 +117,51 @@ exports.sendMessage = async (req, res, next) => {
 
     // --- Notification Logic ---
     const io = req.app.get("io");
-    if (io) {
-      // 1. Notify the "Order Chat" room (updates the chat window itself)
-      // Note: Client also emits this, but server emission is safer/single source of truth.
-      // We can rely on the existing client-side emit or just do it here.
-      // Doing it here covers HTTP-only clients too.
-      // But currently our frontend listens to "receive_message" from server (via server.js handler).
-      // So we don't need to double-emit "receive_message" if the socket handler does it.
-      // WAIT: The socket handler in server.js listens for "send_message" from CLIENT and broadcasts.
-      // If we use the HTTP endpoint, the socket handler isn't involved yet.
-      // So yes, we SHOULD emit "receive_message" here if we want to support pure HTTP sending later.
-      // But right now, the frontend calls API *AND* emits socket. That's a race condition risk (double messages).
-      // BEST PRACTICE: Frontend calls API -> API emits socket -> Frontend receives socket.
-      // Frontend should NOT add message to state optimistically AND listen to socket without ID checks.
-      // My frontend ChatWindow handles duplicate IDs, so it's safe.
 
-      // 2. Send Bell Notification to the Recipient
+    // Create persistent notification in database
+    const notificationTitle = isAdmin
+      ? `Reply on Order #${order.orderNumber}`
+      : `New message on Order #${order.orderNumber}`;
+    const notificationMessage = content || "Sent an image";
+
+    try {
+      if (isAdmin) {
+        // Admin sent message -> Create notification for customer
+        await prisma.notification.create({
+          data: {
+            title: notificationTitle,
+            message: `${req.user.firstName}: ${notificationMessage}`,
+            type: "INFO",
+            isGlobal: false,
+            userId: order.userId,
+            orderId: order.id,
+            sentAt: new Date(),
+            createdBy: req.user.id,
+          },
+        });
+      } else {
+        // Customer sent message -> Create notification for admins (global admin notification)
+        await prisma.notification.create({
+          data: {
+            title: notificationTitle,
+            message: `${req.user.firstName}: ${notificationMessage}`,
+            type: "INFO",
+            isGlobal: true, // Targeted at ALL admins.
+            productId: "ADMIN_ONLY", // Target only admins
+            // SAFETY: Regular users won't see this because getUserNotifications filters out
+            // global notifications that have an orderId (unless it's their own).
+            orderId: order.id,
+            sentAt: new Date(),
+            createdBy: req.user.id,
+          },
+        });
+      }
+    } catch (notifError) {
+      console.error("Failed to create chat notification:", notifError);
+      // Don't fail the request if notification creation fails
+    }
+
+    if (io) {
       const notificationData = {
         orderId,
         orderNumber: order.orderNumber,
@@ -146,12 +175,22 @@ exports.sendMessage = async (req, res, next) => {
           "new_message_notification",
           notificationData
         );
+        io.to(`user_${order.userId}`).emit("new_notification", {
+          title: notificationTitle,
+          message: `${req.user.firstName}: ${notificationMessage}`,
+          type: "INFO",
+        });
       } else {
         // Client sent message -> Notify Admins
         io.to("admin_notifications").emit(
           "new_message_notification",
           notificationData
         );
+        io.to("admin_notifications").emit("new_notification", {
+          title: notificationTitle,
+          message: `${req.user.firstName}: ${notificationMessage}`,
+          type: "INFO",
+        });
       }
     }
   } catch (error) {

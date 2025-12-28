@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Space } from "antd"
+import { Space } from "antd";
 import {
   Float,
   Environment,
@@ -121,15 +121,15 @@ const HeroSection = () => {
       </div>
 
       {/* Content Overlay */}
-      <div className="relative z-10 w-full">
-        <Space direction="vertical" size={80} align="center" className="w-full">
+      <div className="relative z-10 w-full container mx-auto px-4">
+        <Space direction="vertical" size={80} align="start" className="w-full">
           {/* Main Content */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-start">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="max-w-3xl text-center"
+              className="max-w-3xl text-left"
             >
               <span className="inline-block px-4 py-2 rounded-full bg-white/5 border border-cyan-500/30 text-cyan-400 font-medium text-sm mb-6 backdrop-blur-sm tracking-wide">
                 Next-Gen Tech is Here
@@ -144,7 +144,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl text-center"
+              className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl text-left"
             >
               Discover state-of-the-art laptops, powerful desktops, and premium
               accessories designed for professionals and gamers who demand the
@@ -155,7 +155,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap justify-center gap-6 pt-8"
+              className="flex flex-wrap justify-start gap-6 pt-8"
             >
               <Link
                 to="/products"
@@ -178,10 +178,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="w-fit"
+            className="w-full"
           >
             <div className="bg-gradient-to-r from-cyan-500/10 via-transparent to-cyan-500/10 backdrop-blur-lg border border-white/10 rounded-2xl py-8 px-6">
-              <div className="flex flex-wrap justify-center md:justify-between items-center gap-8 md:gap-12">
+              <div className="flex flex-wrap justify-start md:justify-between items-center gap-8 md:gap-12">
                 <FeatureItem
                   icon={Zap}
                   title="Fast Delivery"

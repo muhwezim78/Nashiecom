@@ -24,6 +24,33 @@ exports.createMessage = async (req, res, next) => {
 
     logger.info(`New contact message from: ${email}`);
 
+    // Create notification for admins
+    try {
+      await prisma.notification.create({
+        data: {
+          title: `New Inquiry: ${subject}`,
+          message: `${name} (${email}): ${message.substring(0, 50)}...`,
+          type: "INFO",
+          isGlobal: true, // Visible to all admins
+          productId: "ADMIN_ONLY", // Target only admins
+          scheduledAt: null,
+          createdBy: req.user?.id || null,
+        },
+      });
+
+      // Emit socket event to admins
+      const io = req.app.get("io");
+      if (io) {
+        io.to("admin_notifications").emit("new_notification", {
+          title: `New Inquiry: ${subject}`,
+          message: `${name} (${email}): ${message.substring(0, 50)}...`,
+          type: "INFO",
+        });
+      }
+    } catch (notifError) {
+      console.error("Failed to create contact notification:", notifError);
+    }
+
     // TODO: Send email notification to admin
     // await sendNotificationEmail(contactMessage);
 

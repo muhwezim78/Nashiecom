@@ -430,32 +430,37 @@ const Home = () => {
                         </p>
                       </div>
 
-                      <div className="space-y-4 bg-white/5 p-6 rounded-3xl backdrop-blur-md border border-white/5">
-                        <div className="flex justify-between items-center pb-4 border-b border-white/10 uppercase tracking-widest text-[10px] font-black">
-                          <span className="text-gray-500">
-                            Tier 1 Essentials
-                          </span>
-                          <span className="text-green-400">In Stock</span>
-                        </div>
-                        <div className="flex justify-between items-end">
-                          <div>
-                            <p className="text-xs text-gray-500 font-black uppercase mb-1">
-                              Standard Price
-                            </p>
-                            <p className="text-gray-600 line-through font-bold">
-                              1,850,000
-                            </p>
+                      <Card
+                        className="!bg-white/5 !rounded-2xl backdrop-blur-md !border-white/5 !border"
+                        styles={{ body: { padding: "1.5rem" } }}
+                      >
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center pb-4 border-b border-white/10 uppercase tracking-widest text-[10px] font-black">
+                            <span className="text-gray-500">
+                              Tier 1 Essentials
+                            </span>
+                            <span className="text-green-400">In Stock</span>
                           </div>
-                          <div className="text-right">
-                            <p className="text-xs text-purple-400 font-black uppercase mb-1">
-                              Bundle Value
-                            </p>
-                            <p className="text-4xl font-black text-white">
-                              1.29M
-                            </p>
+                          <div className="flex justify-between items-end">
+                            <div>
+                              <p className="text-xs text-gray-500 font-black uppercase mb-1">
+                                Standard Price
+                              </p>
+                              <p className="text-gray-600 line-through font-bold">
+                                1,850,000
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-purple-400 font-black uppercase mb-1">
+                                Bundle Value
+                              </p>
+                              <p className="text-4xl font-black text-white">
+                                1.29M
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Card>
 
                       <button className="w-full py-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:shadow-[0_0_30px_rgba(147,51,234,0.3)] transition-all transform hover:-translate-y-1">
                         Acquire Bundle

@@ -122,9 +122,9 @@ const Navbar = () => {
               </Badge>
             </Link>
 
-            <button
+            <Link
+              to="/notifications"
               className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-gray-300 hover:text-white group"
-              onClick={clearNotifications}
             >
               <Badge
                 count={unreadCount}
@@ -132,9 +132,9 @@ const Navbar = () => {
                 color="#f5222d"
                 size="small"
               >
-                <Bell className="w-5 h-5 group-hover:swing" />
+                <Bell className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </Badge>
-            </button>
+            </Link>
 
             <Button
               type="text"

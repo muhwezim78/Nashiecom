@@ -22,4 +22,31 @@ cache.on("expired", (key, value) => {
   }
 });
 
+// Helper function to invalidate product-related cache
+const invalidateProductCache = () => {
+  const keys = cache.keys();
+  const productKeys = keys.filter(
+    (key) =>
+      key.includes("/api/products") ||
+      key.includes("/api/search") ||
+      key.includes("/api/categories")
+  );
+  if (productKeys.length > 0) {
+    cache.del(productKeys);
+    logger.info(`Invalidated ${productKeys.length} product cache keys`);
+  }
+};
+
+// Helper function to invalidate category-related cache
+const invalidateCategoryCache = () => {
+  const keys = cache.keys();
+  const categoryKeys = keys.filter((key) => key.includes("/api/categories"));
+  if (categoryKeys.length > 0) {
+    cache.del(categoryKeys);
+    logger.info(`Invalidated ${categoryKeys.length} category cache keys`);
+  }
+};
+
 module.exports = cache;
+module.exports.invalidateProductCache = invalidateProductCache;
+module.exports.invalidateCategoryCache = invalidateCategoryCache;

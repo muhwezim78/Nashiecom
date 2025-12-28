@@ -4,11 +4,12 @@ import React, {
   useEffect,
   useState,
   useRef,
+  useCallback,
 } from "react";
 import { io } from "socket.io-client";
 import { notification, message as antMessage } from "antd";
 import { useAuth } from "./AuthContext";
-// import notificationSound from "../assets/notification.mp3";
+import { notificationsAPI } from "../services/api";
 
 const NotificationContext = createContext();
 
@@ -18,6 +19,7 @@ export const NotificationProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   const [socket, setSocket] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
   const audioRef = useRef(
     new Audio(
       "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
@@ -27,8 +29,33 @@ export const NotificationProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   const SOCKET_URL = API_URL.replace("/api", "");
 
+  // Fetch unread count from API
+  const fetchUnreadCount = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const response = await notificationsAPI.getUnreadCount();
+      setUnreadCount(response.data.unreadCount);
+    } catch (error) {
+      console.error("Failed to fetch unread count:", error);
+    }
+  }, [isAuthenticated]);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const response = await notificationsAPI.getAll({ limit: 10 });
+      setNotifications(response.data.notifications);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (isAuthenticated && user) {
+      fetchUnreadCount();
+      fetchNotifications();
+
       console.log("Initializing Notification Socket...");
       const newSocket = io(SOCKET_URL, {
         withCredentials: true,
@@ -37,28 +64,44 @@ export const NotificationProvider = ({ children }) => {
 
       newSocket.on("connect", () => {
         console.log("Notification Socket Connected:", newSocket.id);
-        // Join a room specific to this user
         newSocket.emit("join_user_notifications", user.id);
 
-        // If Admin, join admin channel
         if (["ADMIN", "SUPER_ADMIN"].includes(user.role)) {
           newSocket.emit("join_admin_notifications");
         }
       });
 
+      // Handle real-time notifications
+      newSocket.on("new_notification", (data) => {
+        playNotificationSound();
+        notification.info({
+          message: data.title,
+          description: data.message,
+          placement: "topRight",
+          duration: 5,
+        });
+        setUnreadCount((prev) => prev + 1);
+        // Add to notifications list
+        setNotifications((prev) => [
+          {
+            id: data.id,
+            title: data.title,
+            message: data.message,
+            type: data.type,
+            isRead: false,
+            createdAt: new Date().toISOString(),
+          },
+          ...prev.slice(0, 9), // Keep only 10
+        ]);
+      });
+
       newSocket.on("new_message_notification", (data) => {
-        // data = { orderId, senderName, content }
         playNotificationSound();
         notification.info({
           message: `New Message from ${data.senderName}`,
           description: data.content || "Sent an image",
           placement: "topRight",
           duration: 4,
-          onClick: () => {
-            // Logic to navigate to chat if needed,
-            // or just let the user know.
-            // Ideally navigate to /my-orders or /admin/messages
-          },
         });
         setUnreadCount((prev) => prev + 1);
       });
@@ -79,7 +122,7 @@ export const NotificationProvider = ({ children }) => {
         newSocket.disconnect();
       };
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, fetchUnreadCount, fetchNotifications]);
 
   const playNotificationSound = () => {
     try {
@@ -96,9 +139,20 @@ export const NotificationProvider = ({ children }) => {
     setUnreadCount(0);
   };
 
+  const refreshNotifications = () => {
+    fetchUnreadCount();
+    fetchNotifications();
+  };
+
   return (
     <NotificationContext.Provider
-      value={{ socket, unreadCount, clearNotifications }}
+      value={{
+        socket,
+        unreadCount,
+        notifications,
+        clearNotifications,
+        refreshNotifications,
+      }}
     >
       {children}
     </NotificationContext.Provider>

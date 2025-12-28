@@ -547,6 +547,51 @@ exports.updateOrderStatus = async (req, res, next) => {
       },
     });
 
+    // Create persistent notification for customer
+    const statusMessages = {
+      CONFIRMED: "Your order has been confirmed",
+      PROCESSING: "Your order is being prepared",
+      SHIPPED: "Your order has been shipped",
+      DELIVERED: "Your order has been delivered",
+      CANCELLED: "Your order has been cancelled",
+      REFUNDED: "Your order has been refunded",
+    };
+
+    const notificationMessage =
+      statusMessages[status] || `Order status updated to ${status}`;
+
+    try {
+      await prisma.notification.create({
+        data: {
+          title: `Order #${order.orderNumber} Update`,
+          message: notificationMessage,
+          type: "ORDER_UPDATE",
+          isGlobal: false,
+          userId: order.userId,
+          orderId: order.id,
+          sentAt: new Date(),
+          createdBy: req.user.id,
+        },
+      });
+    } catch (notifError) {
+      console.error("Failed to create order status notification:", notifError);
+    }
+
+    // Emit real-time notification
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`user_${order.userId}`).emit("order_status_update", {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        status,
+      });
+      io.to(`user_${order.userId}`).emit("new_notification", {
+        title: `Order #${order.orderNumber} Update`,
+        message: notificationMessage,
+        type: "ORDER_UPDATE",
+      });
+    }
+
     res.status(200).json({
       success: true,
       data: { order },

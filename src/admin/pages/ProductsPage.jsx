@@ -121,12 +121,37 @@ const ProductsPage = () => {
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
+  const handleUpload = async ({ file, onSuccess, onError }) => {
+    try {
+      const response = await uploadAPI.image(file);
+      onSuccess(response, file);
+      message.success(`${file.name} uploaded successfully`);
+    } catch (error) {
+      onError(error);
+      message.error(`${file.name} upload failed.`);
+    }
+  };
+
   const openModal = (product = null) => {
     setEditingProduct(product);
     if (product) {
+      const fileList =
+        product.images?.map((img, index) => ({
+          uid: `-${index}`,
+          name: `Image ${index + 1}`,
+          status: "done",
+          url: img.url,
+        })) || [];
       form.setFieldsValue({
         ...product,
-        images: product.images?.map((img) => img.url) || [],
+        images: fileList,
       });
     } else {
       form.resetFields();
@@ -136,9 +161,22 @@ const ProductsPage = () => {
 
   const handleSubmit = async (values) => {
     try {
+      // Extract URLs from fileList
+      const imageUrls =
+        values.images
+          ?.map((file) => {
+            // For newly uploaded files, URL is in response.data.url
+            if (file.response?.data?.url) {
+              return file.response.data.url;
+            }
+            // For existing images (when editing), URL is directly on file.url
+            return file.url;
+          })
+          .filter(Boolean) || [];
+
       const productData = {
         ...values,
-        images: values.images?.map((url, index) => ({
+        images: imageUrls.map((url, index) => ({
           url,
           isPrimary: index === 0,
         })),
@@ -538,13 +576,25 @@ const ProductsPage = () => {
             </Col>
           </Row>
 
-          <Form.Item name="images" label="Image URLs">
-            <Select
-              mode="tags"
-              placeholder="Add image URLs"
-              tokenSeparators={[","]}
-              style={{ width: "100%" }}
-            />
+          <Form.Item
+            name="images"
+            label="Product Images"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+          >
+            <Upload
+              name="image"
+              listType="picture-card"
+              customRequest={handleUpload}
+              multiple={true}
+              maxCount={10}
+              accept="image/*"
+            >
+              <div>
+                <UploadIcon size={20} />
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
+            </Upload>
           </Form.Item>
         </Form>
       </Drawer>

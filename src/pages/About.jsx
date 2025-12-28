@@ -6,11 +6,11 @@ const About = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       {/* Hero */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-blue-900/10" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0f]" />
 
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="container mx-auto px-4 relative z-10 text-left">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -22,7 +22,7 @@ const About = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-400 max-w-2xl mx-auto"
+            className="text-xl text-gray-400 max-w-2xl"
           >
             Empowering creators, gamers, and professionals with forward-thinking
             technology.
@@ -53,9 +53,9 @@ const About = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card
                 className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
-                <Target className="w-8 h-8 text-cyan-400 mx-auto mb-4" />
+                <Target className="w-8 h-8 text-cyan-400 mb-4" />
                 <h3 className="font-bold text-white mb-2">Innovation</h3>
                 <p className="text-sm text-gray-500">
                   Always ahead of the curve
@@ -63,25 +63,25 @@ const About = () => {
               </Card>
               <Card
                 className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
-                <Users className="w-8 h-8 text-purple-400 mx-auto mb-4" />
+                <Users className="w-8 h-8 text-purple-400 mb-4" />
                 <h3 className="font-bold text-white mb-2">Community</h3>
                 <p className="text-sm text-gray-500">Built for enthusiasts</p>
               </Card>
               <Card
                 className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
-                <Shield className="w-8 h-8 text-green-400 mx-auto mb-4" />
+                <Shield className="w-8 h-8 text-green-400 mb-4" />
                 <h3 className="font-bold text-white mb-2">Trust</h3>
                 <p className="text-sm text-gray-500">Reliable & secure</p>
               </Card>
               <Card
                 className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
-                <Globe className="w-8 h-8 text-blue-400 mx-auto mb-4" />
+                <Globe className="w-8 h-8 text-blue-400 mb-4" />
                 <h3 className="font-bold text-white mb-2">Global</h3>
                 <p className="text-sm text-gray-500">Shipping worldwide</p>
               </Card>

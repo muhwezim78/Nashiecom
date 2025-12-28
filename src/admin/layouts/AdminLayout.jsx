@@ -87,6 +87,12 @@ const menuItems = [
     path: "/admin/analytics",
   },
   {
+    key: "notifications",
+    icon: <Bell size={18} />,
+    label: "Notifications",
+    path: "/admin/notifications",
+  },
+  {
     key: "settings",
     icon: <Settings size={18} />,
     label: "Settings",
@@ -231,15 +237,17 @@ const AdminLayout = () => {
           </div>
 
           <div className="header-right">
-            <Button
-              type="text"
-              icon={
-                <Badge count={3} size="small">
-                  <Bell size={20} />
-                </Badge>
-              }
-              className="notification-btn"
-            />
+            <NavLink to="/admin/notifications">
+              <Button
+                type="text"
+                icon={
+                  <Badge count={0} size="small">
+                    <Bell size={20} />
+                  </Badge>
+                }
+                className="notification-btn"
+              />
+            </NavLink>
 
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <div className="user-profile">

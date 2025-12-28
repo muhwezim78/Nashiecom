@@ -5,15 +5,8 @@ services:
     build: .
     ports:
       - "4000:4000"
-    environment:
-      - PORT=4000
-      - NODE_ENV=production
-      # Connecting to external RDS with custom schema 'nashiecom'
-      - DATABASE_URL=postgresql://postgres:postgres@voucher-sys.ce54ug48e1dg.us-east-1.rds.amazonaws.com:5432/voucher_sys?schema=nashiecom
-      - JWT_SECRET=supersecretkeychangeinproduction
-      - FRONTEND_URL=http://localhost:5173
-      - RATE_LIMIT_WINDOW_MS=900000
-      - RATE_LIMIT_MAX_REQUESTS=100
+    env_file:
+      - .env
     volumes:
       - ./uploads:/app/uploads
     networks:

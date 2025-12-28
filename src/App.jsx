@@ -20,6 +20,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 // Admin Pages
 import AdminLayout from "./admin/layouts/AdminLayout";
@@ -129,6 +131,10 @@ function App() {
                   </CustomerLayout>
                 }
               />
+
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
 
               {/* Admin Login */}
               <Route path="/admin/login" element={<AdminLogin />} />

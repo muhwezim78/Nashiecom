@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { useProduct } from "../hooks/useProducts";
 import {
   Star,
@@ -19,6 +20,10 @@ import { formatCurrency } from "../utils/currency";
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [messageApi, contextHolder] = message.useMessage();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
 
@@ -57,6 +62,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pb-12">
+      {contextHolder}
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Images */}
@@ -223,8 +229,13 @@ const ProductDetail = () => {
 
               <button
                 onClick={() => {
+                  if (!user) {
+                    messageApi.info("Please login to add to cart");
+                    navigate("/login", { state: { from: location.pathname } });
+                    return;
+                  }
                   addToCart(product, quantity);
-                  message.success(
+                  messageApi.success(
                     `Added ${quantity} x ${product.name} to cart`
                   );
                 }}

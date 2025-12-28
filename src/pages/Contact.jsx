@@ -8,7 +8,7 @@ import {
   Clock,
   Shield,
 } from "lucide-react";
-import { Space, Input, Button, Select, Form, Card, Row, Col } from "antd";
+import { Input, Button, Select, Form, Card, Row, Col } from "antd"; // Removed Space
 const { TextArea } = Input;
 
 const Contact = () => {
@@ -76,18 +76,8 @@ const Contact = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5" />
 
         <div className="container mx-auto px-4 py-16 md:py-20">
-          <Space
-            direction="vertical"
-            size={40}
-            align="center"
-            className="w-full"
-          >
-            <Space
-              direction="vertical"
-              size={16}
-              align="center"
-              className="text-center"
-            >
+          <div className="w-full flex flex-col gap-10 items-center">
+            <div className="text-center flex flex-col gap-4 items-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
                 Contact{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
@@ -98,11 +88,11 @@ const Contact = () => {
                 Have a question about a product, shipping, or need technical
                 advice? Our team of experts is ready to help.
               </p>
-            </Space>
+            </div>
 
             {/* Features Strip */}
             <div className="w-full max-w-4xl">
-              <Space direction="vertical" size={16} className="w-full">
+              <div className="w-full flex flex-col gap-4">
                 <Row gutter={[35, 35]} justify="center">
                   {supportFeatures.map((feature, index) => (
                     <Col xs={16} sm={12} key={index}>
@@ -122,40 +112,35 @@ const Contact = () => {
                     </Col>
                   ))}
                 </Row>
-              </Space>
+              </div>
             </div>
-          </Space>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
-        <Space direction="vertical" size={48} className="w-full">
+        <div className="w-full flex flex-col gap-12">
           {/* Contact Cards & Form */}
           <Row gutter={[32, 32]} className="w-full">
             {/* Contact Information Column */}
             <Col xs={24} lg={12}>
-              <Space direction="vertical" size={24} className="w-full">
+              <div className="w-full flex flex-col gap-6">
                 {/* Contact Cards */}
-                <Space direction="vertical" size={16} className="w-full">
+                <div className="w-full flex flex-col gap-4">
                   {contactInfo.map((info, index) => (
                     <Card
                       key={index}
                       className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm hover:border-cyan-500/30 transition-all"
                       bodyStyle={{ padding: "12px" }}
                     >
-                      <Space
-                        direction="horizontal"
-                        size={16}
-                        align="start"
-                        className="w-full"
-                      >
+                      <div className="w-full flex items-start gap-4">
                         <div
                           className={`w-12 h-12 rounded-xl ${info.bgColor} border ${info.borderColor} flex items-center justify-center`}
                         >
                           <div className={info.color}>{info.icon}</div>
                         </div>
-                        <Space direction="vertical" size={4}>
+                        <div className="flex flex-col gap-1">
                           <h4 className="text-white font-semibold">
                             {info.title}
                           </h4>
@@ -164,11 +149,11 @@ const Contact = () => {
                               {detail}
                             </p>
                           ))}
-                        </Space>
-                      </Space>
+                        </div>
+                      </div>
                     </Card>
                   ))}
-                </Space>
+                </div>
 
                 {/* Map */}
                 <div className="rounded-2xl overflow-hidden border border-white/10 hover:border-cyan-500/30 transition-all duration-300">
@@ -186,7 +171,7 @@ const Contact = () => {
                     className="hover:grayscale-0 transition-all duration-500"
                   />
                 </div>
-              </Space>
+              </div>
             </Col>
 
             {/* Contact Form Column */}
@@ -195,7 +180,7 @@ const Contact = () => {
                 className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm"
                 bodyStyle={{ padding: "32px" }}
               >
-                <Space direction="vertical" size={32} className="w-full">
+                <div className="w-full flex flex-col gap-8">
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2">
                       Send us a Message
@@ -211,7 +196,7 @@ const Contact = () => {
                     onFinish={onFinish}
                     className="w-full"
                   >
-                    <Space direction="vertical" size={20} className="w-full">
+                    <div className="w-full flex flex-col gap-5">
                       <Row gutter={16}>
                         <Col xs={24} sm={12}>
                           <Form.Item
@@ -303,20 +288,15 @@ const Contact = () => {
                           Send Message
                         </Button>
                       </Form.Item>
-                    </Space>
+                    </div>
                   </Form>
-                </Space>
+                </div>
               </Card>
             </Col>
           </Row>
 
           {/* FAQ Preview */}
-          <Space
-            direction="vertical"
-            size={24}
-            align="center"
-            className="w-full"
-          >
+          <div className="w-full flex flex-col gap-6 items-center">
             <h3 className="text-2xl font-bold text-white text-center">
               Frequently Asked Questions
             </h3>
@@ -366,8 +346,8 @@ const Contact = () => {
                 </div>
               </Col>
             </Row>
-          </Space>
-        </Space>
+          </div>
+        </div>
       </div>
     </div>
   );

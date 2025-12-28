@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
@@ -10,11 +10,16 @@ import {
   Check,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../utils/currency";
-import { Space } from "antd";
+import { Space, message } from "antd";
 
 const ProductCard = ({ product }) => {
   const { addToCart, isInCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [messageApi, contextHolder] = message.useMessage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -82,13 +87,19 @@ const ProductCard = ({ product }) => {
       e.preventDefault();
       e.stopPropagation();
 
+      if (!user) {
+        messageApi.info("Please login or sign up to add items to your cart");
+        navigate("/login", { state: { from: location.pathname } });
+        return;
+      }
+
       addToCart(product);
       setIsAdded(true);
 
       // Reset feedback after 2 seconds
       setTimeout(() => setIsAdded(false), 2000);
     },
-    [addToCart, product]
+    [addToCart, product, user, navigate, location]
   );
 
   // Handle image click for mobile
@@ -143,6 +154,7 @@ const ProductCard = ({ product }) => {
       }}
       className="group relative bg-gradient-to-b from-gray-900 to-black rounded-3xl border border-gray-800 overflow-hidden hover:border-cyan-500/30 hover:shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all duration-500 h-full flex flex-col"
     >
+      {contextHolder}
       {/* Containerized Content Wrapper */}
       <div className="flex-1 flex flex-col p-6">
         {/* Image Carousel Container */}

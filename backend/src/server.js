@@ -34,6 +34,7 @@ const uploadRoutes = require("./routes/upload.routes");
 const searchRoutes = require("./routes/search.routes");
 const chatRoutes = require("./routes/chat.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const initScheduler = require("./jobs/notificationScheduler");
 
 // Initialize Express App
 const app = express();
@@ -104,7 +105,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Static Files (for uploaded images)
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Health Check Endpoint
 app.get("/api/health", async (req, res) => {
@@ -255,6 +256,9 @@ const startServer = async () => {
     // Test database connection
     await prisma.$connect();
     logger.info("📦 Database connected successfully");
+
+    // Initialize notification scheduler
+    initScheduler(app);
 
     server.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT}`);

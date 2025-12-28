@@ -346,7 +346,16 @@ const Footer = () => {
                 ))}
               </div>
               <p className="text-[10px] text-gray-700 font-black uppercase tracking-[0.3em]">
-                Built by Visionaries for the Modern World
+                Developed by{" "}
+                <a
+                  href="https://blossomtech.site"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan-400 transition-colors"
+                >
+                  Blossom Tech
+                </a>{" "}
+                2025
               </p>
             </div>
           </div>

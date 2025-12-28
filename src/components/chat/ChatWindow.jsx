@@ -11,12 +11,11 @@ import {
   Map as MapIcon,
 } from "lucide-react";
 import { io } from "socket.io-client";
-import { chatAPI, uploadAPI } from "../../services/api";
+import { chatAPI, uploadAPI, API_BASE_URL } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./ChatWindow.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const SOCKET_URL = API_URL.replace("/api", "");
+const SOCKET_URL = API_BASE_URL.replace("/api", "");
 
 const ChatWindow = ({ orderId, orderNumber, onClose, isAdmin = false }) => {
   const [messages, setMessages] = useState([]);

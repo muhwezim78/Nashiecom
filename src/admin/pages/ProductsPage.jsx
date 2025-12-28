@@ -240,7 +240,7 @@ const ProductsPage = () => {
             width={50}
             height={50}
             style={{ borderRadius: 8, objectFit: "cover" }}
-            fallback="https://via.placeholder.com/50"
+            fallback="https://placehold.co/50"
           />
           <div>
             <div style={{ fontWeight: 500, color: "#fff" }}>{record.name}</div>

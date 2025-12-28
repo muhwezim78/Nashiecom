@@ -13,7 +13,7 @@ exports.uploadImage = async (req, res, next) => {
     }
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    const imageUrl = `${baseUrl}/api/uploads/${req.file.filename}`;
 
     res.status(200).json({
       success: true,
@@ -42,7 +42,7 @@ exports.uploadMultipleImages = async (req, res, next) => {
 
     const images = req.files.map((file) => ({
       filename: file.filename,
-      url: `${baseUrl}/uploads/${file.filename}`,
+      url: `${baseUrl}/api/uploads/${file.filename}`,
       size: file.size,
       mimetype: file.mimetype,
     }));

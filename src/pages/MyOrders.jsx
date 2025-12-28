@@ -265,10 +265,7 @@ const MyOrders = () => {
                     >
                       <div className="w-14 h-14 bg-white/10 rounded-md border border-white/10 p-1 shrink-0 flex items-center justify-center">
                         <img
-                          src={
-                            item.productImage ||
-                            "https://via.placeholder.com/150"
-                          }
+                          src={item.productImage || "https://placehold.co/150"}
                           alt={item.productName}
                           className="w-full h-full object-contain"
                         />

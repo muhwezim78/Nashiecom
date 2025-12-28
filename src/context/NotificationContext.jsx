@@ -9,7 +9,7 @@ import React, {
 import { io } from "socket.io-client";
 import { notification, message as antMessage } from "antd";
 import { useAuth } from "./AuthContext";
-import { notificationsAPI } from "../services/api";
+import { notificationsAPI, API_BASE_URL } from "../services/api";
 
 const NotificationContext = createContext();
 
@@ -26,8 +26,7 @@ export const NotificationProvider = ({ children }) => {
     )
   );
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-  const SOCKET_URL = API_URL.replace("/api", "");
+  const SOCKET_URL = API_BASE_URL.replace("/api", "");
 
   // Fetch unread count from API
   const fetchUnreadCount = useCallback(async () => {

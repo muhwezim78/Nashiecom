@@ -15,7 +15,9 @@ import { chatAPI, uploadAPI, API_BASE_URL } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./ChatWindow.css";
 
-const SOCKET_URL = API_BASE_URL.replace("/api", "");
+const socketUrl = new URL(API_BASE_URL);
+const SOCKET_ORIGIN = socketUrl.origin;
+const SOCKET_PATH = socketUrl.pathname + "/socket.io";
 
 const ChatWindow = ({ orderId, orderNumber, onClose, isAdmin = false }) => {
   const [messages, setMessages] = useState([]);
@@ -53,8 +55,9 @@ const ChatWindow = ({ orderId, orderNumber, onClose, isAdmin = false }) => {
     fetchMessages();
 
     // Initialize Socket
-    console.log("Connecting to Socket:", SOCKET_URL);
-    socketRef.current = io(SOCKET_URL, {
+    console.log("Connecting to Socket:", SOCKET_ORIGIN, "Path:", SOCKET_PATH);
+    socketRef.current = io(SOCKET_ORIGIN, {
+      path: SOCKET_PATH,
       withCredentials: true,
       transports: ["websocket", "polling"],
       reconnectionAttempts: 5,

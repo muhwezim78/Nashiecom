@@ -22,11 +22,13 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const audioRef = useRef(
     new Audio(
-      "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+      "https://codeskulptor-demos.commondatastorage.googleapis.com/pang/pop.mp3"
     )
   );
 
-  const SOCKET_URL = API_BASE_URL.replace("/api", "");
+  const socketUrl = new URL(API_BASE_URL);
+  const SOCKET_ORIGIN = socketUrl.origin;
+  const SOCKET_PATH = socketUrl.pathname + "/socket.io";
 
   // Fetch unread count from API
   const fetchUnreadCount = useCallback(async () => {
@@ -55,8 +57,14 @@ export const NotificationProvider = ({ children }) => {
       fetchUnreadCount();
       fetchNotifications();
 
-      console.log("Initializing Notification Socket...");
-      const newSocket = io(SOCKET_URL, {
+      console.log(
+        "Initializing Notification Socket...",
+        SOCKET_ORIGIN,
+        "Path:",
+        SOCKET_PATH
+      );
+      const newSocket = io(SOCKET_ORIGIN, {
+        path: SOCKET_PATH,
         withCredentials: true,
         transports: ["websocket", "polling"],
       });

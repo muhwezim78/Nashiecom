@@ -199,6 +199,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+  path: "/api/socket.io",
 });
 
 // Socket.io Middleware for Auth (optional, but good)

@@ -19,6 +19,7 @@ import {
   Form,
   Divider,
   Badge,
+  Tooltip,
 } from "antd";
 import {
   Search,
@@ -30,7 +31,9 @@ import {
   Clock,
   Filter,
   RefreshCw,
+  MessageSquare,
 } from "lucide-react";
+import ChatWindow from "../../components/chat/ChatWindow";
 import { ordersAPI } from "../../services/api";
 import "../layouts/AdminLayout.css";
 
@@ -121,6 +124,8 @@ const OrdersPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [statusForm] = Form.useForm();
+  const [activeChatOrder, setActiveChatOrder] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -206,6 +211,21 @@ const OrdersPage = () => {
     } catch (error) {
       message.error("Update failed");
     }
+  };
+
+  const handleConfirmDelivery = async (orderId) => {
+    try {
+      await ordersAPI.confirmDelivery(orderId);
+      message.success("Delivery confirmed");
+      fetchOrders();
+    } catch (error) {
+      message.error("Action failed");
+    }
+  };
+
+  const openChat = (order) => {
+    setActiveChatOrder(order);
+    setIsChatOpen(true);
   };
 
   const getStatusInfo = (status) => {
@@ -319,12 +339,36 @@ const OrdersPage = () => {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <Button
-          type="text"
-          icon={<Eye size={16} />}
-          onClick={() => viewOrder(record)}
-          className="action-btn"
-        />
+        <Space>
+          <Tooltip title="View Details">
+            <Button
+              type="text"
+              icon={<Eye size={16} />}
+              onClick={() => viewOrder(record)}
+              className="action-btn"
+            />
+          </Tooltip>
+          <Tooltip title="Chat with Client">
+            <Button
+              type="primary"
+              size="small"
+              icon={<MessageSquare size={14} />}
+              onClick={() => openChat(record)}
+              className="bg-cyan-600 border-none flex items-center justify-center"
+            />
+          </Tooltip>
+          {record.status === "SHIPPED" && !record.adminConfirmedDelivery && (
+            <Tooltip title="Confirm Delivery">
+              <Button
+                type="primary"
+                size="small"
+                icon={<CheckCircle size={14} />}
+                onClick={() => handleConfirmDelivery(record.id)}
+                className="bg-green-600 border-none flex items-center justify-center"
+              />
+            </Tooltip>
+          )}
+        </Space>
       ),
     },
   ];
@@ -634,6 +678,16 @@ const OrdersPage = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* Floating Chat Window */}
+      {isChatOpen && activeChatOrder && (
+        <ChatWindow
+          orderId={activeChatOrder.id}
+          orderNumber={activeChatOrder.orderNumber}
+          onClose={() => setIsChatOpen(false)}
+          isAdmin={true}
+        />
+      )}
     </div>
   );
 };

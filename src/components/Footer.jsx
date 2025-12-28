@@ -20,8 +20,10 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import { Card } from "antd";
 
 const Footer = () => {
+  // ... (previous state/hooks remain same)
   const location = useLocation();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentYear] = useState(new Date().getFullYear());
@@ -58,6 +60,7 @@ const Footer = () => {
     { icon: Sparkles, label: "Premium Quality", desc: "Curated Selection" },
   ];
 
+  // ... (linkSections remain same)
   const linkSections = [
     {
       title: "Navigation",
@@ -107,7 +110,7 @@ const Footer = () => {
               className="group relative"
             >
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-3xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-              <div className="relative p-8 bg-white/[0.02] border border-white/5 backdrop-blur-md rounded-3xl transition-all duration-500 group-hover:bg-white/[0.04]">
+              <Card className="!bg-white/[0.02] !border-white/5 backdrop-blur-md !rounded-3xl hover:!bg-white/[0.04] transition-all duration-500 h-full !border-0">
                 <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <badge.icon className="w-6 h-6 text-cyan-400" />
                 </div>
@@ -117,7 +120,7 @@ const Footer = () => {
                 <p className="text-gray-500 text-xs uppercase font-medium">
                   {badge.desc}
                 </p>
-              </div>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -126,6 +129,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-20">
           {/* Brand Col */}
           <div className="lg:col-span-4 space-y-10">
+            {/* ... Brand Content ... */}
             <div className="space-y-6">
               <Link to="/" className="flex items-center gap-4 group">
                 <div className="relative w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-all duration-500">
@@ -202,12 +206,15 @@ const Footer = () => {
 
           {/* Newsletter Col */}
           <div className="lg:col-span-3">
-            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] space-y-8 relative overflow-hidden group">
+            <Card
+              className="!bg-white/[0.02] !border-white/5 !rounded-[2.5rem] relative overflow-hidden group !border-0"
+              styles={{ body: { padding: "2rem" } }}
+            >
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Mail className="w-16 h-16 text-cyan-500" />
               </div>
 
-              <div className="relative z-10">
+              <div className="relative z-10 mb-8">
                 <h4 className="text-lg font-black text-white uppercase tracking-wider mb-2">
                   The Dispatch
                 </h4>
@@ -250,52 +257,60 @@ const Footer = () => {
                   )}
                 </AnimatePresence>
               </form>
-            </div>
+            </Card>
           </div>
         </div>
 
         {/* Contact Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 bg-white/[0.01] border border-white/5 rounded-[2.5rem] mb-20">
-          <div className="flex items-center gap-6 group">
-            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                HQ Distribution
-              </p>
-              <p className="text-sm font-bold text-white">
-                New Pioneer Mall shop PH-38
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-6 group">
-            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
-              <Phone className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                Direct Line
-              </p>
-              <p className="text-sm font-bold text-white">+256 786 400 713</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-6 group">
-            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                System Status
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
+            <div className="flex items-center gap-6 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                  HQ Distribution
+                </p>
                 <p className="text-sm font-bold text-white">
-                  All Systems Operational
+                  New Pioneer Mall shop PH-38
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
+
+          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
+            <div className="flex items-center gap-6 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
+                <Phone className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                  Direct Line
+                </p>
+                <p className="text-sm font-bold text-white">+256 786 400 713</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
+            <div className="flex items-center gap-6 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
+                <Shield className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                  System Status
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <p className="text-sm font-bold text-white">
+                    All Systems Operational
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Footer Bottom */}

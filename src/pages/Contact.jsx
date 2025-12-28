@@ -96,7 +96,10 @@ const Contact = () => {
                 <Row gutter={[35, 35]} justify="center">
                   {supportFeatures.map((feature, index) => (
                     <Col xs={16} sm={12} key={index}>
-                      <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                      <Card
+                        className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                        bodyStyle={{ padding: "1rem" }}
+                      >
                         <div className="flex flex-col items-center text-center">
                           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 flex items-center justify-center mb-3">
                             <div className="text-cyan-400">{feature.icon}</div>
@@ -108,7 +111,7 @@ const Contact = () => {
                             {feature.desc}
                           </p>
                         </div>
-                      </div>
+                      </Card>
                     </Col>
                   ))}
                 </Row>
@@ -131,7 +134,7 @@ const Contact = () => {
                   {contactInfo.map((info, index) => (
                     <Card
                       key={index}
-                      className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm hover:border-cyan-500/30 transition-all"
+                      className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm hover:border-cyan-500/30 transition-all !rounded-2xl"
                       bodyStyle={{ padding: "12px" }}
                     >
                       <div className="w-full flex items-start gap-4">
@@ -156,7 +159,10 @@ const Contact = () => {
                 </div>
 
                 {/* Map */}
-                <div className="rounded-2xl overflow-hidden border border-white/10 hover:border-cyan-500/30 transition-all duration-300">
+                <Card
+                  className="!rounded-2xl overflow-hidden !border-white/10 hover:!border-cyan-500/30 transition-all duration-300 !p-0 !border"
+                  bodyStyle={{ padding: 0 }}
+                >
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.758270670238!2d32.57511682349239!3d0.3143525140320503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbc819013388f%3A0x520e9a88a2d65633!2sPioneer%20Mall%2C%20Kampala!5e0!3m2!1sen!2sug!4v1766837295151!5m2!1sen!2sug"
                     width="100%"
@@ -168,16 +174,16 @@ const Contact = () => {
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    className="hover:grayscale-0 transition-all duration-500"
+                    className="hover:grayscale-0 transition-all duration-500 block"
                   />
-                </div>
+                </Card>
               </div>
             </Col>
 
             {/* Contact Form Column */}
             <Col xs={24} lg={12}>
               <Card
-                className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm"
+                className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm !rounded-2xl"
                 bodyStyle={{ padding: "32px" }}
               >
                 <div className="w-full flex flex-col gap-8">
@@ -302,7 +308,10 @@ const Contact = () => {
             </h3>
             <Row gutter={[16, 16]} className="w-full max-w-4xl">
               <Col xs={24} md={12}>
-                <div className="p-6 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                <Card
+                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  bodyStyle={{ padding: "1.5rem" }}
+                >
                   <h4 className="text-white font-semibold mb-2">
                     What is your shipping time?
                   </h4>
@@ -310,10 +319,13 @@ const Contact = () => {
                     Most orders ship within 24 hours and arrive within 3-5
                     business days.
                   </p>
-                </div>
+                </Card>
               </Col>
               <Col xs={24} md={12}>
-                <div className="p-6 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                <Card
+                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  bodyStyle={{ padding: "1.5rem" }}
+                >
                   <h4 className="text-white font-semibold mb-2">
                     Do you offer warranties?
                   </h4>
@@ -321,10 +333,13 @@ const Contact = () => {
                     All products come with a 1-year manufacturer warranty,
                     extendable up to 3 years.
                   </p>
-                </div>
+                </Card>
               </Col>
               <Col xs={24} md={12}>
-                <div className="p-6 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                <Card
+                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  bodyStyle={{ padding: "1.5rem" }}
+                >
                   <h4 className="text-white font-semibold mb-2">
                     Can I return a product?
                   </h4>
@@ -332,10 +347,13 @@ const Contact = () => {
                     Yes, we offer a 30-day return policy for unused products in
                     original packaging.
                   </p>
-                </div>
+                </Card>
               </Col>
               <Col xs={24} md={12}>
-                <div className="p-6 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all">
+                <Card
+                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  bodyStyle={{ padding: "1.5rem" }}
+                >
                   <h4 className="text-white font-semibold mb-2">
                     Do you ship internationally?
                   </h4>
@@ -343,7 +361,7 @@ const Contact = () => {
                     We ship to over 50 countries worldwide. Shipping rates vary
                     by location.
                   </p>
-                </div>
+                </Card>
               </Col>
             </Row>
           </div>

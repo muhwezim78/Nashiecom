@@ -48,7 +48,6 @@ const upload = multer({
 router.post(
   "/image",
   authenticate,
-  adminOnly,
   upload.single("image"),
   uploadController.uploadImage
 );

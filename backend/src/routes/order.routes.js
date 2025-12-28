@@ -30,6 +30,7 @@ router.get("/my-orders", orderController.getMyOrders);
 router.get("/:id", orderController.getOrderById);
 router.post("/", validate(createOrderValidation), orderController.createOrder);
 router.post("/:id/cancel", orderController.cancelOrder);
+router.patch("/:id/confirm-delivery", orderController.confirmDelivery);
 
 // Admin Routes
 router.get("/", adminOnly, orderController.getAllOrders);

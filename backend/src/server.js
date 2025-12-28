@@ -10,6 +10,8 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const { PrismaClient } = require("@prisma/client");
 const logger = require("./config/logger");
@@ -29,6 +31,8 @@ const contactRoutes = require("./routes/contact.routes");
 const settingRoutes = require("./routes/setting.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const uploadRoutes = require("./routes/upload.routes");
+const searchRoutes = require("./routes/search.routes");
+const chatRoutes = require("./routes/chat.routes");
 
 // Initialize Express App
 const app = express();
@@ -134,6 +138,8 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/settings", settingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/chat", chatRoutes);
 
 // API Documentation Route
 app.get("/api", (req, res) => {
@@ -182,6 +188,57 @@ app.get("/api", (req, res) => {
   });
 });
 
+// Create HTTP Server for Socket.io
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// Socket.io Middleware for Auth (optional, but good)
+// For simplicity, we'll just handle events. In a real app, you'd verify JWT here too.
+
+// Socket.io Connection Handler
+io.on("connection", (socket) => {
+  logger.info(`🔌 User connected: ${socket.id}`);
+
+  // Join a room for a specific order
+  socket.on("join_order_chat", (orderId) => {
+    socket.join(orderId);
+    logger.info(`📁 User joined chat for order: ${orderId}`);
+  });
+
+  // Handle incoming messages
+  socket.on("send_message", (data) => {
+    // data expected: { orderId, message }
+    // Emit to everyone in the room (including sender if we want, or use broadcast)
+    io.to(data.orderId).emit("receive_message", data.message);
+  });
+
+  // Handle delivery confirmation updates
+  socket.on("delivery_update", (data) => {
+    // data: { orderId, order }
+    io.to(data.orderId).emit("order_updated", data.order);
+  });
+
+  socket.on("join_user_notifications", (userId) => {
+    logger.info(`🔔 User joined notification channel: ${userId}`);
+    socket.join(`user_${userId}`);
+  });
+
+  socket.on("join_admin_notifications", () => {
+    logger.info(`🛡️ Admin joined notification channel`);
+    socket.join("admin_notifications");
+  });
+
+  socket.on("disconnect", () => {
+    logger.info(`❌ User disconnected: ${socket.id}`);
+  });
+});
+
 // 404 Handler
 app.use(notFound);
 
@@ -197,7 +254,7 @@ const startServer = async () => {
     await prisma.$connect();
     logger.info("📦 Database connected successfully");
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
       logger.info(`📍 API URL: http://localhost:${PORT}/api`);
@@ -220,6 +277,10 @@ process.on("SIGTERM", async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
+
+// Make io accessible to our router wrapper if needed,
+// but easier is to attach it to the app or export it.
+app.set("io", io);
 
 startServer();
 

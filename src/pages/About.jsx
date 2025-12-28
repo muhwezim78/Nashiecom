@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Target, Users, Globe, Shield } from "lucide-react";
+import { Card } from "antd";
 
 const About = () => {
   return (
@@ -50,28 +51,40 @@ const About = () => {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="glass-card p-6 text-center">
+              <Card
+                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+              >
                 <Target className="w-8 h-8 text-cyan-400 mx-auto mb-4" />
                 <h3 className="font-bold text-white mb-2">Innovation</h3>
                 <p className="text-sm text-gray-500">
                   Always ahead of the curve
                 </p>
-              </div>
-              <div className="glass-card p-6 text-center transalte-y-8">
+              </Card>
+              <Card
+                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+              >
                 <Users className="w-8 h-8 text-purple-400 mx-auto mb-4" />
                 <h3 className="font-bold text-white mb-2">Community</h3>
                 <p className="text-sm text-gray-500">Built for enthusiasts</p>
-              </div>
-              <div className="glass-card p-6 text-center">
+              </Card>
+              <Card
+                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+              >
                 <Shield className="w-8 h-8 text-green-400 mx-auto mb-4" />
                 <h3 className="font-bold text-white mb-2">Trust</h3>
                 <p className="text-sm text-gray-500">Reliable & secure</p>
-              </div>
-              <div className="glass-card p-6 text-center">
+              </Card>
+              <Card
+                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                bodyStyle={{ padding: "1.5rem", textAlign: "center" }}
+              >
                 <Globe className="w-8 h-8 text-blue-400 mx-auto mb-4" />
                 <h3 className="font-bold text-white mb-2">Global</h3>
                 <p className="text-sm text-gray-500">Shipping worldwide</p>
-              </div>
+              </Card>
             </div>
           </div>
         </div>

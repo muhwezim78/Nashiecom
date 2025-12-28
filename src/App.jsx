@@ -5,11 +5,13 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme, App as AntdApp } from "antd";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import "./App.css";
 
 // Customer Pages
@@ -22,6 +24,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import MyOrders from "./pages/MyOrders";
 
 // Admin Pages
 import AdminLayout from "./admin/layouts/AdminLayout";
@@ -69,92 +72,108 @@ function App() {
         },
       }}
     >
-      <Router>
-        <AuthProvider>
-          <CartProvider>
-            <ScrollToTop />
-            <Routes>
-              {/* Customer Routes */}
-              <Route
-                path="/"
-                element={
-                  <CustomerLayout>
-                    <Home />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/products"
-                element={
-                  <CustomerLayout>
-                    <Products />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/products/:id"
-                element={
-                  <CustomerLayout>
-                    <ProductDetail />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/cart"
-                element={
-                  <CustomerLayout>
-                    <Cart />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/checkout"
-                element={
-                  <CustomerLayout>
-                    <Checkout />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/about"
-                element={
-                  <CustomerLayout>
-                    <About />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/contact"
-                element={
-                  <CustomerLayout>
-                    <Contact />
-                  </CustomerLayout>
-                }
-              />
+      <AntdApp>
+        <Router>
+          <AuthProvider>
+            <CartProvider>
+              <NotificationProvider>
+                <ScrollToTop />
+                <Routes>
+                  {/* Customer Routes */}
+                  <Route
+                    path="/"
+                    element={
+                      <CustomerLayout>
+                        <Home />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/products"
+                    element={
+                      <CustomerLayout>
+                        <Products />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/products/:id"
+                    element={
+                      <CustomerLayout>
+                        <ProductDetail />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/cart"
+                    element={
+                      <CustomerLayout>
+                        <Cart />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerLayout>
+                          <Checkout />
+                        </CustomerLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/about"
+                    element={
+                      <CustomerLayout>
+                        <About />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/contact"
+                    element={
+                      <CustomerLayout>
+                        <Contact />
+                      </CustomerLayout>
+                    }
+                  />
+                  <Route
+                    path="/my-orders"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerLayout>
+                          <MyOrders />
+                        </CustomerLayout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
 
-              {/* Admin Login */}
-              <Route path="/admin/login" element={<AdminLogin />} />
+                  {/* Admin Login */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="products" element={<ProductsPage />} />
-                <Route path="orders" element={<OrdersPage />} />
-                <Route path="customers" element={<CustomersPage />} />
-                <Route path="categories" element={<CategoriesPage />} />
-                <Route path="coupons" element={<CouponsPage />} />
-                <Route path="messages" element={<MessagesPage />} />
-                <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-              </Route>
-            </Routes>
-          </CartProvider>
-        </AuthProvider>
-      </Router>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="products" element={<ProductsPage />} />
+                    <Route path="orders" element={<OrdersPage />} />
+                    <Route path="customers" element={<CustomersPage />} />
+                    <Route path="categories" element={<CategoriesPage />} />
+                    <Route path="coupons" element={<CouponsPage />} />
+                    <Route path="messages" element={<MessagesPage />} />
+                    <Route path="analytics" element={<AnalyticsPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                  </Route>
+                </Routes>
+              </NotificationProvider>
+            </CartProvider>
+          </AuthProvider>
+        </Router>
+      </AntdApp>
     </ConfigProvider>
   );
 }

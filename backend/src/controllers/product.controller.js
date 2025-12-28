@@ -227,15 +227,20 @@ exports.searchProducts = async (req, res, next) => {
   }
 };
 
-// @desc    Get product by ID
+// @desc    Get product by ID or Slug
 // @route   GET /api/products/:id
 // @access  Public
 exports.getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    // Check if ID is a valid UUID
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const isUuid = uuidRegex.test(id);
+
     const product = await prisma.product.findUnique({
-      where: { id },
+      where: isUuid ? { id } : { slug: id },
       include: {
         category: {
           include: {

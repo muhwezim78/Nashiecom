@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Space, Spin } from "antd";
+import { Space, Spin, Card } from "antd";
 import HeroSection from "../components/HeroSection";
 import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
@@ -179,19 +179,24 @@ const Home = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                     viewport={{ once: true }}
-                    className="p-8 bg-black/20 border border-white/5 rounded-[2rem] hover:border-cyan-500/30 transition-all text-center group"
+                    className="h-full"
                   >
-                    <div
-                      className={`w-14 h-14 mx-auto mb-6 bg-white/5 rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
+                    <Card
+                      className="h-full !bg-black/20 !border-white/5 hover:!border-cyan-500/30 !rounded-2xl transition-all group !border-0 text-center"
+                      styles={{ body: { padding: "2rem" } }}
                     >
-                      <service.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      {service.title}
-                    </h3>
-                    <p className="text-gray-500 text-sm font-medium">
-                      {service.subtitle}
-                    </p>
+                      <div
+                        className={`w-14 h-14 mx-auto mb-6 bg-white/5 rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
+                      >
+                        <service.icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-white font-bold text-lg mb-1">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-500 text-sm font-medium">
+                        {service.subtitle}
+                      </p>
+                    </Card>
                   </motion.div>
                 ))}
               </div>
@@ -310,8 +315,8 @@ const Home = () => {
                       transition={{ delay: index * 0.1, duration: 0.8 }}
                       className={index === 1 ? "lg:-mt-12 lg:mb-12" : ""}
                     >
-                      <div className="relative group p-1 rounded-[2.8rem] bg-gradient-to-b from-white/10 to-white/0 hover:from-blue-500/30 transition-all duration-500">
-                        <div className="relative bg-[#0a0a0f] rounded-[2.5rem] overflow-hidden">
+                      <div className="relative group p-1 rounded-2xl bg-gradient-to-b from-white/10 to-white/0 hover:from-blue-500/30 transition-all duration-500">
+                        <div className="relative bg-[#0a0a0f] rounded-2xl overflow-hidden">
                           <ProductCard product={product} />
                         </div>
                       </div>
@@ -348,31 +353,43 @@ const Home = () => {
                       <Link
                         key={product.id}
                         to={`/products/${product.id}`}
-                        className="flex items-center gap-6 p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:bg-white/[0.05] hover:border-purple-500/30 transition-all group"
+                        className="block group"
                       >
-                        <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                          {/* Use image instead of icon if available */}
-                          {product.image ? (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-10 h-10 object-contain"
-                            />
-                          ) : (
-                            "🎮"
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-white font-bold text-lg">
-                            {product.name}
-                          </h4>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="text-purple-400 font-bold">
-                              {product.price.toLocaleString()} UGX
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-all" />
+                        <Card
+                          className="!bg-white/[0.02] !border-white/5 hover:!bg-white/[0.05] hover:!border-purple-500/30 !rounded-2xl transition-all !border-0"
+                          styles={{
+                            body: {
+                              padding: "1.5rem",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "1.5rem",
+                            },
+                          }}
+                        >
+                          <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                            {/* Use image instead of icon if available */}
+                            {product.image ? (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-10 h-10 object-contain"
+                              />
+                            ) : (
+                              "🎮"
+                            )}
                           </div>
-                        </div>
+                          <div className="flex-1">
+                            <h4 className="text-white font-bold text-lg">
+                              {product.name}
+                            </h4>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-purple-400 font-bold">
+                                {product.price.toLocaleString()} UGX
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-all" />
+                            </div>
+                          </div>
+                        </Card>
                       </Link>
                     ))}
                   </div>
@@ -385,12 +402,23 @@ const Home = () => {
                   className="relative lg:h-[600px] flex items-center justify-center"
                 >
                   <div className="absolute inset-0 bg-purple-600/20 blur-[100px] animate-pulse rounded-full" />
-                  <div className="relative w-full max-w-lg aspect-square bg-[#0a0a0f] border border-white/5 rounded-[4rem] p-12 overflow-hidden group shadow-2xl">
+                  <Card
+                    className="relative w-full max-w-lg aspect-square !bg-[#0a0a0f] !border-white/5 !rounded-2xl overflow-hidden group shadow-2xl !border-0"
+                    styles={{
+                      body: {
+                        padding: "3rem",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      },
+                    }}
+                  >
                     <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 group-hover:rotate-0 transition-transform duration-1000">
                       <Play className="w-64 h-64 text-purple-500" />
                     </div>
 
-                    <div className="relative h-full flex flex-col justify-between">
+                    <div className="relative h-full flex flex-col justify-between z-10">
                       <div className="space-y-4">
                         <h3 className="text-4xl font-black text-white tracking-tight uppercase">
                           Special Edition <br />{" "}
@@ -433,7 +461,7 @@ const Home = () => {
                         Acquire Bundle
                       </button>
                     </div>
-                  </div>
+                  </Card>
                 </motion.div>
               </div>
             </div>
@@ -443,6 +471,8 @@ const Home = () => {
         {/* CTA Layer */}
         <div className="w-full">
           <section className="pt-32 pb-40 lg:pt-40 lg:pb-48 relative bg-black overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent pointer-events-none" />
+            {/* ... CTA Content ... */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.15),transparent)] pointer-events-none" />
 
             <div className="container mx-auto px-4 relative z-10 text-center">

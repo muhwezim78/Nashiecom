@@ -42,7 +42,10 @@ const apiFetch = async (endpoint, options = {}) => {
         removeUser();
         window.dispatchEvent(new CustomEvent("auth:logout"));
       }
-      throw new Error(data.message || "Something went wrong");
+      const error = new Error(data.message || "Something went wrong");
+      error.errors = data.errors; // Attach validation errors
+      error.status = response.status;
+      throw error;
     }
 
     return data;
@@ -274,6 +277,12 @@ export const ordersAPI = {
 
   getStats: async () => {
     return apiFetch("/orders/stats");
+  },
+
+  confirmDelivery: async (id) => {
+    return apiFetch(`/orders/${id}/confirm-delivery`, {
+      method: "PATCH",
+    });
   },
 };
 
@@ -611,6 +620,31 @@ export const uploadAPI = {
   },
 };
 
+// ============== CHAT API ==============
+export const chatAPI = {
+  getMessages: async (orderId) => {
+    return apiFetch(`/chat/${orderId}`);
+  },
+
+  sendMessage: async (orderId, messageData) => {
+    return apiFetch(`/chat/${orderId}`, {
+      method: "POST",
+      body: JSON.stringify(messageData),
+    });
+  },
+
+  getAllChats: async () => {
+    return apiFetch("/chat");
+  },
+};
+
+// ============== COMMON/SEARCH API ==============
+export const commonAPI = {
+  globalSearch: async (q, limit = 5) => {
+    return apiFetch(`/search?q=${encodeURIComponent(q)}&limit=${limit}`);
+  },
+};
+
 // Default export
 export default {
   auth: authAPI,
@@ -625,4 +659,6 @@ export default {
   dashboard: dashboardAPI,
   settings: settingsAPI,
   upload: uploadAPI,
+  search: commonAPI,
+  chat: chatAPI,
 };

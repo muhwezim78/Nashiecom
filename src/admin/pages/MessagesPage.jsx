@@ -9,39 +9,66 @@ import {
   Descriptions,
   Select,
   message,
+  Tabs,
+  Badge,
 } from "antd";
-import { Eye, Mail, MessageSquare } from "lucide-react";
-import { contactAPI } from "../../services/api";
+import { Eye, Mail, MessageSquare, RefreshCw } from "lucide-react";
+import { contactAPI, chatAPI } from "../../services/api";
+import ChatWindow from "../../components/chat/ChatWindow";
 import "../layouts/AdminLayout.css";
 
 const MessagesPage = () => {
+  const [activeTab, setActiveTab] = useState("chats");
+
+  // Contact Messages State
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(null);
 
-  const fetchMessages = async () => {
-    setLoading(true);
+  // Order Chats State
+  const [chats, setChats] = useState([]);
+  const [loadingChats, setLoadingChats] = useState(false);
+  const [selectedChatOrder, setSelectedChatOrder] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const fetchContactMessages = async () => {
+    setLoadingMessages(true);
     try {
       const { data } = await contactAPI.getAll();
       setMessages(data.messages || []);
     } catch (error) {
       console.error(error);
-      // message.error("Failed to load messages");
     } finally {
-      setLoading(false);
+      setLoadingMessages(false);
+    }
+  };
+
+  const fetchOrderChats = async () => {
+    setLoadingChats(true);
+    try {
+      const { data } = await chatAPI.getAllChats();
+      setChats(data.chats || []);
+    } catch (error) {
+      console.error(error);
+      // message.error("Failed to load active chats");
+    } finally {
+      setLoadingChats(false);
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    if (activeTab === "contact") fetchContactMessages();
+    else fetchOrderChats();
+  }, [activeTab]);
+
+  // --- Contact Messages Logic ---
 
   const handleStatusChange = async (id, status) => {
     try {
       await contactAPI.updateStatus(id, status);
       message.success("Status updated");
-      fetchMessages();
+      fetchContactMessages();
       if (currentMessage && currentMessage.id === id) {
         setCurrentMessage({ ...currentMessage, status });
       }
@@ -50,22 +77,10 @@ const MessagesPage = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Subject",
-      dataIndex: "subject",
-      key: "subject",
-    },
+  const contactColumns = [
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Subject", dataIndex: "subject", key: "subject" },
     {
       title: "Date",
       dataIndex: "createdAt",
@@ -109,24 +124,144 @@ const MessagesPage = () => {
     },
   ];
 
+  // --- Order Chats Logic ---
+
+  const chatColumns = [
+    {
+      title: "Order #",
+      dataIndex: "orderNumber",
+      key: "orderNumber",
+      render: (text) => (
+        <span className="font-semibold text-cyan-400">{text}</span>
+      ),
+    },
+    {
+      title: "Customer",
+      key: "customer",
+      render: (_, record) => (
+        <div className="flex items-center gap-2">
+          {record.customer?.avatar ? (
+            <img
+              src={record.customer.avatar}
+              className="w-6 h-6 rounded-full"
+              alt=""
+            />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs">
+              {record.customer?.firstName?.[0]}
+            </div>
+          )}
+          <span>
+            {record.customer?.firstName} {record.customer?.lastName}
+          </span>
+        </div>
+      ),
+    },
+    {
+      title: "Last Message",
+      dataIndex: "lastMessage",
+      key: "lastMessage",
+      render: (msg) => (
+        <div className="max-w-xs truncate text-gray-400">
+          {msg?.isAdmin && <span className="text-cyan-500 mr-1">You:</span>}
+          {msg?.content || (msg?.imageUrl ? "📷 Image" : "")}
+        </div>
+      ),
+    },
+    {
+      title: "Last Updated",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (date) => (
+        <span className="text-xs text-gray-500">
+          {new Date(date).toLocaleString()}
+        </span>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          icon={<MessageSquare size={16} />}
+          onClick={() => {
+            setSelectedChatOrder(record);
+            setIsChatOpen(true);
+          }}
+        >
+          Open Chat
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Messages</h1>
-          <p className="admin-page-subtitle">Contact from users</p>
+          <p className="admin-page-subtitle">Manage customer communications</p>
         </div>
+        <Button
+          icon={<RefreshCw size={16} />}
+          onClick={
+            activeTab === "contact" ? fetchContactMessages : fetchOrderChats
+          }
+        >
+          Refresh
+        </Button>
       </div>
 
-      <Card className="admin-table-card">
-        <Table
-          dataSource={messages}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-        />
-      </Card>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        items={[
+          {
+            key: "chats",
+            label: (
+              <span className="flex items-center gap-2">
+                <MessageSquare size={16} />
+                Order Chats
+                <Badge count={chats.length} offset={[10, 0]} color="#00d4ff" />
+              </span>
+            ),
+            children: (
+              <Card className="admin-table-card">
+                <Table
+                  dataSource={chats}
+                  columns={chatColumns}
+                  rowKey="id"
+                  loading={loadingChats}
+                  pagination={{ pageSize: 8 }}
+                />
+              </Card>
+            ),
+          },
+          {
+            key: "contact",
+            label: (
+              <span className="flex items-center gap-2">
+                <Mail size={16} />
+                Inquiries
+              </span>
+            ),
+            children: (
+              <Card className="admin-table-card">
+                <Table
+                  dataSource={messages}
+                  columns={contactColumns}
+                  rowKey="id"
+                  loading={loadingMessages}
+                />
+              </Card>
+            ),
+          },
+        ]}
+      />
 
+      {/* Contact Message Modal */}
       <Modal
         title="View Message"
         open={viewModalOpen}
@@ -168,6 +303,16 @@ const MessagesPage = () => {
           </Descriptions>
         )}
       </Modal>
+
+      {/* Order Chat Window */}
+      {isChatOpen && selectedChatOrder && (
+        <ChatWindow
+          orderId={selectedChatOrder.id}
+          orderNumber={selectedChatOrder.orderNumber}
+          onClose={() => setIsChatOpen(false)}
+          isAdmin={true}
+        />
+      )}
     </div>
   );
 };

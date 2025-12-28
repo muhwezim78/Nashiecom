@@ -14,7 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
-import { message, Spin } from "antd";
+import { message, Spin, Card } from "antd";
 import { formatCurrency } from "../utils/currency";
 
 const ProductDetail = () => {
@@ -70,7 +70,7 @@ const ProductDetail = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="aspect-[4/3] rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#12121a] relative group shadow-2xl"
+              className="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-[#12121a] relative group shadow-2xl"
             >
               <img
                 src={mainImage}
@@ -172,9 +172,10 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {Array.isArray(product.specs)
                     ? product.specs.map((spec, index) => (
-                        <div
+                        <Card
                           key={spec.id || index}
-                          className="bg-[#12121a] rounded-[2rem] p-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 shadow-lg"
+                          className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
+                          styles={{ body: { padding: "1.5rem" } }}
                         >
                           <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
                             {spec.name}
@@ -182,13 +183,14 @@ const ProductDetail = () => {
                           <span className="block text-white font-bold text-lg">
                             {spec.value}
                           </span>
-                        </div>
+                        </Card>
                       ))
                     : typeof product.specs === "object"
                     ? Object.entries(product.specs).map(([key, value]) => (
-                        <div
+                        <Card
                           key={key}
-                          className="bg-[#12121a] rounded-[2rem] p-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 shadow-lg"
+                          className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
+                          styles={{ body: { padding: "1.5rem" } }}
                         >
                           <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
                             {key}
@@ -198,7 +200,7 @@ const ProductDetail = () => {
                               ? JSON.stringify(value)
                               : value}
                           </span>
-                        </div>
+                        </Card>
                       ))
                     : null}
                 </div>
@@ -250,30 +252,33 @@ const ProductDetail = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-6 pt-6">
-              <div className="flex flex-col items-center text-center gap-3 p-6 rounded-[2rem] bg-[#12121a] border border-white/5 shadow-xl">
-                <div className="p-3 bg-cyan-500/10 rounded-xl">
-                  <Truck className="w-6 h-6 text-cyan-400" />
-                </div>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                  Free Shipping
-                </span>
-              </div>
-              <div className="flex flex-col items-center text-center gap-3 p-6 rounded-[2rem] bg-[#12121a] border border-white/5 shadow-xl">
-                <div className="p-3 bg-cyan-500/10 rounded-xl">
-                  <Shield className="w-6 h-6 text-cyan-400" />
-                </div>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                  2 Year Warranty
-                </span>
-              </div>
-              <div className="flex flex-col items-center text-center gap-3 p-6 rounded-[2rem] bg-[#12121a] border border-white/5 shadow-xl">
-                <div className="p-3 bg-cyan-500/10 rounded-xl">
-                  <RotateCcw className="w-6 h-6 text-cyan-400" />
-                </div>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                  30 Day Returns
-                </span>
-              </div>
+              {[
+                { icon: Truck, label: "Free Shipping" },
+                { icon: Shield, label: "2 Year Warranty" },
+                { icon: RotateCcw, label: "30 Day Returns" },
+              ].map((badge, i) => (
+                <Card
+                  key={i}
+                  className="!bg-[#12121a] !border-white/5 !rounded-2xl shadow-xl !border"
+                  styles={{
+                    body: {
+                      padding: "1.5rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                      gap: "0.75rem",
+                    },
+                  }}
+                >
+                  <div className="p-3 bg-cyan-500/10 rounded-xl">
+                    <badge.icon className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    {badge.label}
+                  </span>
+                </Card>
+              ))}
             </div>
           </div>
         </div>

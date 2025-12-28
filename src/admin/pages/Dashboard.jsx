@@ -422,7 +422,11 @@ const Dashboard = () => {
                     )}
                     <div className="activity-content">
                       <div className="activity-message">{product.name}</div>
-                      <div className="activity-time">{product.category}</div>
+                      <div className="activity-time">
+                        {typeof product.category === "object"
+                          ? product.category.name
+                          : product.category}
+                      </div>
                     </div>
                     <Tag color={product.quantity <= 0 ? "red" : "orange"}>
                       {product.quantity} left

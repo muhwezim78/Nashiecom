@@ -1,20 +1,34 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Form, Input, Button, message } from "antd";
-import { User, Lock, Mail, ArrowRight, Loader, Smartphone } from "lucide-react"; // Import Smartphone
+import { Form, Input, Button, Card, Typography, App, Divider } from "antd";
+import {
+  User,
+  Lock,
+  Mail,
+  ArrowRight,
+  ArrowLeft,
+  Monitor,
+  Smartphone,
+} from "lucide-react";
 import { motion } from "framer-motion";
+import "./Login.css";
+
+const { Title, Text } = Typography;
 
 const Signup = () => {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       await register({
-        name: values.name,
+        firstName: values.firstName,
+        lastName: values.lastName,
         email: values.email,
         password: values.password,
         phone: values.phone,
@@ -23,134 +37,175 @@ const Signup = () => {
       navigate("/");
     } catch (error) {
       console.error("Signup failed:", error);
-      message.error(error.message || "Registration failed. Please try again.");
+
+      if (error.errors && Array.isArray(error.errors)) {
+        // Map backend errors to form fields
+        const formErrors = error.errors.map((err) => ({
+          name: err.field,
+          errors: [err.message],
+        }));
+        form.setFields(formErrors);
+        message.error("Please fix the validation errors.");
+      } else {
+        message.error(
+          error.message || "Registration failed. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/10 blur-[120px] rounded-full" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
+    <div className="login-container">
+      <div className="login-background">
+        <div className="login-glow login-glow-1" />
+        <div className="login-glow login-glow-2" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <div className="bg-[#12121a]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-black text-white tracking-tight mb-2">
-              Join the Future
-            </h1>
-            <p className="text-gray-400">
-              Create your account to start shopping
-            </p>
+      <Card className="login-card" style={{ maxWidth: 500 }}>
+        <div className="login-header">
+          <div className="login-logo">
+            <Monitor size={40} />
           </div>
-
-          <Form
-            name="signup"
-            layout="vertical"
-            onFinish={onFinish}
-            autoComplete="off"
-            className="space-y-4"
-          >
-            <Form.Item
-              name="name"
-              rules={[
-                { required: true, message: "Please input your full name!" },
-                { min: 2, message: "Name must be at least 2 characters" },
-              ]}
-            >
-              <Input
-                size="large"
-                prefix={<User className="w-4 h-4 text-gray-400" />}
-                placeholder="Full Name"
-                className="bg-black/20 border-white/10 text-white placeholder-gray-500 rounded-xl hover:border-cyan-500/50 focus:border-cyan-500 h-12"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="email"
-              rules={[
-                { required: true, message: "Please input your email!" },
-                { type: "email", message: "Please enter a valid email!" },
-              ]}
-            >
-              <Input
-                size="large"
-                prefix={<Mail className="w-4 h-4 text-gray-400" />}
-                placeholder="Email Address"
-                className="bg-black/20 border-white/10 text-white placeholder-gray-500 rounded-xl hover:border-cyan-500/50 focus:border-cyan-500 h-12"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="phone"
-              rules={[
-                { required: true, message: "Please input your phone number!" },
-              ]}
-            >
-              <Input
-                size="large"
-                prefix={<Smartphone className="w-4 h-4 text-gray-400" />}
-                placeholder="Phone Number"
-                className="bg-black/20 border-white/10 text-white placeholder-gray-500 rounded-xl hover:border-cyan-500/50 focus:border-cyan-500 h-12"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-                { min: 6, message: "Password must be at least 6 characters" },
-              ]}
-            >
-              <Input.Password
-                size="large"
-                prefix={<Lock className="w-4 h-4 text-gray-400" />}
-                placeholder="Password"
-                className="bg-black/20 border-white/10 text-white placeholder-gray-500 rounded-xl hover:border-cyan-500/50 focus:border-cyan-500 h-12"
-              />
-            </Form.Item>
-
-            <Form.Item className="mb-0 pt-4">
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 border-none rounded-xl text-base font-bold shadow-lg hover:shadow-purple-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <Loader className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    Create Account <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </Button>
-            </Form.Item>
-          </Form>
-
-          <div className="mt-8 pt-8 border-t border-white/10 text-center">
-            <p className="text-gray-400">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-cyan-400 hover:text-cyan-300 font-bold ml-1"
-              >
-                Sign In
-              </Link>
-            </p>
-          </div>
+          <Title level={3} style={{ margin: 0, color: "#fff" }}>
+            Join Nashiecom
+          </Title>
+          <Text type="secondary">Create your account to start shopping</Text>
         </div>
-      </motion.div>
+
+        <Form
+          form={form}
+          name="signup"
+          layout="vertical"
+          onFinish={onFinish}
+          autoComplete="off"
+          requiredMark={false}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+            <Form.Item
+              name="firstName"
+              label="First Name"
+              rules={[
+                { required: true, message: "Please input your first name!" },
+              ]}
+            >
+              <Input
+                prefix={<User size={16} />}
+                placeholder="First Name"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="lastName"
+              label="Last Name"
+              rules={[
+                { required: true, message: "Please input your last name!" },
+              ]}
+            >
+              <Input
+                prefix={<User size={16} />}
+                placeholder="Last Name"
+                size="large"
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please input your email!" },
+              { type: "email", message: "Please enter a valid email!" },
+            ]}
+          >
+            <Input
+              prefix={<Mail size={16} />}
+              placeholder="Enter your email"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="phone"
+            label="Phone Number"
+            rules={[
+              { required: true, message: "Please input your phone number!" },
+            ]}
+          >
+            <Input
+              prefix={<Smartphone size={16} />}
+              placeholder="Phone Number"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              { required: true, message: "Please input your password!" },
+              { min: 8, message: "Password must be at least 8 characters" },
+              {
+                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                message:
+                  "Password must contain uppercase, lowercase, and a number",
+              },
+            ]}
+          >
+            <Input.Password
+              prefix={<Lock size={16} />}
+              placeholder="Create a password"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item className="mt-6">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              size="large"
+            >
+              Create Account
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <Divider style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+          <span className="text-gray-500 text-sm">or</span>
+        </Divider>
+
+        <div className="space-y-3">
+          <Link to="/login">
+            <Button
+              block
+              className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-cyan-500/50 h-10 rounded-xl"
+            >
+              Sign In Instead
+            </Button>
+          </Link>
+
+          <Link to="/">
+            <Button
+              type="text"
+              block
+              icon={<ArrowLeft size={16} />}
+              style={{ color: "rgba(255,255,255,0.6)" }}
+            >
+              Back to Store
+            </Button>
+          </Link>
+        </div>
+
+        <div className="login-footer">
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            By joining, you agree to our Terms and Conditions.
+          </Text>
+        </div>
+      </Card>
     </div>
   );
 };

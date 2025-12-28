@@ -233,8 +233,52 @@ exports.getOrderById = async (req, res, next) => {
 // @access  Private
 exports.createOrder = async (req, res, next) => {
   try {
-    const { items, shippingAddress, paymentMethod, couponCode, customerNote } =
-      req.body;
+    const {
+      items,
+      shippingAddress,
+      paymentMethod,
+      paymentDetails,
+      idempotencyKey,
+      couponCode,
+      customerNote,
+    } = req.body;
+
+    // --- Idempotency Check ---
+    if (idempotencyKey) {
+      const existingOrder = await prisma.order.findUnique({
+        where: { idempotencyKey },
+        include: { items: true, address: true },
+      });
+
+      if (existingOrder) {
+        console.log(
+          `[Idempotency] Returning existing order: ${existingOrder.orderNumber}`
+        );
+        return res.status(200).json({
+          success: true,
+          data: { order: existingOrder },
+        });
+      }
+    }
+
+    // --- Mobile Money Logic ---
+    if (paymentMethod === "MOBILE_MONEY") {
+      if (
+        !paymentDetails ||
+        !paymentDetails.phoneNumber ||
+        !paymentDetails.network
+      ) {
+        return next(
+          new AppError("Mobile Money requires phone number and network", 400)
+        );
+      }
+
+      console.log(
+        `[MOMO] Initiating Payment on ${paymentDetails.network} for ${paymentDetails.phoneNumber}...`
+      );
+      // TODO: Integrate actual API calls here using process.env.MTN_MOMO_API_KEY etc.
+      // For now, we assume pending status until callback or manual confirm.
+    }
 
     // Validate and calculate order
     let subtotal = 0;
@@ -333,6 +377,8 @@ exports.createOrder = async (req, res, next) => {
         discount,
         total,
         paymentMethod,
+        paymentDetails,
+        idempotencyKey,
         couponCode: couponCode?.toUpperCase(),
         customerNote,
         items: {
@@ -645,6 +691,77 @@ exports.getOrderStats = async (req, res, next) => {
           monthlyRevenue: parseFloat(monthlyRevenue._sum.total || 0),
         },
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// @desc    Confirm delivery (Client or Admin)
+// @route   PATCH /api/orders/:id/confirm-delivery
+// @access  Private
+exports.confirmDelivery = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const isAdmin = ["ADMIN", "SUPER_ADMIN"].includes(req.user.role);
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+    });
+
+    if (!order) {
+      return next(new AppError("Order not found", 404));
+    }
+
+    const updateData = {};
+    if (isAdmin) {
+      updateData.adminConfirmedDelivery = true;
+    } else {
+      if (order.userId !== req.user.id) {
+        return next(new AppError("Not authorized to confirm this order", 403));
+      }
+      updateData.clientConfirmedDelivery = true;
+    }
+
+    // Check if both are now confirmed
+    const finalAdminConfirmed = isAdmin ? true : order.adminConfirmedDelivery;
+    const finalClientConfirmed = !isAdmin
+      ? true
+      : order.clientConfirmedDelivery;
+
+    if (finalAdminConfirmed && finalClientConfirmed) {
+      updateData.status = "DELIVERED";
+      updateData.deliveredAt = new Date();
+
+      // Auto-mark payment as PAID if it was Payment on Delivery (COD)
+      if (order.paymentMethod === "COD" && order.paymentStatus !== "PAID") {
+        updateData.paymentStatus = "PAID";
+        updateData.paidAt = new Date();
+      }
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id },
+      data: {
+        ...updateData,
+        statusHistory: {
+          create: {
+            status:
+              finalAdminConfirmed && finalClientConfirmed
+                ? "DELIVERED"
+                : order.status,
+            note: `Delivery confirmed by ${isAdmin ? "Admin" : "Client"}`,
+            createdBy: req.user.id,
+          },
+        },
+      },
+      include: {
+        statusHistory: { orderBy: { createdAt: "desc" } },
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { order: updatedOrder },
     });
   } catch (error) {
     next(error);

@@ -19,7 +19,7 @@ import ProductCard from "../components/ProductCard";
 import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 import { formatCurrency } from "../utils/currency";
-import { Space, Menu, Spin, Pagination } from "antd";
+import { Space, Menu, Spin, Pagination, Card } from "antd";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -374,7 +374,10 @@ const Products = () => {
             <div className="sticky top-24">
               <Space orientation="vertical" size={24} className="w-full">
                 {/* Categories with Ant Design Menu */}
-                <div className="bg-gradient-to-b from-gray-900/50 to-black/50 rounded-2xl p-6 border border-gray-800">
+                <Card
+                  className="!bg-gradient-to-b !from-gray-900/50 !to-black/50 !rounded-2xl !border-gray-800 !border-0"
+                  styles={{ body: { padding: "1.5rem" } }}
+                >
                   <h3 className="text-lg font-bold text-white mb-4 pb-3 border-b border-gray-800">
                     Categories
                   </h3>
@@ -387,10 +390,13 @@ const Products = () => {
                       className="bg-transparent border-0 custom-menu"
                     />
                   )}
-                </div>
+                </Card>
 
                 {/* Price Range */}
-                <div className="bg-gradient-to-b from-gray-900/50 to-black/50 rounded-2xl p-6 border border-gray-800">
+                <Card
+                  className="!bg-gradient-to-b !from-gray-900/50 !to-black/50 !rounded-2xl !border-gray-800 !border-0"
+                  styles={{ body: { padding: "1.5rem" } }}
+                >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-white">
                       Price Range
@@ -419,10 +425,13 @@ const Products = () => {
                       {formatCurrency(20000000)}
                     </span>
                   </Space>
-                </div>
+                </Card>
 
                 {/* Stats */}
-                <div className="bg-gradient-to-b from-gray-900/50 to-black/50 rounded-2xl p-6 border border-gray-800">
+                <Card
+                  className="!bg-gradient-to-b !from-gray-900/50 !to-black/50 !rounded-2xl !border-gray-800 !border-0"
+                  styles={{ body: { padding: "1.5rem" } }}
+                >
                   <h3 className="text-lg font-bold text-white mb-4">
                     Product Stats
                   </h3>
@@ -434,7 +443,7 @@ const Products = () => {
                       </span>
                     </div>
                   </Space>
-                </div>
+                </Card>
 
                 {/* Clear Filters Button */}
                 {(activeCategory !== "all" ||
@@ -594,10 +603,14 @@ const Products = () => {
                 {Array(6)
                   .fill(0)
                   .map((_, i) => (
-                    <div
+                    <motion.div
                       key={i}
-                      className="h-[500px] bg-white/5 rounded-3xl animate-pulse"
-                    />
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5, delay: i * 0.1 }}
+                    >
+                      <Card className="!bg-white/5 !rounded-2xl !border-0 h-[500px] animate-pulse" />
+                    </motion.div>
                   ))}
               </div>
             ) : products.length > 0 ? (

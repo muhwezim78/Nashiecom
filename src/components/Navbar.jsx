@@ -71,8 +71,12 @@ const Navbar = () => {
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 group">
-            <div className="relative w-10 h-10 flex items-center justify-center bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-cyan-500/20">
-              <Monitor className="text-white w-6 h-6" />
+            <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-cyan-500/20">
+              <img
+                src="/nashiecom.jpeg"
+                alt="Nashiecom Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-cyan-400 group-hover:to-blue-500 transition-all duration-300">
               Nashiecom Technologies

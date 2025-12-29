@@ -184,8 +184,9 @@ export const productsAPI = {
 
 // ============== CATEGORIES API ==============
 export const categoriesAPI = {
-  getAll: async () => {
-    return apiFetch("/categories");
+  getAll: async (params = {}) => {
+    const searchParams = new URLSearchParams(params);
+    return apiFetch(`/categories?${searchParams.toString()}`);
   },
 
   getTree: async () => {
@@ -219,6 +220,18 @@ export const categoriesAPI = {
   delete: async (id) => {
     return apiFetch(`/categories/${id}`, {
       method: "DELETE",
+    });
+  },
+
+  toggleFeatured: async (id) => {
+    return apiFetch(`/categories/${id}/toggle-featured`, {
+      method: "PATCH",
+    });
+  },
+
+  toggleStatus: async (id) => {
+    return apiFetch(`/categories/${id}/toggle-status`, {
+      method: "PATCH",
     });
   },
 };

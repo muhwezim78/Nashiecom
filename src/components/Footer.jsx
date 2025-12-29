@@ -132,9 +132,12 @@ const Footer = () => {
             {/* ... Brand Content ... */}
             <div className="space-y-6">
               <Link to="/" className="flex items-center gap-4 group">
-                <div className="relative w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-all duration-500">
-                  <Monitor className="w-8 h-8 text-white" />
-                  <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative w-14 h-14 flex items-center justify-center group-hover:rotate-12 transition-all duration-500">
+                  <img
+                    src="/nashiecom.jpeg"
+                    alt="Nashiecom Logo"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div>
                   <h2 className="text-3xl font-black text-white tracking-tighter">
@@ -158,8 +161,11 @@ const Footer = () => {
               </span>
               <div className="flex gap-4">
                 {[
-                  { Icon: Facebook, url: "#" },
-                  { Icon: Twitter, url: "#" },
+                  {
+                    Icon: Facebook,
+                    url: "https://www.facebook.com/share/17kyZYVS4f/?mibextid=wwXIfr",
+                  },
+                  { Icon: Twitter, url: "https://x.com/nashiecom" },
                   {
                     Icon: Instagram,
                     url: "https://www.instagram.com/nashiecom_tecnologies_store?igsh=Nnd2a2owd2FuZndh",

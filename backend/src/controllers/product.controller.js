@@ -52,34 +52,42 @@ exports.getAllProducts = async (req, res, next) => {
       where.price = { ...where.price, lte: parseFloat(maxPrice) };
     }
 
-    if (featured === "true") {
-      where.featured = true;
+    if (featured !== undefined) {
+      where.featured = featured === "true";
     }
 
-    if (inStock === "true") {
-      where.inStock = true;
+    if (inStock !== undefined) {
+      where.inStock = inStock === "true";
     }
 
     // Build orderBy
-    let orderBy = {};
+    let orderBy = [];
     switch (sortBy) {
+      case "featured":
+        orderBy = [
+          { featured: "desc" },
+          { inStock: "desc" },
+          { rating: "desc" },
+          { createdAt: "desc" },
+        ];
+        break;
       case "price-low":
-        orderBy = { price: "asc" };
+        orderBy = [{ price: "asc" }];
         break;
       case "price-high":
-        orderBy = { price: "desc" };
+        orderBy = [{ price: "desc" }];
         break;
       case "rating":
-        orderBy = { rating: "desc" };
+        orderBy = [{ rating: "desc" }];
         break;
       case "name":
-        orderBy = { name: "asc" };
+        orderBy = [{ name: "asc" }];
         break;
       case "newest":
-        orderBy = { createdAt: "desc" };
+        orderBy = [{ createdAt: "desc" }];
         break;
       default:
-        orderBy = { [sortBy]: sortOrder };
+        orderBy = [{ [sortBy]: sortOrder }];
     }
 
     const [products, total] = await Promise.all([
@@ -143,7 +151,7 @@ exports.getFeaturedProducts = async (req, res, next) => {
     const products = await prisma.product.findMany({
       where: { isActive: true, featured: true },
       take: parseInt(limit),
-      orderBy: { rating: "desc" },
+      orderBy: [{ inStock: "desc" }, { rating: "desc" }, { createdAt: "desc" }],
       include: {
         category: {
           select: { id: true, name: true, slug: true },
@@ -403,7 +411,7 @@ exports.createProduct = async (req, res, next) => {
         featured: featured || false,
         weight,
         dimensions,
-        inStock: (quantity || 0) > 0,
+        inStock: quantity > 0,
       },
       include: {
         category: { select: { id: true, name: true } },
@@ -504,12 +512,15 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     // Calculate inStock based on quantity
-    const finalInStock =
-      quantity !== undefined
-        ? quantity > 0
-        : inStock !== undefined
-        ? inStock
-        : existing.inStock;
+    let finalInStock = inStock;
+    if (quantity !== undefined) {
+      if (quantity <= 0) {
+        finalInStock = false;
+      } else if (inStock === undefined || inStock === null) {
+        // If updating quantity but not inStock, auto-set to true if quantity > 0
+        finalInStock = true;
+      }
+    }
 
     const product = await prisma.product.update({
       where: { id },

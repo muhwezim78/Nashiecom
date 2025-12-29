@@ -66,7 +66,11 @@ const Signup = () => {
       <Card className="login-card" style={{ maxWidth: 500 }}>
         <div className="login-header">
           <div className="login-logo">
-            <Monitor size={40} />
+            <img
+              src="/nashiecom.jpeg"
+              alt="Logo"
+              style={{ width: 60, height: 60, objectFit: "contain" }}
+            />
           </div>
           <Title level={3} style={{ margin: 0, color: "#fff" }}>
             Join Nashiecom

@@ -530,6 +530,28 @@ exports.updateOrderStatus = async (req, res, next) => {
         break;
     }
 
+    const oldOrder = await prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
+
+    if (!oldOrder) {
+      return next(new AppError("Order not found", 404));
+    }
+
+    // Restore stock if being cancelled (and was not cancelled before)
+    if (status === "CANCELLED" && oldOrder.status !== "CANCELLED") {
+      for (const item of oldOrder.items) {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            quantity: { increment: item.quantity },
+            inStock: true,
+          },
+        });
+      }
+    }
+
     const order = await prisma.order.update({
       where: { id },
       data: {
@@ -677,6 +699,23 @@ exports.addTracking = async (req, res, next) => {
 exports.deleteOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
+
+    if (order && !["CANCELLED", "REFUNDED"].includes(order.status)) {
+      for (const item of order.items) {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            quantity: { increment: item.quantity },
+            inStock: true,
+          },
+        });
+      }
+    }
 
     await prisma.order.delete({ where: { id } });
 

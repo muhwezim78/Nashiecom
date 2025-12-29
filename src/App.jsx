@@ -40,6 +40,7 @@ import MessagesPage from "./admin/pages/MessagesPage";
 import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 import NotificationsPage from "./admin/pages/NotificationsPage";
+import ReviewsPage from "./admin/pages/ReviewsPage";
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -178,6 +179,7 @@ function App() {
                     <Route path="coupons" element={<CouponsPage />} />
                     <Route path="messages" element={<MessagesPage />} />
                     <Route path="analytics" element={<AnalyticsPage />} />
+                    <Route path="reviews" element={<ReviewsPage />} />
                     <Route path="settings" element={<SettingsPage />} />
                     <Route
                       path="notifications"

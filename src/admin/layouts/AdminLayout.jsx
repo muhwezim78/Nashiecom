@@ -30,6 +30,7 @@ import {
   FolderTree,
   ChevronLeft,
   BarChart3,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import "./AdminLayout.css";
@@ -79,6 +80,12 @@ const menuItems = [
     icon: <MessageSquare size={18} />,
     label: "Messages",
     path: "/admin/messages",
+  },
+  {
+    key: "reviews",
+    icon: <Star size={18} />,
+    label: "Reviews",
+    path: "/admin/reviews",
   },
   {
     key: "analytics",
@@ -186,7 +193,15 @@ const AdminLayout = () => {
         collapsedWidth={80}
       >
         <div className="admin-logo">
-          <Store size={collapsed ? 24 : 28} />
+          <img
+            src="/nashiecom.jpeg"
+            alt="Logo"
+            style={{
+              width: collapsed ? 32 : 40,
+              height: collapsed ? 32 : 40,
+              objectFit: "contain",
+            }}
+          />
           {!collapsed && <span>Nashiecom Admin</span>}
         </div>
         {renderMenu()}
@@ -212,7 +227,16 @@ const AdminLayout = () => {
         styles={{ body: { padding: 0, background: "#0a0a0f" } }}
       >
         <div className="admin-logo mobile-logo">
-          <Store size={28} />
+          <img
+            src="/nashiecom.jpeg"
+            alt="Logo"
+            style={{
+              width: 40,
+              height: 40,
+              objectFit: "contain",
+              marginRight: 12,
+            }}
+          />
           <span>Nashiecom Admin</span>
         </div>
         {renderMenu()}

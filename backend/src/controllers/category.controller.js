@@ -8,9 +8,12 @@ const slugify = require("slugify");
 // @access  Public
 exports.getAllCategories = async (req, res, next) => {
   try {
-    const { includeProducts, parentOnly } = req.query;
+    const { includeProducts, parentOnly, includeInactive } = req.query;
 
-    const where = { isActive: true };
+    const where = {};
+    if (includeInactive !== "true") {
+      where.isActive = true;
+    }
 
     if (parentOnly === "true") {
       where.parentId = null;
@@ -220,7 +223,16 @@ exports.getCategoryProducts = async (req, res, next) => {
 // @access  Admin
 exports.createCategory = async (req, res, next) => {
   try {
-    const { name, description, icon, image, parentId, sortOrder } = req.body;
+    const {
+      name,
+      description,
+      icon,
+      image,
+      parentId,
+      sortOrder,
+      featured,
+      isActive,
+    } = req.body;
 
     // Generate unique slug
     let slug = slugify(name, { lower: true, strict: true });
@@ -237,6 +249,7 @@ exports.createCategory = async (req, res, next) => {
         icon,
         image,
         parentId,
+        featured: featured || false,
         sortOrder: sortOrder || 0,
       },
       include: {
@@ -259,8 +272,16 @@ exports.createCategory = async (req, res, next) => {
 exports.updateCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description, icon, image, parentId, sortOrder, isActive } =
-      req.body;
+    const {
+      name,
+      description,
+      icon,
+      image,
+      parentId,
+      sortOrder,
+      isActive,
+      featured,
+    } = req.body;
 
     const existing = await prisma.category.findUnique({ where: { id } });
     if (!existing) {
@@ -295,6 +316,7 @@ exports.updateCategory = async (req, res, next) => {
         parentId,
         sortOrder,
         isActive,
+        featured,
       },
       include: {
         parent: { select: { id: true, name: true } },
@@ -372,6 +394,31 @@ exports.toggleStatus = async (req, res, next) => {
     const updated = await prisma.category.update({
       where: { id },
       data: { isActive: !category.isActive },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { category: updated },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// @desc    Toggle category featured status
+// @route   PATCH /api/categories/:id/toggle-featured
+// @access  Admin
+exports.toggleFeatured = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) {
+      return next(new AppError("Category not found", 404));
+    }
+
+    const updated = await prisma.category.update({
+      where: { id },
+      data: { featured: !category.featured },
     });
 
     res.status(200).json({

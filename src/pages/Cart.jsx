@@ -131,10 +131,15 @@ const Cart = () => {
                       ? item.category.name
                       : item.category}
                   </span>
-                  {item.inStock && (
+                  {item.inStock && item.quantity > 0 ? (
                     <span className="flex items-center gap-1.5 text-green-400/80 text-[10px] font-bold uppercase tracking-widest">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                       Ready to Ship
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-red-500 text-[10px] font-black uppercase tracking-widest">
+                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                      Out of Stock
                     </span>
                   )}
                 </div>
@@ -453,12 +458,40 @@ const Cart = () => {
 
                     <div className="space-y-4 pt-6">
                       <Link
-                        to="/checkout"
-                        className="group relative w-full h-20 bg-cyan-600 rounded-[2rem] flex items-center justify-center gap-4 overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-2xl hover:shadow-cyan-500/25"
+                        to={
+                          cartItems.some(
+                            (item) => !item.inStock || item.quantity <= 0
+                          )
+                            ? "#"
+                            : "/checkout"
+                        }
+                        onClick={(e) => {
+                          if (
+                            cartItems.some(
+                              (item) => !item.inStock || item.quantity <= 0
+                            )
+                          ) {
+                            e.preventDefault();
+                            message.error(
+                              "Some items are out of stock. Please remove them to continue."
+                            );
+                          }
+                        }}
+                        className={`group relative w-full h-20 rounded-[2rem] flex items-center justify-center gap-4 overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-2xl ${
+                          cartItems.some(
+                            (item) => !item.inStock || item.quantity <= 0
+                          )
+                            ? "bg-gray-800 cursor-not-allowed grayscale"
+                            : "bg-cyan-600 hover:shadow-cyan-500/25"
+                        }`}
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="relative z-10 text-xl font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                          Complete Checkout
+                          {cartItems.some(
+                            (item) => !item.inStock || item.quantity <= 0
+                          )
+                            ? "Fix Out of Stock Items"
+                            : "Complete Checkout"}
                           <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                         </span>
                       </Link>

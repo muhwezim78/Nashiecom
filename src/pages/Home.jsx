@@ -21,6 +21,7 @@ import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
 import Newsletter from "../components/Newsletter";
 import { useFeaturedProducts, useProducts } from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
 import { categories as staticCategories } from "../data/products";
 
 const Home = () => {
@@ -34,17 +35,32 @@ const Home = () => {
     limit: 3,
   });
 
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useCategories();
+
   const featuredProducts = featuredData?.data?.products || [];
   const gamingProducts = gamingData?.data?.products || [];
-  const loading = featuredLoading || gamingLoading;
+  const loading = featuredLoading || gamingLoading || categoriesLoading;
 
-  // Still use static categories for now but we could fetch them too
-  // keeping the static highlighting logic
-  const highlightCategories = staticCategories.filter(
-    (cat) =>
-      cat.id !== "all" &&
-      ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
-  );
+  const categories = categoriesData?.data?.categories || [];
+
+  // Get featured categories from DB or fallback to defaults
+  const highlightCategories =
+    categories.length > 0
+      ? categories.filter((cat) => cat.featured).slice(0, 4)
+      : staticCategories
+          .filter(
+            (cat) =>
+              cat.id !== "all" &&
+              ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
+          )
+          .slice(0, 4);
+
+  // If we have categories from DB but none are featured, just take the first 4
+  const finalCategories =
+    highlightCategories.length > 0
+      ? highlightCategories
+      : categories.slice(0, 4);
 
   const partners = [
     "HP",
@@ -228,7 +244,7 @@ const Home = () => {
               </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {highlightCategories.map((category, index) => (
+                {finalCategories.map((category, index) => (
                   <CategoryCard
                     key={category.id}
                     category={category}

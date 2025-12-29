@@ -48,5 +48,11 @@ router.patch(
   adminOnly,
   categoryController.toggleStatus
 );
+router.patch(
+  "/:id/toggle-featured",
+  authenticate,
+  adminOnly,
+  categoryController.toggleFeatured
+);
 
 module.exports = router;

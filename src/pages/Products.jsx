@@ -99,7 +99,7 @@ const Products = () => {
         params.sortOrder = "desc";
         break;
       default:
-        params.featured = sortBy === "featured" ? true : undefined;
+        params.sortBy = sortBy;
         break;
     }
     return params;

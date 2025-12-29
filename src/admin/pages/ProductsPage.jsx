@@ -243,7 +243,22 @@ const ProductsPage = () => {
             fallback="https://placehold.co/50"
           />
           <div>
-            <div style={{ fontWeight: 500, color: "#fff" }}>{record.name}</div>
+            <div
+              style={{
+                fontWeight: 500,
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              {record.name}
+              {record.featured && (
+                <Tooltip title="Featured Product">
+                  <Star size={14} fill="#fbbf24" color="#fbbf24" />
+                </Tooltip>
+              )}
+            </div>
             <Text type="secondary" style={{ fontSize: 12 }}>
               {record.category?.name}
             </Text>
@@ -560,17 +575,26 @@ const ProductsPage = () => {
           </Form.Item>
 
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
+              <Form.Item name="isActive" valuePropName="checked" label="Active">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="inStock"
+                valuePropName="checked"
+                label="In Stock"
+              >
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
               <Form.Item
                 name="featured"
                 valuePropName="checked"
                 label="Featured"
               >
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="isActive" valuePropName="checked" label="Active">
                 <Switch />
               </Form.Item>
             </Col>

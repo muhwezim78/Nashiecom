@@ -95,6 +95,7 @@ model Category {
   description String?
   icon        String?
   image       String?
+  featured    Boolean  @default(false)
   isActive    Boolean  @default(true) @map("is_active")
   sortOrder   Int      @default(0) @map("sort_order")
   createdAt   DateTime @default(now()) @map("created_at")

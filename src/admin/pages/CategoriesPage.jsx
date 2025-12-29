@@ -10,6 +10,8 @@ import {
   message,
   Popconfirm,
   Tooltip,
+  Switch,
+  Tag,
 } from "antd";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { categoriesAPI } from "../../services/api";
@@ -26,7 +28,10 @@ const CategoriesPage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const { data } = await categoriesAPI.getAll();
+      const { data } = await categoriesAPI.getAll({
+        includeInactive: true,
+        _t: Date.now(), // Bypass cache
+      });
       setCategories(data.categories);
     } catch (error) {
       console.error(error);
@@ -65,6 +70,25 @@ const CategoriesPage = () => {
       message.error("Failed to delete");
     }
   };
+  const handleToggleFeatured = async (id) => {
+    try {
+      await categoriesAPI.toggleFeatured(id);
+      message.success("Category updated");
+      fetchCategories();
+    } catch (error) {
+      message.error("Update failed");
+    }
+  };
+
+  const handleToggleStatus = async (id) => {
+    try {
+      await categoriesAPI.toggleStatus(id);
+      message.success("Category updated");
+      fetchCategories();
+    } catch (error) {
+      message.error("Update failed");
+    }
+  };
 
   const filteredCategories = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchText.toLowerCase())
@@ -87,6 +111,32 @@ const CategoriesPage = () => {
       title: "Slug",
       dataIndex: "slug",
       key: "slug",
+    },
+    {
+      title: "Featured",
+      dataIndex: "featured",
+      key: "featured",
+      render: (featured, record) => (
+        <Switch
+          checked={featured}
+          onChange={() => handleToggleFeatured(record.id)}
+          size="small"
+        />
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "isActive",
+      key: "isActive",
+      render: (active, record) => (
+        <Tag
+          color={active ? "green" : "default"}
+          style={{ cursor: "pointer" }}
+          onClick={() => handleToggleStatus(record.id)}
+        >
+          {active ? "Active" : "Inactive"}
+        </Tag>
+      ),
     },
     {
       title: "Description",
@@ -182,6 +232,15 @@ const CategoriesPage = () => {
           </Form.Item>
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="featured" valuePropName="checked">
+            <Switch
+              checkedChildren="Featured"
+              unCheckedChildren="Not Featured"
+            />
+          </Form.Item>
+          <Form.Item name="isActive" valuePropName="checked">
+            <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
           </Form.Item>
         </Form>
       </Modal>

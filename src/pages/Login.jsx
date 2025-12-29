@@ -58,7 +58,11 @@ const Login = () => {
       <Card className="login-card">
         <div className="login-header">
           <div className="login-logo">
-            <Monitor size={40} />
+            <img
+              src="/nashiecom.jpeg"
+              alt="Logo"
+              style={{ width: 60, height: 60, objectFit: "contain" }}
+            />
           </div>
           <Title level={3} style={{ margin: 0, color: "#fff" }}>
             Customer Login

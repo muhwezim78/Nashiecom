@@ -267,7 +267,7 @@ const ProductCard = ({ product }) => {
               </span>
             </div>
             <span className="text-xs text-gray-500">
-              ({product.reviews?.length || product.reviews || 0})
+              ({product.reviewCount || 0})
             </span>
           </div>
 
@@ -296,10 +296,12 @@ const ProductCard = ({ product }) => {
               <motion.button
                 onClick={handleAddToCart}
                 whileTap={{ scale: 0.95 }}
-                disabled={isAdded}
+                disabled={isAdded || !product.inStock || product.quantity <= 0}
                 className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${
                   isAdded
                     ? "bg-green-600 hover:bg-green-700"
+                    : !product.inStock || product.quantity <= 0
+                    ? "bg-gray-700 cursor-not-allowed opacity-60"
                     : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
                 }`}
               >
@@ -309,6 +311,11 @@ const ProductCard = ({ product }) => {
                   <>
                     <Check className="w-5 h-5 relative z-10" />
                     <span className="relative z-10">Added to Cart</span>
+                  </>
+                ) : !product.inStock || product.quantity <= 0 ? (
+                  <>
+                    <ShoppingCart className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">Out of Stock</span>
                   </>
                 ) : (
                   <>

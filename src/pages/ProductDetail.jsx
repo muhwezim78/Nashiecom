@@ -14,8 +14,9 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
-import { message, Spin, Card } from "antd";
+import { message, Spin, Card, Rate } from "antd";
 import { formatCurrency } from "../utils/currency";
+import Reviews from "../components/Reviews";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -112,9 +113,14 @@ const ProductDetail = () => {
                 <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-full text-sm font-medium border border-cyan-500/20">
                   {product.category?.name || product.category || "Product"}
                 </span>
-                {product.stock > 0 ? (
+                {product.featured && (
+                  <span className="px-3 py-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 rounded-full text-sm font-bold border border-amber-500/30">
+                    FEATURED
+                  </span>
+                )}
+                {product.inStock && product.quantity > 0 ? (
                   <span className="flex items-center gap-1 text-green-400 text-sm font-medium">
-                    <Check className="w-4 h-4" /> In Stock ({product.stock})
+                    <Check className="w-4 h-4" /> In Stock ({product.quantity})
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-red-400 text-sm font-medium">
@@ -128,21 +134,17 @@ const ProductDetail = () => {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-1 text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < Math.floor(product.rating || 5)
-                          ? "fill-current"
-                          : "text-gray-600"
-                      }`}
-                    />
-                  ))}
+                <div className="flex items-center gap-1 text-yellow-500">
+                  <Rate
+                    disabled
+                    allowHalf
+                    defaultValue={parseFloat(product.rating || 0)}
+                    className="custom-rate-small"
+                  />
+                  <span className="text-gray-400 font-bold ml-2">
+                    {product.reviewCount || 0} reviews
+                  </span>
                 </div>
-                <span className="text-gray-400">
-                  {product.reviews?.length || 0} reviews
-                </span>
               </div>
 
               <div className="flex items-end gap-4 mb-8">
@@ -221,7 +223,7 @@ const ProductDetail = () => {
                 </span>
                 <button
                   onClick={() =>
-                    setQuantity((q) => Math.min(q + 1, product.stock || 100))
+                    setQuantity((q) => Math.min(q + 1, product.quantity || 100))
                   }
                   className="p-4 text-gray-400 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
                 >
@@ -241,13 +243,17 @@ const ProductDetail = () => {
                     `Added ${quantity} x ${product.name} to cart`
                   );
                 }}
-                disabled={product.stock === 0}
+                disabled={!product.inStock || product.quantity <= 0}
                 className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${
-                  product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
+                  !product.inStock || product.quantity <= 0
+                    ? "opacity-50 cursor-not-allowed grayscale bg-gray-800"
+                    : ""
                 }`}
               >
                 <ShoppingCart className="w-6 h-6 mr-2" />
-                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                {!product.inStock || product.quantity <= 0
+                  ? "Out of Stock"
+                  : "Add to Cart"}
               </button>
             </div>
 
@@ -282,7 +288,25 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <Reviews productId={product.id} />
       </div>
+
+      <style jsx global>{`
+        .custom-rate-small .ant-rate-star {
+          margin-inline-end: 4px !important;
+        }
+        .custom-rate-small .ant-rate-star-second {
+          color: rgba(255, 255, 255, 0.1);
+        }
+        .custom-rate-small .ant-rate-star-full .ant-rate-star-second {
+          color: #f59e0b;
+        }
+        .custom-rate-small .ant-rate-star-half .ant-rate-star-first {
+          color: #f59e0b;
+        }
+      `}</style>
     </div>
   );
 };

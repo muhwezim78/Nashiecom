@@ -81,12 +81,36 @@ export const NotificationProvider = ({ children }) => {
       // Handle real-time notifications
       newSocket.on("new_notification", (data) => {
         playNotificationSound();
-        notification.info({
+
+        const config = {
           message: data.title,
           description: data.message,
           placement: "topRight",
-          duration: 5,
-        });
+          duration: 10, // Increased duration for welcome message
+          style: {
+            borderRadius: "16px",
+            background: "rgba(10, 15, 30, 0.95)",
+            border: "1px solid rgba(0, 242, 254, 0.2)",
+            backdropFilter: "blur(10px)",
+          },
+          className: "premium-notification",
+        };
+
+        // Use appropriate notification method based on type
+        switch (data.type) {
+          case "SUCCESS":
+            notification.success(config);
+            break;
+          case "WARNING":
+            notification.warning(config);
+            break;
+          case "ERROR":
+            notification.error(config);
+            break;
+          default:
+            notification.info(config);
+        }
+
         setUnreadCount((prev) => prev + 1);
         // Add to notifications list
         setNotifications((prev) => [

@@ -81,6 +81,36 @@ exports.register = async (req, res, next) => {
       },
     });
 
+    // Create Welcome Notification
+    try {
+      const welcomeNotification = await prisma.notification.create({
+        data: {
+          title: `🌟 Welcome to Nashiecom Technologies, ${firstName}! 🌟`,
+          message: `We're absolutely thrilled to have you here! As a token of our appreciation, use code **WELCOME10** for 10% off your first order. Explore our curated collections and enjoy exclusive member benefits. Happy shopping!`,
+          type: "SUCCESS",
+          userId: user.id,
+          sentAt: new Date(),
+        },
+      });
+
+      // Emit socket event if io is available
+      const io = req.app.get("io");
+      if (io) {
+        io.to(`user_${user.id}`).emit("new_notification", {
+          id: welcomeNotification.id,
+          title: welcomeNotification.title,
+          message: welcomeNotification.message,
+          type: welcomeNotification.type,
+          createdAt: welcomeNotification.createdAt,
+        });
+      }
+    } catch (notificationError) {
+      // Log notification error but don't fail registration
+      logger.error(
+        `Error creating welcome notification: ${notificationError.message}`
+      );
+    }
+
     logger.info(`New user registered: ${email}`);
     createSendToken(user, 201, res);
   } catch (error) {

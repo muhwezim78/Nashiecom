@@ -451,3 +451,70 @@ img {
   z-index: -1;
   overflow: hidden;
 }
+
+/* Premium Notification Styling */
+.premium-notification {
+  overflow: visible !important;
+}
+
+.premium-notification .ant-notification-notice {
+  background: rgba(10, 15, 30, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 212, 255, 0.1) !important;
+  padding: 20px !important;
+  position: relative;
+}
+
+.premium-notification .ant-notification-notice-message {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 17px !important;
+  margin-bottom: 10px !important;
+  letter-spacing: -0.01em;
+}
+
+.premium-notification .ant-notification-notice-description {
+  color: rgba(255, 255, 255, 0.75) !important;
+  line-height: 1.6 !important;
+  font-size: 14px !important;
+}
+
+.premium-notification .ant-notification-notice-close {
+  color: rgba(255, 255, 255, 0.4) !important;
+  top: 16px !important;
+  right: 16px !important;
+}
+
+.premium-notification .ant-notification-notice-close:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.ant-notification-notice-success.premium-notification
+  .ant-notification-notice-icon {
+  color: #10b981 !important;
+}
+
+.ant-notification-notice-info.premium-notification
+  .ant-notification-notice-icon {
+  color: #00d4ff !important;
+}
+
+/* Animation for premium notification */
+@keyframes notification-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.premium-notification {
+  animation: notification-slide-in 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}

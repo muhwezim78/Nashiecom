@@ -180,6 +180,7 @@ const CouponsPage = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 800 }}
         />
       </Card>
 

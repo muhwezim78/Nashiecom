@@ -222,6 +222,7 @@ const ReviewsPage = () => {
             ...pagination,
             onChange: (page) => fetchReviews(page),
           }}
+          scroll={{ x: 800 }}
           className="admin-table"
         />
       </Card>

@@ -282,6 +282,7 @@ const Dashboard = () => {
               rowKey="id"
               pagination={false}
               size="small"
+              scroll={{ x: 600 }}
             />
           </Card>
         </Col>

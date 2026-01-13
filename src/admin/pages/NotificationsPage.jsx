@@ -350,6 +350,7 @@ const NotificationsPage = () => {
           dataSource={notifications}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 1000 }}
           pagination={{
             current: pagination.page,
             pageSize: pagination.limit,

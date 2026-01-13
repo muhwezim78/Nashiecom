@@ -206,6 +206,7 @@ const CategoriesPage = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 800 }}
           pagination={{ pageSize: 10 }}
         />
       </Card>

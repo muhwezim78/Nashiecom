@@ -234,6 +234,7 @@ const MessagesPage = () => {
                   columns={chatColumns}
                   rowKey="id"
                   loading={loadingChats}
+                  scroll={{ x: 800 }}
                   pagination={{ pageSize: 8 }}
                 />
               </Card>
@@ -254,6 +255,7 @@ const MessagesPage = () => {
                   columns={contactColumns}
                   rowKey="id"
                   loading={loadingMessages}
+                  scroll={{ x: 800 }}
                 />
               </Card>
             ),

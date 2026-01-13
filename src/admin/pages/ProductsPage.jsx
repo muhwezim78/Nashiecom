@@ -449,6 +449,7 @@ const ProductsPage = () => {
           dataSource={products}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 1200 }}
           pagination={{
             current: pagination.page,
             pageSize: pagination.limit,

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Space } from "antd";
 import {
@@ -14,11 +14,23 @@ import { Link } from "react-router-dom";
 /* 3D Model Placeholder - A stylized Laptop composition */
 const LaptopModel = () => {
   const group = useRef();
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMouse({
+        x: (e.clientX / window.innerWidth - 0.5) * 0.5,
+        y: (e.clientY / window.innerHeight - 0.5) * 0.5,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    group.current.rotation.y = Math.sin(t / 4) / 4;
-    group.current.rotation.x = Math.sin(t / 4) / 8;
+    group.current.rotation.y = Math.sin(t / 4) / 8 + mouse.x;
+    group.current.rotation.x = Math.sin(t / 4) / 12 + mouse.y;
     group.current.position.y = Math.sin(t / 1.5) / 10;
   });
 
@@ -92,37 +104,44 @@ const HeroSection = () => {
     <div className="relative w-full min-h-[85vh] bg-[#0a0a0f] text-white overflow-hidden flex items-center">
       {/* 3D Scene Background */}
       <div className="absolute inset-0 z-0">
-        <Canvas>
-          <PerspectiveCamera makeDefault position={[0, 0, 8]} />
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} intensity={1} color="#00d4ff" />
+        <Canvas gl={{ antialias: true }} dpr={[1, 2]}>
+          <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
+          <ambientLight intensity={0.8} />
+          <pointLight position={[10, 10, 10]} intensity={2} color="#00d4ff" />
           <pointLight
             position={[-10, -10, -10]}
-            intensity={1}
+            intensity={1.5}
             color="#7c3aed"
+          />
+          <spotLight
+            position={[0, 5, 10]}
+            angle={0.15}
+            penumbra={1}
+            intensity={2}
+            castShadow
           />
           <Stars
             radius={100}
             depth={50}
-            count={2000}
+            count={3000}
             factor={4}
             saturation={0}
             fade
-            speed={1}
+            speed={1.5}
           />
 
-          <Float speed={2} rotationIntensity={1} floatIntensity={1}>
+          <Float speed={2.5} rotationIntensity={0.5} floatIntensity={1}>
             <LaptopModel />
           </Float>
 
           <AnimatedSphere />
-          <Environment preset="city" />
+          <Environment preset="night" />
         </Canvas>
       </div>
 
       {/* Content Overlay */}
       <div className="relative z-10 w-full container mx-auto px-4">
-        <Space direction="vertical" size={80} align="start" className="w-full">
+        <Space orientation="vertical" size={80} align="start" className="w-full">
           {/* Main Content */}
           <div className="flex flex-col items-start">
             <motion.div
@@ -134,7 +153,7 @@ const HeroSection = () => {
               <span className="inline-block px-4 py-2 rounded-full bg-white/5 border border-cyan-500/30 text-cyan-400 font-medium text-sm mb-6 backdrop-blur-sm tracking-wide">
                 Next-Gen Tech is Here
               </span>
-              <h1 className="text-5xl md:text-8xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-cyan-500 mb-4">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-cyan-500 mb-4 tracking-tight">
                 Elevate Your <br className="hidden md:block" />
                 Digital Experience
               </h1>

@@ -62,23 +62,26 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-[#0a0a0f]/90 backdrop-blur-md border-b border-white/10 shadow-lg"
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
+          ? "bg-[#0a0a0f]/90 backdrop-blur-md border-b border-white/10 shadow-lg"
+          : "bg-transparent"
+          }`}
       >
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo with Magnetic Effect */}
           <Link to="/" className="flex items-center gap-4 group">
-            <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-cyan-500/20">
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative w-12 h-12 flex items-center justify-center transition-all duration-300 shadow-lg shadow-cyan-500/20"
+            >
               <img
                 src="/nashiecom.jpeg"
                 alt="Nashiecom Logo"
                 className="w-full h-full object-contain"
               />
-            </div>
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-cyan-400 group-hover:to-blue-500 transition-all duration-300">
+            </motion.div>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-gray-400 group-hover:from-cyan-400 group-hover:to-blue-500 transition-all duration-300 tracking-tight">
               Nashiecom Technologies
             </span>
           </Link>
@@ -405,9 +408,8 @@ const SearchOverlay = ({ isOpen, onClose }) => {
 const NavLink = ({ to, children, isActive }) => (
   <Link
     to={to}
-    className={`relative text-sm font-medium transition-colors hover:text-cyan-400 ${
-      isActive ? "text-white" : "text-gray-400"
-    }`}
+    className={`relative text-sm font-medium transition-colors hover:text-cyan-400 ${isActive ? "text-white" : "text-gray-400"
+      }`}
   >
     {children}
     {isActive && (

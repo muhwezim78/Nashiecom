@@ -23,9 +23,35 @@ import Newsletter from "../components/Newsletter";
 import { useFeaturedProducts, useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 import { categories as staticCategories } from "../data/products";
+import SEO from "../components/SEO";
 
 const Home = () => {
   const { scrollYProgress } = useScroll();
+
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "ElectronicsStore",
+    "name": "Nashiecom Technologies",
+    "url": "https://nashiecom-technologies.web.app",
+    "logo": "https://nashiecom-technologies.web.app/nashiecom.jpeg",
+    "description": "Premium electronics and IT solutions provider. State-of-the-art laptops, desktops, and computing accessories.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "New Pioneer Mall shop PH-38",
+      "addressLocality": "Kampala",
+      "addressCountry": "UG"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+256 786 400 713",
+      "contactType": "sales"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://nashiecom-technologies.web.app/products?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
 
   // Fetch Data using Hooks
   const { data: featuredData, isLoading: featuredLoading } =
@@ -49,12 +75,12 @@ const Home = () => {
     categories.length > 0
       ? categories.filter((cat) => cat.featured).slice(0, 4)
       : staticCategories
-          .filter(
-            (cat) =>
-              cat.id !== "all" &&
-              ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
-          )
-          .slice(0, 4);
+        .filter(
+          (cat) =>
+            cat.id !== "all" &&
+            ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
+        )
+        .slice(0, 4);
 
   // If we have categories from DB but none are featured, just take the first 4
   const finalCategories =
@@ -112,7 +138,11 @@ const Home = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-x-hidden">
+      <SEO
+        description="Nashiecom Technologies - Your premier destination for high-performance laptops, custom desktops, and professional computing accessories. Engineered for excellence."
+        schema={orgSchema}
+      />
       {/* Immersive Background Layers */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.05)_0%,rgba(0,0,0,0)_50%)]" />
@@ -121,8 +151,13 @@ const Home = () => {
         <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
       </div>
 
-      {/* Main content wrapped in Space with large gaps */}
-      <Space direction="vertical" size={120} className="w-full">
+      {/* Main content wrapped in Space with responsive gaps */}
+      <Space
+        orientation="vertical"
+        size="large"
+        className="w-full"
+        style={{ gap: 'var(--space-2xl)' }}
+      >
         {/* Hero Section */}
         <div className="w-full">
           <HeroSection />

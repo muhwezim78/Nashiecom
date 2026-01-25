@@ -52,108 +52,131 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  // Fetch initial data on mount
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated) {
       fetchUnreadCount();
       fetchNotifications();
-
-      console.log(
-        "Initializing Notification Socket...",
-        SOCKET_ORIGIN,
-        "Path:",
-        SOCKET_PATH
-      );
-      const newSocket = io(SOCKET_ORIGIN, {
-        path: SOCKET_PATH,
-        withCredentials: true,
-        transports: ["websocket", "polling"],
-      });
-
-      newSocket.on("connect", () => {
-        console.log("Notification Socket Connected:", newSocket.id);
-        newSocket.emit("join_user_notifications", user.id);
-
-        if (["ADMIN", "SUPER_ADMIN"].includes(user.role)) {
-          newSocket.emit("join_admin_notifications");
-        }
-      });
-
-      // Handle real-time notifications
-      newSocket.on("new_notification", (data) => {
-        playNotificationSound();
-
-        const config = {
-          message: data.title,
-          description: data.message,
-          placement: "topRight",
-          duration: 10, // Increased duration for welcome message
-          style: {
-            borderRadius: "16px",
-            background: "rgba(10, 15, 30, 0.95)",
-            border: "1px solid rgba(0, 242, 254, 0.2)",
-            backdropFilter: "blur(10px)",
-          },
-          className: "premium-notification",
-        };
-
-        // Use appropriate notification method based on type
-        switch (data.type) {
-          case "SUCCESS":
-            notification.success(config);
-            break;
-          case "WARNING":
-            notification.warning(config);
-            break;
-          case "ERROR":
-            notification.error(config);
-            break;
-          default:
-            notification.info(config);
-        }
-
-        setUnreadCount((prev) => prev + 1);
-        // Add to notifications list
-        setNotifications((prev) => [
-          {
-            id: data.id,
-            title: data.title,
-            message: data.message,
-            type: data.type,
-            isRead: false,
-            createdAt: new Date().toISOString(),
-          },
-          ...prev.slice(0, 9), // Keep only 10
-        ]);
-      });
-
-      newSocket.on("new_message_notification", (data) => {
-        playNotificationSound();
-        notification.info({
-          message: `New Message from ${data.senderName}`,
-          description: data.content || "Sent an image",
-          placement: "topRight",
-          duration: 4,
-        });
-        setUnreadCount((prev) => prev + 1);
-      });
-
-      newSocket.on("order_status_update", (data) => {
-        playNotificationSound();
-        notification.success({
-          message: "Order Update",
-          description: `Order #${data.orderNumber} is now ${data.status}`,
-          placement: "topRight",
-        });
-        setUnreadCount((prev) => prev + 1);
-      });
-
-      setSocket(newSocket);
-
-      return () => {
-        newSocket.disconnect();
-      };
     }
-  }, [isAuthenticated, user, fetchUnreadCount, fetchNotifications]);
+  }, [isAuthenticated, fetchUnreadCount, fetchNotifications]);
+
+  // Handle Socket Connection
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    // Cleanup function to safely disconnect
+    const cleanup = () => {
+      if (socketRef.current) {
+        console.log("Disconnecting Notification Socket...");
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setSocket(null);
+      }
+    };
+
+    if (!isAuthenticated || !user?.id) {
+      cleanup();
+      return;
+    }
+
+    // Only initialize if not already connected/connecting
+    if (socketRef.current?.connected) return;
+
+    console.log("Initializing Notification Socket...", SOCKET_ORIGIN, "Path:", SOCKET_PATH);
+
+    const newSocket = io(SOCKET_ORIGIN, {
+      path: SOCKET_PATH,
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      timeout: 20000,
+    });
+
+    socketRef.current = newSocket;
+
+    newSocket.on("connect", () => {
+      console.log("Notification Socket Connected:", newSocket.id);
+      newSocket.emit("join_user_notifications", user.id);
+
+      if (["ADMIN", "SUPER_ADMIN"].includes(user.role)) {
+        newSocket.emit("join_admin_notifications");
+      }
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.warn("Notification Socket Connection Error:", error.message);
+    });
+
+    // Handle real-time notifications
+    newSocket.on("new_notification", (data) => {
+      playNotificationSound();
+
+      const config = {
+        message: data.title,
+        description: data.message,
+        placement: "topRight",
+        duration: 10,
+        style: {
+          borderRadius: "16px",
+          background: "rgba(10, 15, 30, 0.95)",
+          border: "1px solid rgba(0, 242, 254, 0.2)",
+          backdropFilter: "blur(10px)",
+          color: "#fff",
+        },
+        className: "premium-notification",
+      };
+
+      switch (data.type) {
+        case "SUCCESS": notification.success(config); break;
+        case "WARNING": notification.warning(config); break;
+        case "ERROR": notification.error(config); break;
+        default: notification.info(config);
+      }
+
+      setUnreadCount((prev) => prev + 1);
+      setNotifications((prev) => [
+        {
+          id: data.id,
+          title: data.title,
+          message: data.message,
+          type: data.type,
+          isRead: false,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev.slice(0, 9),
+      ]);
+    });
+
+    newSocket.on("new_message_notification", (data) => {
+      playNotificationSound();
+      notification.info({
+        message: `New Message from ${data.senderName}`,
+        description: data.content || "Sent an image",
+        placement: "topRight",
+        duration: 4,
+        style: { borderRadius: "12px", background: "rgba(10, 15, 30, 0.9)" },
+      });
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    newSocket.on("order_status_update", (data) => {
+      playNotificationSound();
+      notification.success({
+        message: "Order Update",
+        description: `Order #${data.orderNumber} is now ${data.status}`,
+        placement: "topRight",
+        style: { borderRadius: "12px", background: "rgba(10, 15, 30, 0.9)" },
+      });
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    setSocket(newSocket);
+
+    return cleanup;
+  }, [isAuthenticated, user?.id, user?.role, SOCKET_ORIGIN, SOCKET_PATH]);
 
   const playNotificationSound = () => {
     try {

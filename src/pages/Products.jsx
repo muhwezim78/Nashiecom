@@ -20,6 +20,7 @@ import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 import { formatCurrency } from "../utils/currency";
 import { Space, Menu, Spin, Pagination, Card } from "antd";
+import SEO from "../components/SEO";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -182,15 +183,21 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900">
+      <SEO
+        title="Store Explorer"
+        description="Browse our curated selection of high-performance laptops, custom-built desktops, and premium computing accessories at Nashiecom Technologies."
+        url="/products"
+      />
       {/* Hero Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 to-black border-b border-gray-800">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2306b6d4\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
 
-        <div className="container mx-auto px-4 py-12 md:py-16 relative z-10">
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <Space
             orientation="vertical"
-            size={40}
+            size="large"
             className="w-full max-w-4xl mx-auto text-center"
+            style={{ gap: 'var(--space-xl)' }}
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -272,21 +279,19 @@ const Products = () => {
             <div className="hidden md:flex items-center gap-1 bg-white/5 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === "grid"
-                    ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                className={`p-2 rounded-lg transition-colors ${viewMode === "grid"
+                  ? "bg-cyan-500/20 text-cyan-400"
+                  : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === "list"
-                    ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                className={`p-2 rounded-lg transition-colors ${viewMode === "list"
+                  ? "bg-cyan-500/20 text-cyan-400"
+                  : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <List className="w-5 h-5" />
               </button>
@@ -303,9 +308,8 @@ const Products = () => {
                   {sortOptions.find((opt) => opt.value === sortBy)?.label}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    showSortOptions ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${showSortOptions ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
@@ -327,11 +331,10 @@ const Products = () => {
                               setSortBy(option.value);
                               setShowSortOptions(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-                              sortBy === option.value
-                                ? "bg-cyan-500/10 text-cyan-400"
-                                : "text-gray-300 hover:text-white hover:bg-white/5"
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${sortBy === option.value
+                              ? "bg-cyan-500/10 text-cyan-400"
+                              : "text-gray-300 hover:text-white hover:bg-white/5"
+                              }`}
                           >
                             <Icon className="w-4 h-4" />
                             {option.label}
@@ -357,14 +360,14 @@ const Products = () => {
             {(activeCategory !== "all" ||
               searchQuery ||
               priceRange < 20000000) && (
-              <button
-                onClick={clearFilters}
-                className="hidden md:flex items-center gap-2 px-4 py-2.5 text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                <X className="w-4 h-4" />
-                Clear Filters
-              </button>
-            )}
+                <button
+                  onClick={clearFilters}
+                  className="hidden md:flex items-center gap-2 px-4 py-2.5 text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  Clear Filters
+                </button>
+              )}
           </div>
         </div>
 
@@ -449,13 +452,13 @@ const Products = () => {
                 {(activeCategory !== "all" ||
                   searchQuery ||
                   priceRange < 20000000) && (
-                  <button
-                    onClick={clearFilters}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-400 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-colors font-medium"
-                  >
-                    Clear All Filters
-                  </button>
-                )}
+                    <button
+                      onClick={clearFilters}
+                      className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-400 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-colors font-medium"
+                    >
+                      Clear All Filters
+                    </button>
+                  )}
               </Space>
             </div>
           </aside>
@@ -501,11 +504,10 @@ const Products = () => {
                                 setSortBy(option.value);
                                 setIsMobileFilterOpen(false);
                               }}
-                              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
-                                sortBy === option.value
-                                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/20"
-                                  : "text-gray-400 border border-gray-800 hover:border-gray-700"
-                              }`}
+                              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${sortBy === option.value
+                                ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/20"
+                                : "text-gray-400 border border-gray-800 hover:border-gray-700"
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                               {option.label}
@@ -525,11 +527,10 @@ const Products = () => {
                           <button
                             key={cat.id}
                             onClick={() => handleCategoryChange(cat.id)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${
-                              activeCategory === cat.id
-                                ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30"
-                                : "bg-white/5 text-gray-400 border-gray-800 hover:border-gray-700"
-                            }`}
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${activeCategory === cat.id
+                              ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30"
+                              : "bg-white/5 text-gray-400 border-gray-800 hover:border-gray-700"
+                              }`}
                           >
                             <span className="text-2xl mb-2">{cat.icon}</span>
                             <span className="text-sm font-medium">
@@ -576,13 +577,13 @@ const Products = () => {
                       {(activeCategory !== "all" ||
                         searchQuery ||
                         priceRange < 20000000) && (
-                        <button
-                          onClick={clearFilters}
-                          className="w-full py-3 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/10 transition-colors"
-                        >
-                          Clear All Filters
-                        </button>
-                      )}
+                          <button
+                            onClick={clearFilters}
+                            className="w-full py-3 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/10 transition-colors"
+                          >
+                            Clear All Filters
+                          </button>
+                        )}
                       <button
                         onClick={() => setIsMobileFilterOpen(false)}
                         className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-500 hover:to-blue-500 transition-all"
@@ -616,11 +617,10 @@ const Products = () => {
             ) : products.length > 0 ? (
               <>
                 <div
-                  className={`grid gap-8 ${
-                    viewMode === "grid"
-                      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-                      : "grid-cols-1"
-                  }`}
+                  className={`grid gap-8 ${viewMode === "grid"
+                    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                    : "grid-cols-1"
+                    }`}
                 >
                   {products.map((product, index) => (
                     <motion.div

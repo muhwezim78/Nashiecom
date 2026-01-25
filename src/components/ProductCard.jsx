@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
   ShoppingCart,
   Star,
@@ -23,6 +23,37 @@ const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const cardRef = useRef(null);
+
+  // 3D Tilt Logic
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (images.length > 1) startAutoScroll();
+    x.set(0);
+    y.set(0);
+  };
   const images =
     product.images && product.images.length > 0
       ? product.images.map((img) => (typeof img === "object" ? img.url : img))
@@ -31,8 +62,8 @@ const ProductCard = ({ product }) => {
   const isDiscounted = product.originalPrice > product.price;
   const discountPercentage = isDiscounted
     ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
+      ((product.originalPrice - product.price) / product.originalPrice) * 100
+    )
     : 0;
 
   // Auto-scroll with pause on hover
@@ -140,25 +171,39 @@ const ProductCard = ({ product }) => {
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8 }}
-      transition={{ duration: 0.3 }}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      onMouseMove={handleMouseMove}
       onMouseEnter={() => {
         setIsHovered(true);
         if (images.length > 1) stopAutoScroll();
       }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        if (images.length > 1) startAutoScroll();
-      }}
-      className="group relative bg-gradient-to-b from-gray-900 to-black rounded-3xl border border-gray-800 overflow-hidden hover:border-cyan-500/30 hover:shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all duration-500 h-full flex flex-col"
+      onMouseLeave={handleMouseLeave}
+      className="group relative bg-gradient-to-b from-gray-900 to-black rounded-3xl border border-gray-800 overflow-hidden hover:border-cyan-500/30 transition-all duration-500 h-full flex flex-col"
     >
       {contextHolder}
+
+      {/* Reactive Glow Effect */}
+      <motion.div
+        style={{
+          background: useTransform(
+            [mouseXSpring, mouseYSpring],
+            ([x, y]) => `radial-gradient(600px circle at ${50 + x * 100}% ${50 + y * 100}%, rgba(0, 212, 255, 0.08), transparent)`
+          ),
+        }}
+        className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+      />
+
       {/* Containerized Content Wrapper */}
-      <div className="flex-1 flex flex-col p-6">
+      <div className="relative z-10 flex-1 flex flex-col p-6" style={{ transform: "translateZ(20px)" }}>
         {/* Image Carousel Container */}
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-900 to-black rounded-2xl mb-6 group/carousel">
+        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-900 to-black rounded-2xl mb-6 group/carousel shadow-2xl" style={{ transform: "translateZ(30px)" }}>
           <Link to={`/products/${product.id}`} className="block w-full h-full">
             <AnimatePresence mode="wait">
               <motion.img
@@ -204,11 +249,10 @@ const ProductCard = ({ product }) => {
                     setCurrentImageIndex(idx);
                     restartAutoScroll();
                   }}
-                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    currentImageIndex === idx
-                      ? "w-6 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-                      : "w-1.5 bg-white/40 hover:bg-white/60"
-                  }`}
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${currentImageIndex === idx
+                    ? "w-6 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                    : "w-1.5 bg-white/40 hover:bg-white/60"
+                    }`}
                 />
               ))}
             </div>
@@ -297,13 +341,12 @@ const ProductCard = ({ product }) => {
                 onClick={handleAddToCart}
                 whileTap={{ scale: 0.95 }}
                 disabled={isAdded || !product.inStock || product.quantity <= 0}
-                className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${
-                  isAdded
-                    ? "bg-green-600 hover:bg-green-700"
-                    : !product.inStock || product.quantity <= 0
+                className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${isAdded
+                  ? "bg-green-600 hover:bg-green-700"
+                  : !product.inStock || product.quantity <= 0
                     ? "bg-gray-700 cursor-not-allowed opacity-60"
                     : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
-                }`}
+                  }`}
               >
                 <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
 

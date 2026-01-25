@@ -1,10 +1,16 @@
 import { motion } from "framer-motion";
 import { Target, Users, Globe, Shield } from "lucide-react";
 import { Card } from "antd";
+import SEO from "../components/SEO";
 
 const About = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
+      <SEO
+        title="Our Story"
+        description="Learn about Nashiecom Technologies - Uganda's premier electronic store. Our mission is to provide high-performance tech for creators and gamers."
+        url="/about"
+      />
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-blue-900/10" />
@@ -32,8 +38,8 @@ const About = () => {
 
       {/* Mission */}
       <section className="section bg-[#12121a]">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-xl)] items-center">
             <div>
               <h2 className="text-3xl font-bold text-white mb-6">
                 Our Mission

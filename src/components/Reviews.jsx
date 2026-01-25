@@ -47,11 +47,11 @@ const Reviews = ({ productId }) => {
   const averageRating =
     totalReviews > 0
       ? (
-          Object.entries(distribution).reduce(
-            (acc, [rating, count]) => acc + rating * count,
-            0
-          ) / totalReviews
-        ).toFixed(1)
+        Object.entries(distribution).reduce(
+          (acc, [rating, count]) => acc + rating * count,
+          0
+        ) / totalReviews
+      ).toFixed(1)
       : 0;
 
   const onFinish = async (values) => {
@@ -333,28 +333,6 @@ const Reviews = ({ productId }) => {
         </div>
       </div>
 
-      <style jsx global>{`
-        .custom-rate .ant-rate-star-second {
-          color: rgba(255, 255, 255, 0.05);
-        }
-        .custom-rate .ant-rate-star-full .ant-rate-star-second {
-          color: #06b6d4;
-        }
-        .dark-input {
-          background: rgba(255, 255, 255, 0.02) !important;
-          border: 1px solid rgba(255, 255, 255, 0.05) !important;
-          border-radius: 12px !important;
-          color: white !important;
-          padding: 12px 16px !important;
-        }
-        .dark-input:focus {
-          border-color: #06b6d4 !important;
-          box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1) !important;
-        }
-        .dark-input::placeholder {
-          color: rgba(255, 255, 255, 0.2);
-        }
-      `}</style>
     </div>
   );
 };

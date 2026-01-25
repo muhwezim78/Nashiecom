@@ -17,6 +17,7 @@ import { useState } from "react";
 import { message, Spin, Card, Rate } from "antd";
 import { formatCurrency } from "../utils/currency";
 import Reviews from "../components/Reviews";
+import SEO from "../components/SEO";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -62,10 +63,39 @@ const ProductDetail = () => {
   const mainImage = images[activeImage] || product.image;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pb-12">
+    <div className="min-h-screen bg-[#0a0a0f] pb-20">
+      <SEO
+        title={product.name}
+        description={product.description?.substring(0, 160)}
+        image={mainImage}
+        url={`/products/${id}`}
+        schema={{
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": product.name,
+          "image": images,
+          "description": product.description,
+          "brand": {
+            "@type": "Brand",
+            "name": "Nashiecom"
+          },
+          "offers": {
+            "@type": "Offer",
+            "url": `https://nashiecom-technologies.web.app/products/${id}`,
+            "priceCurrency": "UGX",
+            "price": product.price,
+            "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+          },
+          "aggregateRating": product.reviewCount > 0 ? {
+            "@type": "AggregateRating",
+            "ratingValue": product.rating,
+            "reviewCount": product.reviewCount
+          } : undefined
+        }}
+      />
       {contextHolder}
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+      <div className="container mx-auto px-4 pt-[var(--navbar-clearance)]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--space-xl)] mb-[var(--space-2xl)]">
           {/* Images */}
           <div className="space-y-4">
             <motion.div
@@ -86,11 +116,10 @@ const ProductDetail = () => {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                    activeImage === idx
-                      ? "border-cyan-500"
-                      : "border-white/10 hover:border-white/30"
-                  }`}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${activeImage === idx
+                    ? "border-cyan-500"
+                    : "border-white/10 hover:border-white/30"
+                    }`}
                 >
                   <img
                     src={img}
@@ -174,21 +203,21 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {Array.isArray(product.specs)
                     ? product.specs.map((spec, index) => (
-                        <Card
-                          key={spec.id || index}
-                          className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
-                          styles={{ body: { padding: "1.5rem" } }}
-                        >
-                          <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
-                            {spec.name}
-                          </span>
-                          <span className="block text-white font-bold text-lg">
-                            {spec.value}
-                          </span>
-                        </Card>
-                      ))
+                      <Card
+                        key={spec.id || index}
+                        className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
+                        styles={{ body: { padding: "1.5rem" } }}
+                      >
+                        <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                          {spec.name}
+                        </span>
+                        <span className="block text-white font-bold text-lg">
+                          {spec.value}
+                        </span>
+                      </Card>
+                    ))
                     : typeof product.specs === "object"
-                    ? Object.entries(product.specs).map(([key, value]) => (
+                      ? Object.entries(product.specs).map(([key, value]) => (
                         <Card
                           key={key}
                           className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
@@ -204,7 +233,7 @@ const ProductDetail = () => {
                           </span>
                         </Card>
                       ))
-                    : null}
+                      : null}
                 </div>
               </div>
             )}
@@ -244,11 +273,10 @@ const ProductDetail = () => {
                   );
                 }}
                 disabled={!product.inStock || product.quantity <= 0}
-                className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${
-                  !product.inStock || product.quantity <= 0
-                    ? "opacity-50 cursor-not-allowed grayscale bg-gray-800"
-                    : ""
-                }`}
+                className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${!product.inStock || product.quantity <= 0
+                  ? "opacity-50 cursor-not-allowed grayscale bg-gray-800"
+                  : ""
+                  }`}
               >
                 <ShoppingCart className="w-6 h-6 mr-2" />
                 {!product.inStock || product.quantity <= 0
@@ -293,20 +321,6 @@ const ProductDetail = () => {
         <Reviews productId={product.id} />
       </div>
 
-      <style jsx global>{`
-        .custom-rate-small .ant-rate-star {
-          margin-inline-end: 4px !important;
-        }
-        .custom-rate-small .ant-rate-star-second {
-          color: rgba(255, 255, 255, 0.1);
-        }
-        .custom-rate-small .ant-rate-star-full .ant-rate-star-second {
-          color: #f59e0b;
-        }
-        .custom-rate-small .ant-rate-star-half .ant-rate-star-first {
-          color: #f59e0b;
-        }
-      `}</style>
     </div>
   );
 };

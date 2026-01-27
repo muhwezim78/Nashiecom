@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import { ordersAPI } from "../services/api";
 import { formatCurrency } from "../utils/currency";
 import {
@@ -11,18 +12,49 @@ import {
   AlertCircle,
   Eye,
   ChevronRight,
+  Search,
+  Filter,
+  ArrowLeft,
+  Calendar,
+  Box,
+  MapPin,
+  CreditCard,
+  History,
 } from "lucide-react";
-import { Table, Tag, Button, Card, Modal, App, Empty, Steps } from "antd";
+import {
+  Table,
+  Tag,
+  Button,
+  Card,
+  Drawer,
+  App,
+  Empty,
+  Steps,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Input,
+  Select,
+  Divider,
+  Badge,
+  Tooltip,
+  Result,
+} from "antd";
 import ChatWindow from "../components/chat/ChatWindow";
-import "./MyOrders.css";
+import SEO from "../components/SEO";
+
+const { Title, Text, Paragraph } = Typography;
 
 const MyOrders = () => {
   const { message } = App.useApp();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeChatOrder, setActiveChatOrder] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -75,195 +107,406 @@ const MyOrders = () => {
     }
   };
 
+  const [statusFilter, setStatusFilter] = useState(null);
+
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch = order.orderNumber
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+    const matchesStatus = statusFilter ? order.status === statusFilter : true;
+    return matchesSearch && matchesStatus;
+  });
+
   const columns = [
     {
-      title: "Order #",
+      title: (
+        <Text className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+          Order ID
+        </Text>
+      ),
       dataIndex: "orderNumber",
       key: "orderNumber",
       render: (text) => (
-        <span className="font-semibold text-white">{text}</span>
+        <Space direction="vertical" size={0}>
+          <Text strong className="text-[var(--text-primary)] font-black">
+            #{text}
+          </Text>
+          <Text className="text-[10px] text-[var(--text-muted)]">
+            Order Module
+          </Text>
+        </Space>
       ),
     },
     {
-      title: "Date",
+      title: (
+        <Text className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+          Order Placement Date
+        </Text>
+      ),
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (date) => new Date(date).toLocaleDateString(),
+      render: (date) => (
+        <Space size="small">
+          <Calendar size={14} className="text-cyan-500/50" />
+          <Text className="text-[var(--text-secondary)]">
+            {new Date(date).toLocaleDateString()}
+          </Text>
+        </Space>
+      ),
     },
     {
-      title: "Total",
+      title: (
+        <Text className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+          Total Amount
+        </Text>
+      ),
       dataIndex: "total",
       key: "total",
       render: (total) => (
-        <span className="text-cyan-400 font-bold">{formatCurrency(total)}</span>
+        <Text strong className="text-cyan-400 font-black">
+          {formatCurrency(total)}
+        </Text>
       ),
     },
     {
-      title: "Status",
+      title: (
+        <Text className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+          Order Status
+        </Text>
+      ),
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={getStatusColor(status)} className="rounded-full px-3">
-          {status}
-        </Tag>
+        <Badge
+          status={
+            status === "DELIVERED"
+              ? "success"
+              : status === "CANCELLED"
+                ? "error"
+                : "processing"
+          }
+          text={
+            <Tag
+              color={getStatusColor(status)}
+              className="rounded-full px-3 border-none font-bold uppercase tracking-widest text-[9px]"
+            >
+              {status}
+            </Tag>
+          }
+        />
       ),
     },
     {
-      title: "Actions",
+      title: (
+        <Text className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+          Control Panel
+        </Text>
+      ),
       key: "actions",
+      fixed: "right",
       render: (_, record) => (
-        <div className="flex gap-2">
-          <Button
-            type="text"
-            className="text-gray-400 hover:text-white"
-            icon={<Eye size={16} />}
-            onClick={() => setSelectedOrder(record)}
-          >
-            Details
-          </Button>
+        <Space size="middle">
+          <Tooltip title="View Detailed Logs">
+            <Button
+              type="text"
+              className="!bg-[var(--bg-glass)] hover:!bg-cyan-500/10 text-cyan-400 border border-[var(--border-subtle)] rounded-xl"
+              icon={<Eye size={16} />}
+              onClick={() => setSelectedOrder(record)}
+            >
+              Details
+            </Button>
+          </Tooltip>
 
           {record.status !== "DELIVERED" && record.status !== "CANCELLED" && (
-            <Button
-              type="primary"
-              className="bg-cyan-600 hover:bg-cyan-500 flex items-center gap-2"
-              icon={<MessageSquare size={16} />}
-              onClick={() => openChat(record)}
-            >
-              Chat
-            </Button>
+            <Tooltip title="Secure Comm Link">
+              <Button
+                type="primary"
+                className="bg-cyan-600 hover:bg-cyan-500 border-none rounded-xl"
+                icon={<MessageSquare size={16} />}
+                onClick={() => openChat(record)}
+              >
+                Chat
+              </Button>
+            </Tooltip>
           )}
 
           {record.status === "SHIPPED" && !record.clientConfirmedDelivery && (
             <Button
-              className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+              className="bg-green-600 hover:bg-green-500 border-none text-white rounded-xl"
               onClick={() => handleConfirmDelivery(record.id)}
             >
               Confirm Delivery
             </Button>
           )}
-        </div>
+        </Space>
       ),
     },
   ];
 
+  const stats = [
+    {
+      label: "Total Orders",
+      value: orders.length,
+      icon: Box,
+      color: "text-blue-400",
+      bg: "bg-blue-500/10",
+    },
+    {
+      label: "Active Orders",
+      value: orders.filter((o) =>
+        ["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED"].includes(o.status),
+      ).length,
+      icon: History,
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+    },
+    {
+      label: "Delivered Orders",
+      value: orders.filter((o) => o.status === "DELIVERED").length,
+      icon: CheckCircle,
+      color: "text-green-400",
+      bg: "bg-green-500/10",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-12">
-          <h1 className="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">
-            My <span className="text-cyan-400">Orders</span>
-          </h1>
-          <p className="mt-4 text-gray-400">
-            Track your orders and communicate with our team.
-          </p>
-        </header>
+    <div className="min-h-screen bg-[var(--bg-primary)] pt-32 pb-20 overflow-hidden relative transition-colors duration-500">
+      <SEO
+        title="My Orders"
+        description="Track your Nashiecom orders and communicate with our support team."
+      />
 
-        <Card className="order-table-card glass-card !rounded-2xl">
-          <Table
-            dataSource={orders}
-            columns={columns}
-            rowKey="id"
-            loading={loading}
-            pagination={{ pageSize: 8 }}
-            className="custom-antd-table"
-          />
-        </Card>
+      {/* Decorative Aura */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-[-10%] w-[800px] h-[800px] bg-cyan-600/[0.02] blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[800px] h-[800px] bg-purple-600/[0.02] blur-[150px] rounded-full" />
+      </div>
 
-        {/* Order Details Modal */}
-        <Modal
-          title={
-            <div className="flex items-center gap-2 text-xl font-bold !text-white">
-              <Package className="text-cyan-400" />
-              Order Details
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+        <Space direction="vertical" size={48} className="w-full">
+          {/* Hero Hub */}
+          <Card
+            className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[3rem] shadow-3xl overflow-hidden relative !border-0"
+            styles={{ body: { padding: 0 } }}
+          >
+            <div className="h-32 bg-gradient-to-r from-cyan-600/10 via-blue-600/10 to-purple-600/10 relative">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
             </div>
-          }
-          open={!!selectedOrder}
-          onCancel={() => setSelectedOrder(null)}
-          footer={null}
-          width={800}
-          className="order-details-modal"
-          centered
-        >
-          {selectedOrder && (
-            <div className="py-2 space-y-6">
-              {/* Order Header */}
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold text-white">
-                    Order #{selectedOrder.orderNumber}
-                  </h3>
-                  <p className="text-gray-400">
-                    Placed on{" "}
-                    {new Date(selectedOrder.createdAt).toLocaleString()}
-                  </p>
+            <div className="px-8 md:px-16 py-10 flex flex-col md:flex-row items-end justify-between gap-8 -mt-12 relative z-10">
+              <div className="flex items-end gap-6">
+                <div className="p-1 bg-[var(--bg-secondary)] rounded-[2rem] shadow-2xl">
+                  <div className="w-24 h-24 rounded-[1.5rem] bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white">
+                    <History size={40} className="text-white" />
+                  </div>
                 </div>
-                <Tag
-                  color={getStatusColor(selectedOrder.status)}
-                  className="px-4 py-1 rounded-full text-sm font-semibold uppercase border-none"
-                >
-                  {selectedOrder.status}
-                </Tag>
+                <div className="pb-2">
+                  <Title
+                    level={1}
+                    className="!text-[var(--text-primary)] !font-black !m-0 !tracking-tighter !text-5xl"
+                  >
+                    Tracking <span className="text-cyan-400">Hub</span>
+                  </Title>
+                  <Text className="text-[var(--text-muted)] font-medium uppercase tracking-[0.3em] text-[10px] block mt-1">
+                    Products Delivery System
+                  </Text>
+                </div>
               </div>
 
-              {/* Progress Stepper - White icons/text for dark mode */}
-              <Card
-                size="small"
-                className="!bg-white/5 !border-white/10 shadow-none !rounded-2xl"
-              >
-                <Steps
-                  size="small"
-                  className="dark-steps"
-                  current={[
-                    "PENDING",
-                    "CONFIRMED",
-                    "PROCESSING",
-                    "SHIPPED",
-                    "DELIVERED",
-                  ].indexOf(selectedOrder.status)}
-                  items={[
-                    {
-                      title: <span className="text-gray-300">Pending</span>,
-                      icon: <Clock size={16} />,
-                    },
-                    {
-                      title: <span className="text-gray-300">Confirmed</span>,
-                      icon: <CheckCircle size={16} />,
-                    },
-                    {
-                      title: <span className="text-gray-300">Shipped</span>,
-                      icon: <Truck size={16} />,
-                    },
-                    {
-                      title: <span className="text-gray-300">Delivered</span>,
-                      icon: <Package size={16} />,
-                    },
-                  ]}
-                />
-              </Card>
+              <div className="hidden lg:flex gap-4">
+                {stats.map((stat, i) => (
+                  <Card
+                    key={i}
+                    className="!bg-[var(--bg-primary)]/50 !border-[var(--border-subtle)] !rounded-2xl"
+                    styles={{ body: { padding: "12px 24px" } }}
+                    variant="borderless"
+                  >
+                    <Space>
+                      <div
+                        className={`p-2 ${stat.bg} ${stat.color} rounded-lg`}
+                      >
+                        <stat.icon size={16} />
+                      </div>
+                      <div className="leading-tight">
+                        <Text className="text-[10px] text-[var(--text-muted)] block uppercase font-black tracking-widest">
+                          {stat.label}
+                        </Text>
+                        <Title
+                          level={4}
+                          className="!m-0 !text-[var(--text-primary)] !font-black"
+                        >
+                          {stat.value}
+                        </Title>
+                      </div>
+                    </Space>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </Card>
 
-              {/* Order Items */}
-              <Card
-                title={
-                  <span className="font-bold flex items-center gap-2 text-white">
-                    <Package size={18} className="text-cyan-400" /> Items
-                    Purchased
-                  </span>
-                }
-                size="small"
-                className="!bg-white/5 !border-white/10 shadow-none !rounded-2xl"
-                headStyle={{
-                  borderBottom: "1px solid rgba(255,255,255,0.1)",
-                  color: "white",
+          {/* Interaction Bar */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="w-full md:w-96 relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search
+                  size={18}
+                  className="text-cyan-500/50 group-focus-within:text-cyan-400 transition-colors"
+                />
+              </div>
+              <Input
+                placeholder="Search orders by ID..."
+                className="theme-input !pl-12 !h-14 !text-base !rounded-2xl"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </div>
+
+            <Space>
+              <Select
+                placeholder="Filter Status"
+                className="w-40 h-14 custom-glass-select"
+                variant="borderless"
+                allowClear
+                onChange={(val) => setStatusFilter(val)}
+                styles={{
+                  popup: {
+                    root: {
+                      backgroundColor: "var(--bg-secondary)",
+                      border: "1px solid var(--border-subtle)",
+                      borderRadius: "1rem",
+                      padding: "0.5rem",
+                    },
+                  },
                 }}
-                styles={{ body: { padding: "12px" } }}
+                options={[
+                  { value: "PENDING", label: "Pending" },
+                  { value: "CONFIRMED", label: "Confirmed" },
+                  { value: "SHIPPED", label: "Shipped" },
+                  { value: "DELIVERED", label: "Delivered" },
+                  { value: "CANCELLED", label: "Cancelled" },
+                ]}
+              />
+              <Button
+                onClick={fetchOrders}
+                className="theme-input !h-14 !px-6 !border-[var(--border-subtle)] !bg-transparent text-[var(--text-primary)] font-bold rounded-2xl"
               >
-                <div className="space-y-3">
-                  {selectedOrder.items?.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex gap-4 items-center p-2 rounded-lg hover:bg-white/5 transition-colors"
+                Refresh Log
+              </Button>
+            </Space>
+          </div>
+
+          {/* Grid View */}
+          <Card
+            className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[3rem] shadow-3xl overflow-hidden !border-0"
+            styles={{ body: { padding: 0 } }}
+          >
+            <Table
+              dataSource={filteredOrders}
+              columns={columns}
+              rowKey="id"
+              loading={loading}
+              pagination={{
+                pageSize: 8,
+                className: "custom-pagination px-8 py-6",
+              }}
+              className="custom-antd-table"
+              scroll={{ x: 1000 }}
+              locale={{
+                emptyText: (
+                  <div className="py-20">
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <Text className="text-[var(--text-muted)]">
+                          No active order flows found in the grid.
+                        </Text>
+                      }
                     >
-                      <div className="w-14 h-14 bg-white/10 rounded-md border border-white/10 p-1 shrink-0 flex items-center justify-center">
+                      <Button
+                        type="primary"
+                        className="bg-cyan-600 border-none rounded-xl h-11 px-8"
+                        onClick={() => navigate("/products")}
+                      >
+                        Initialize New Flow
+                      </Button>
+                    </Empty>
+                  </div>
+                ),
+              }}
+            />
+          </Card>
+        </Space>
+      </div>
+
+      {/* DETAILED TRACKING DRAWER */}
+      <Drawer
+        title={
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-2xl">
+              <Box size={24} />
+            </div>
+            <div>
+              <Title
+                level={4}
+                className="!text-[var(--text-primary)] !m-0 !font-black !tracking-tight"
+              >
+                Order Insight
+              </Title>
+              <Text className="text-[var(--text-muted)] text-[10px] font-black uppercase tracking-widest">
+                #{selectedOrder?.orderNumber}
+              </Text>
+            </div>
+          </div>
+        }
+        placement="right"
+        width={window.innerWidth > 768 ? 600 : "100%"}
+        onClose={() => setSelectedOrder(null)}
+        open={!!selectedOrder}
+        className="premium-drawer"
+        closeIcon={
+          <div className="p-2 bg-[var(--bg-glass)] rounded-xl text-white">
+            <ArrowLeft size={18} />
+          </div>
+        }
+      >
+        {selectedOrder && (
+          <div className="space-y-8 animate-fade-in pb-10">
+            {/* Real-time Status */}
+            <Card className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] !rounded-3xl shadow-inner">
+              <Steps
+                current={[
+                  "PENDING",
+                  "CONFIRMED",
+                  "PROCESSING",
+                  "SHIPPED",
+                  "DELIVERED",
+                ].indexOf(selectedOrder.status)}
+                className="custom-steps"
+                items={[
+                  { title: "Pending", icon: <Clock size={16} /> },
+                  { title: "Confirmed", icon: <CheckCircle size={16} /> },
+                  { title: "Transit", icon: <Truck size={16} /> },
+                  { title: "Finalized", icon: <Package size={16} /> },
+                ]}
+              />
+            </Card>
+
+            {/* Inventory Map */}
+            <div className="space-y-4">
+              <Title
+                level={5}
+                className="!text-[var(--text-primary)] !font-black uppercase tracking-[0.2em] text-[10px]"
+              >
+                Order Details
+              </Title>
+              <div className="space-y-3">
+                {selectedOrder.items?.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-2xl hover:bg-[var(--bg-secondary)] transition-all"
+                  >
+                    <div className="flex gap-4 items-center">
+                      <div className="w-16 h-16 bg-white/[0.03] rounded-xl border border-[var(--border-subtle)] p-2 flex items-center justify-center">
                         <img
                           src={item.productImage || "https://placehold.co/150"}
                           alt={item.productName}
@@ -271,158 +514,206 @@ const MyOrders = () => {
                         />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-200 text-sm">
+                        <Text
+                          strong
+                          className="text-[var(--text-primary)] block text-sm"
+                        >
                           {item.productName}
-                        </p>
-                        <p className="text-gray-400 text-xs">
-                          Qty: {item.quantity}
-                        </p>
+                        </Text>
+                        <Text className="text-[var(--text-muted)] text-xs">
+                          Qty: {item.quantity} × {formatCurrency(item.price)}
+                        </Text>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-white text-sm">
-                          {formatCurrency(item.price)}
-                        </p>
-                        <p className="text-cyan-400 font-bold text-xs">
+                        <Text strong className="text-cyan-400 block">
                           {formatCurrency(item.subtotal)}
-                        </p>
+                        </Text>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Info Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Shipping Info */}
-                <Card
-                  size="small"
-                  title={
-                    <span className="font-bold flex items-center gap-2 text-white">
-                      <Truck size={16} className="text-cyan-400" /> Shipping
-                      Details
-                    </span>
-                  }
-                  className="!bg-white/5 !border-white/10 shadow-none h-full !rounded-2xl"
-                  headStyle={{
-                    borderBottom: "1px solid rgba(255,255,255,0.1)",
-                    color: "white",
-                  }}
-                >
-                  <div className="text-sm text-gray-300 space-y-1">
-                    <p className="font-semibold text-white">
-                      {selectedOrder.address?.firstName}{" "}
-                      {selectedOrder.address?.lastName}
-                    </p>
-                    <p>{selectedOrder.address?.addressLine1}</p>
-                    <p>
-                      {selectedOrder.address?.city}{" "}
-                      {selectedOrder.address?.postalCode}
-                    </p>
-                    <p>{selectedOrder.address?.phone}</p>
-                  </div>
-                </Card>
-
-                {/* Payment Info */}
-                <Card
-                  size="small"
-                  title={
-                    <span className="font-bold flex items-center gap-2 text-white">
-                      <AlertCircle size={16} className="text-cyan-400" />{" "}
-                      Payment Info
-                    </span>
-                  }
-                  className="!bg-white/5 !border-white/10 shadow-none h-full !rounded-2xl"
-                  headStyle={{
-                    borderBottom: "1px solid rgba(255,255,255,0.1)",
-                    color: "white",
-                  }}
-                >
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Method:</span>
-                      <span className="font-medium text-white">
-                        {selectedOrder.paymentMethod || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm items-center">
-                      <span className="text-gray-400">Status:</span>
-                      <Tag
-                        color={
-                          selectedOrder.paymentStatus === "PAID"
-                            ? "success"
-                            : "warning"
-                        }
-                        className="border-none"
-                      >
-                        {selectedOrder.paymentStatus}
-                      </Tag>
-                    </div>
-                    <div className="border-t border-dashed border-white/10 pt-2 mt-auto">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-gray-300">
-                          Total Paid
-                        </span>
-                        <span className="font-bold text-lg text-cyan-400">
-                          {formatCurrency(selectedOrder.total)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              {selectedOrder.status === "SHIPPED" &&
-                !selectedOrder.clientConfirmedDelivery && (
-                  <Card
-                    className="!bg-cyan-950/30 !border-cyan-800/50 shadow-none !rounded-2xl"
-                    styles={{ body: { padding: "16px" } }}
-                  >
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 text-cyan-400">
-                        <Truck className="animate-bounce" />
-                        <div>
-                          <p className="font-bold text-white">
-                            Shipment on the way!
-                          </p>
-                          <p className="text-sm text-cyan-200/80">
-                            Have you received this order?
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        type="primary"
-                        onClick={() => handleConfirmDelivery(selectedOrder.id)}
-                        className="bg-cyan-600 hover:bg-cyan-500 border-none"
-                      >
-                        Confirm Delivery
-                      </Button>
                     </div>
                   </Card>
-                )}
+                ))}
+              </div>
             </div>
-          )}
-        </Modal>
 
-        {/* Floating Chat Window */}
-        <AnimatePresence>
-          {isChatOpen && activeChatOrder && (
-            <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.9 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}
-            >
-              <ChatWindow
-                orderId={activeChatOrder.id}
-                orderNumber={activeChatOrder.orderNumber}
-                onClose={() => setIsChatOpen(false)}
-                isAdmin={false}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            {/* Logistics Grid */}
+            <Row gutter={[24, 24]}>
+              <Col span={24}>
+                <Card
+                  title={
+                    <Space size="small">
+                      <MapPin size={16} className="text-cyan-500" />
+                      <Text className="text-[var(--text-primary)] font-bold text-xs uppercase tracking-widest">
+                        Delivery Type
+                      </Text>
+                    </Space>
+                  }
+                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-3xl"
+                >
+                  <Text className="text-[var(--text-secondary)] block">
+                    {selectedOrder.address?.firstName}{" "}
+                    {selectedOrder.address?.lastName}
+                  </Text>
+                  <Text className="text-[var(--text-muted)] text-sm block mt-1">
+                    {selectedOrder.address?.addressLine1},{" "}
+                    {selectedOrder.address?.city}
+                  </Text>
+                  <Text className="text-[var(--text-muted)] text-sm block">
+                    {selectedOrder.address?.phone}
+                  </Text>
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card
+                  title={
+                    <Space size="small">
+                      <CreditCard size={16} className="text-purple-500" />
+                      <Text className="text-[var(--text-primary)] font-bold text-xs uppercase tracking-widest">
+                        Payment Method
+                      </Text>
+                    </Space>
+                  }
+                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-3xl"
+                >
+                  <div className="flex justify-between items-center">
+                    <Text className="text-[var(--text-muted)]">
+                      Method: {selectedOrder.paymentMethod || "MM Sync"}
+                    </Text>
+                    <Tag
+                      color={
+                        selectedOrder.paymentStatus === "PAID"
+                          ? "success"
+                          : "warning"
+                      }
+                      className="border-none font-bold uppercase tracking-widest text-[9px]"
+                    >
+                      {selectedOrder.paymentStatus}
+                    </Tag>
+                  </div>
+                  <Divider className="!border-[var(--border-subtle)] !my-4" />
+                  <div className="flex justify-between items-center">
+                    <Text
+                      strong
+                      className="text-[var(--text-primary)] uppercase tracking-[0.2em] text-[10px]"
+                    >
+                      Total Amount
+                    </Text>
+                    <Text strong className="text-xl text-cyan-400 font-black">
+                      {formatCurrency(selectedOrder.total)}
+                    </Text>
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+
+            {/* Control Actions */}
+            <div className="flex flex-col gap-4">
+              {selectedOrder.status === "SHIPPED" &&
+                !selectedOrder.clientConfirmedDelivery && (
+                  <Button
+                    type="primary"
+                    block
+                    className="h-14 rounded-2xl bg-green-600 hover:bg-green-500 border-none font-bold text-lg"
+                    onClick={() => handleConfirmDelivery(selectedOrder.id)}
+                  >
+                    Finalize Receipt
+                  </Button>
+                )}
+              <Button
+                block
+                icon={<MessageSquare size={18} />}
+                className="h-14 rounded-2xl bg-[var(--bg-glass)] border-[var(--border-subtle)] text-[var(--text-primary)] font-bold hover:border-cyan-400"
+                onClick={() => openChat(selectedOrder)}
+              >
+                Chat with Seller
+              </Button>
+            </div>
+          </div>
+        )}
+      </Drawer>
+
+      {/* FLOAT CHAT - Persisted */}
+      <AnimatePresence>
+        {isChatOpen && activeChatOrder && (
+          <motion.div
+            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 100, scale: 0.9 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed bottom-6 right-6 z-[1000] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)]"
+          >
+            <ChatWindow
+              orderId={activeChatOrder.id}
+              orderNumber={activeChatOrder.orderNumber}
+              onClose={() => setIsChatOpen(false)}
+              isAdmin={false}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style>{`
+        .custom-antd-table .ant-table-wrapper {
+          background: transparent !important;
+        }
+        .custom-antd-table .ant-table {
+          background: transparent !important;
+        }
+        .custom-antd-table .ant-table-thead > tr > th {
+          background: var(--bg-primary) !important;
+          border-bottom: 1px solid var(--border-subtle) !important;
+          padding: 24px 16px !important;
+        }
+        .custom-antd-table .ant-table-tbody > tr > td {
+          border-bottom: 1px solid var(--border-subtle) !important;
+          padding: 20px 16px !important;
+          background: transparent !important;
+        }
+        .custom-antd-table .ant-table-tbody > tr:hover > td {
+          background: var(--bg-glass) !important;
+        }
+        .premium-drawer .ant-drawer-content {
+          background: var(--bg-secondary) !important;
+          backdrop-filter: blur(40px);
+          border-left: 1px solid var(--border-subtle);
+        }
+        .premium-drawer .ant-drawer-header {
+          background: var(--bg-glass) !important;
+          border-bottom: 1px solid var(--border-subtle);
+          padding: 24px 32px;
+        }
+        .premium-drawer .ant-drawer-body {
+          padding: 32px;
+        }
+        .custom-steps .ant-steps-item-icon {
+          background: var(--bg-glass) !important;
+          border-color: var(--border-subtle) !important;
+        }
+        .custom-steps .ant-steps-item-title {
+          font-size: 11px !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.1em !important;
+          color: var(--text-muted) !important;
+        }
+        .custom-pagination .ant-pagination-item {
+          background: var(--bg-glass) !important;
+          border: 1px solid var(--border-subtle) !important;
+          border-radius: 12px !important;
+        }
+        .custom-pagination .ant-pagination-item-active {
+          border-color: var(--accent-primary) !important;
+        }
+        .custom-pagination .ant-pagination-item-active a {
+          color: var(--accent-primary) !important;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };

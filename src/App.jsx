@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import "./App.css";
 
 // Customer Pages
@@ -26,6 +27,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import MyOrders from "./pages/MyOrders";
 import Notifications from "./pages/Notifications";
+import Profile from "./pages/Profile";
 
 // Admin Pages
 import AdminLayout from "./admin/layouts/AdminLayout";
@@ -62,16 +64,20 @@ const CustomerLayout = ({ children }) => {
   );
 };
 
-function App() {
+const AppContent = () => {
+  const { theme: currentTheme } = useTheme();
+
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm:
+          currentTheme === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
           colorPrimary: "#00d4ff",
-          colorBgBase: "#0a0a0f",
-          colorBgContainer: "#12121a",
+          colorBgBase: currentTheme === "dark" ? "#0a0a0f" : "#ffffff",
+          colorBgContainer: currentTheme === "dark" ? "#12121a" : "#f1f5f9",
           borderRadius: 8,
+          colorTextBase: currentTheme === "dark" ? "#ffffff" : "#0f172a",
         },
       }}
     >
@@ -161,6 +167,16 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerLayout>
+                          <Profile />
+                        </CustomerLayout>
+                      </ProtectedRoute>
+                    }
+                  />
 
                   {/* Auth Routes */}
                   <Route path="/login" element={<Login />} />
@@ -193,6 +209,14 @@ function App() {
         </Router>
       </AntdApp>
     </ConfigProvider>
+  );
+};
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

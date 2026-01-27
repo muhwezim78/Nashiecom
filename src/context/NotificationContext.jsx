@@ -151,24 +151,42 @@ export const NotificationProvider = ({ children }) => {
     });
 
     newSocket.on("new_message_notification", (data) => {
+      // Security: Only show if it's for this user or if they are the recipient
+      // We assume data.recipientId is sent by the server for safety
+      if (data.recipientId && data.recipientId !== user.id) return;
+
       playNotificationSound();
       notification.info({
         message: `New Message from ${data.senderName}`,
         description: data.content || "Sent an image",
         placement: "topRight",
         duration: 4,
-        style: { borderRadius: "12px", background: "rgba(10, 15, 30, 0.9)" },
+        style: {
+          borderRadius: "12px",
+          background: "rgba(10, 15, 30, 0.95)",
+          border: "1px solid rgba(0, 242, 254, 0.2)",
+          color: "#fff"
+        },
       });
       setUnreadCount((prev) => prev + 1);
     });
 
     newSocket.on("order_status_update", (data) => {
+      // Security: Only show if it matches the current user's role/id logic
+      // In this case, order_status_update should normally be room-specific
+      if (data.userId && data.userId !== user.id) return;
+
       playNotificationSound();
       notification.success({
         message: "Order Update",
         description: `Order #${data.orderNumber} is now ${data.status}`,
         placement: "topRight",
-        style: { borderRadius: "12px", background: "rgba(10, 15, 30, 0.9)" },
+        style: {
+          borderRadius: "12px",
+          background: "rgba(10, 15, 30, 0.95)",
+          border: "1px solid rgba(0, 242, 254, 0.2)",
+          color: "#fff"
+        },
       });
       setUnreadCount((prev) => prev + 1);
     });

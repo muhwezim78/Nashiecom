@@ -291,6 +291,7 @@ const Dashboard = () => {
         <Col xs={24} lg={8}>
           <Card
             className="admin-table-card"
+            variant="borderless"
             title="Recent Activity"
             style={{ height: "100%" }}
           >

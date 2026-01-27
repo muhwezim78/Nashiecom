@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle2, Sparkles } from "lucide-react";
-import { Card } from "antd";
+import { Card, Input } from "antd";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +21,7 @@ const Newsletter = () => {
 
   return (
     <Card
-      className="!rounded-2xl !bg-gradient-to-br from-gray-900 to-black !border-white/5 shadow-2xl overflow-hidden !border"
+      className="!rounded-2xl !bg-[var(--bg-secondary)] !border-[var(--border-subtle)] shadow-2xl overflow-hidden !border"
       styles={{ body: { padding: 0 } }}
     >
       <div className="relative p-8 md:p-16">
@@ -31,13 +31,13 @@ const Newsletter = () => {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full mb-2">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--bg-glass)] rounded-full mb-2">
               <Sparkles className="w-4 h-4 text-cyan-400" />
               <span className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">
                 Weekly Updates
               </span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter uppercase">
+            <h2 className="text-4xl md:text-6xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
               Join the <span className="text-cyan-400">Future</span>
             </h2>
             <p className="text-gray-400 text-lg max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
@@ -75,13 +75,14 @@ const Newsletter = () => {
                   className="flex flex-col gap-4"
                 >
                   <div className="relative group">
-                    <input
+                    <Input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="w-full px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-lg"
+                      className="w-full px-6 py-5 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder-gray-500 h-16 text-lg"
+                      variant="borderless"
                     />
                     <div className="absolute inset-0 rounded-2xl bg-cyan-500/0 group-hover:bg-cyan-500/5 pointer-events-none transition-colors" />
                   </div>

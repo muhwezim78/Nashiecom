@@ -53,7 +53,7 @@ const ProfileSettings = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card title="Personal Information" bordered={false}>
+      <Card title="Personal Information" variant="borderless">
         <Form form={form} layout="vertical" onFinish={handleUpdateProfile}>
           <Row gutter={16}>
             <Col span={12}>
@@ -88,7 +88,7 @@ const ProfileSettings = () => {
         </Form>
       </Card>
 
-      <Card title="Security" bordered={false}>
+      <Card title="Security" variant="borderless">
         <Form form={passForm} layout="vertical" onFinish={handleChangePassword}>
           <Form.Item
             name="currentPassword"
@@ -161,7 +161,7 @@ const SystemSettings = () => {
   const hasSettings = Object.keys(settingsGroups).length > 0;
 
   return (
-    <Card title="System Settings" loading={loading} bordered={false}>
+    <Card title="System Settings" loading={loading} variant="borderless">
       {!hasSettings ? (
         <p>No settings available.</p>
       ) : (

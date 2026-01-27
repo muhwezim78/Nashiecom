@@ -193,7 +193,7 @@ const OrdersPage = () => {
       await ordersAPI.updateStatus(
         selectedOrder.id,
         values.status,
-        values.note
+        values.note,
       );
       message.success("Order status updated");
       setStatusModalOpen(false);
@@ -283,10 +283,54 @@ const OrdersPage = () => {
       ),
     },
     {
-      title: "Items",
-      dataIndex: "_count",
-      key: "items",
-      render: (count) => count?.items || 0,
+      title: "Products",
+      key: "products",
+      width: 200,
+      render: (_, record) => (
+        <div style={{ maxWidth: 200 }}>
+          {record.items?.slice(0, 2).map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                fontSize: 12,
+                marginBottom: 2,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.productName}
+            </div>
+          ))}
+          {record.items?.length > 2 && (
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              + {record.items.length - 2} more...
+            </Text>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Qty",
+      key: "total_quantity",
+      width: 80,
+      align: "center",
+      render: (_, record) => {
+        const total =
+          record.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        return (
+          <Badge
+            count={total}
+            showZero
+            color="#00d4ff"
+            style={{
+              backgroundColor: "rgba(0, 212, 255, 0.1)",
+              color: "#00d4ff",
+              boxShadow: "none",
+            }}
+          />
+        );
+      },
     },
     {
       title: "Total",
@@ -389,7 +433,11 @@ const OrdersPage = () => {
       </div>
 
       {/* Filters */}
-      <Card className="form-card" style={{ marginBottom: 24 }}>
+      <Card
+        className="form-card"
+        variant="borderless"
+        style={{ marginBottom: 24 }}
+      >
         <Row gutter={16} align="middle">
           <Col xs={24} md={8}>
             <Input
@@ -444,7 +492,7 @@ const OrdersPage = () => {
       </Card>
 
       {/* Orders Table */}
-      <Card className="admin-table-card">
+      <Card className="admin-table-card" variant="borderless">
         <Table
           className="admin-table"
           columns={columns}
@@ -596,8 +644,24 @@ const OrdersPage = () => {
                     />
                   )}
                   <div style={{ flex: 1 }}>
-                    <div>{item.productName}</div>
-                    <Text type="secondary">
+                    <div style={{ fontWeight: 600, color: "#fff" }}>
+                      {item.productName}
+                    </div>
+                    {item.sku && (
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: "rgba(255,255,255,0.45)",
+                          marginTop: 2,
+                        }}
+                      >
+                        SKU: {item.sku}
+                      </div>
+                    )}
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 12, display: "block", marginTop: 4 }}
+                    >
                       {formatCurrency(item.price)} × {item.quantity}
                     </Text>
                   </div>

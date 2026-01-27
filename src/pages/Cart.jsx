@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../utils/currency";
-import { Card } from "antd";
+import { Card, Input, Button } from "antd";
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } =
@@ -28,11 +28,11 @@ const Cart = () => {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const shippingProgress = Math.min(
     (subtotal / FREE_SHIPPING_THRESHOLD) * 100,
-    100
+    100,
   );
 
   const EmptyCart = () => (
-    <div className="min-h-[85vh] flex flex-col items-center justify-center text-center p-8 bg-gradient-to-b from-gray-900 to-black">
+    <div className="min-h-[85vh] flex flex-col items-center justify-center text-center p-8 bg-[var(--bg-primary)]">
       {/* ... Empty Cart Content (no cards usually needed here, or maybe one big one) ... */}
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
@@ -41,14 +41,14 @@ const Cart = () => {
         className="relative mb-12"
       >
         <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-[60px] animate-pulse" />
-        <div className="relative w-48 h-48 rounded-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center border border-white/10 shadow-3xl">
+        <div className="relative w-48 h-48 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center border border-[var(--border-subtle)] shadow-3xl">
           <ShoppingBag className="w-24 h-24 text-gray-500" />
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-12 border border-white/20"
           >
-            <Plus className="w-8 h-8 text-white" />
+            <Plus className="w-8 h-8 text-[var(--text-primary)]" />
           </motion.div>
         </div>
       </motion.div>
@@ -59,7 +59,7 @@ const Cart = () => {
         transition={{ delay: 0.2 }}
         className="max-w-md mx-auto space-y-6"
       >
-        <h2 className="text-5xl font-black text-white tracking-tight">
+        <h2 className="text-5xl font-black text-[var(--text-primary)] tracking-tight">
           Your Cart is <span className="text-cyan-400">Empty</span>
         </h2>
         <p className="text-gray-400 text-xl leading-relaxed">
@@ -74,21 +74,31 @@ const Cart = () => {
         transition={{ delay: 0.3 }}
         className="mt-12 flex flex-col sm:flex-row gap-6"
       >
-        <Link
-          to="/products"
-          className="group relative px-10 py-5 bg-cyan-600 text-white font-black rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(6,182,212,0.3)]"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <span className="relative z-10 flex items-center gap-3">
-            Start Exploring{" "}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </span>
+        <Link to="/products" className="flex-1">
+          <Card
+            hoverable
+            variant="borderless"
+            className="group relative !bg-cyan-600 !rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.3)] transition-all duration-300 hover:scale-[1.02]"
+            styles={{ body: { padding: "24px" } }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10 flex items-center justify-center gap-3 text-white font-black uppercase tracking-wider">
+              Start Exploring{" "}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Card>
         </Link>
-        <Link
-          to="/products?featured=true"
-          className="px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 transition-all duration-300"
-        >
-          View Trending
+        <Link to="/products?featured=true" className="flex-1">
+          <Card
+            hoverable
+            variant="borderless"
+            className="!bg-[var(--bg-glass)] !text-[var(--text-primary)] !rounded-2xl border border-[var(--border-subtle)] hover:!border-cyan-500/30 hover:!bg-[var(--bg-secondary)] transition-all duration-300 hover:scale-[1.02]"
+            styles={{ body: { padding: "24px" } }}
+          >
+            <div className="text-center font-bold uppercase tracking-wider">
+              View Trending
+            </div>
+          </Card>
         </Link>
       </motion.div>
     </div>
@@ -103,6 +113,7 @@ const Cart = () => {
       className="group relative"
     >
       <Card
+        variant="borderless"
         className="!bg-gradient-to-br !from-white/[0.03] !to-white/[0.01] !backdrop-blur-md !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 overflow-hidden !border-0"
         styles={{ body: { padding: 0 } }}
       >
@@ -144,7 +155,7 @@ const Cart = () => {
                   )}
                 </div>
                 <Link to={`/products/${item.id}`}>
-                  <h3 className="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors line-clamp-2 tracking-tight">
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors line-clamp-2 tracking-tight">
                     {item.name}
                   </h3>
                 </Link>
@@ -175,22 +186,22 @@ const Cart = () => {
             {/* Action Row */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mt-8">
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-1 bg-white/5 rounded-2xl border border-white/10 p-1.5 shadow-inner">
+                <div className="flex items-center gap-1 bg-[var(--bg-glass)] rounded-2xl border border-[var(--border-subtle)] p-1.5 shadow-inner">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group/btn"
+                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group/btn"
                     disabled={item.quantity <= 1}
                   >
                     <Minus className="w-5 h-5 group-active/btn:scale-75 transition-transform" />
                   </button>
                   <div className="w-12 text-center">
-                    <span className="text-xl font-black text-white">
+                    <span className="text-xl font-black text-[var(--text-primary)]">
                       {item.quantity}
                     </span>
                   </div>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all group/btn"
+                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all group/btn"
                   >
                     <Plus className="w-5 h-5 group-active/btn:scale-125 transition-transform" />
                   </button>
@@ -210,7 +221,7 @@ const Cart = () => {
                       {formatCurrency(item.originalPrice * item.quantity)}
                     </p>
                   )}
-                  <p className="text-3xl font-black text-white tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
+                  <p className="text-3xl font-black text-[var(--text-primary)] tracking-tighter">
                     {formatCurrency(item.price * item.quantity)}
                   </p>
                 </div>
@@ -227,7 +238,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] py-16">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-16 transition-colors duration-500">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16">
@@ -243,12 +254,14 @@ const Cart = () => {
                 Secured Session
               </span>
             </motion.div>
-            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter">
+            <h1 className="text-5xl md:text-7xl font-black text-[var(--text-primary)] tracking-tighter">
               Shopping <span className="text-cyan-400">Bag</span>
             </h1>
             <div className="flex items-center gap-6 text-gray-400">
               <p className="text-lg">
-                <span className="text-white font-black">{totalItems}</span>{" "}
+                <span className="text-[var(--text-primary)] font-black">
+                  {totalItems}
+                </span>{" "}
                 {totalItems === 1 ? "item" : "items"} selected
               </p>
               <div className="w-1 h-1 bg-gray-800 rounded-full" />
@@ -264,7 +277,7 @@ const Cart = () => {
 
           <Link
             to="/products"
-            className="group inline-flex items-center gap-3 px-8 py-4 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 transition-all duration-300"
+            className="group inline-flex items-center gap-3 px-8 py-4 bg-[var(--bg-glass)] text-[var(--text-primary)] font-bold rounded-2xl border border-[var(--border-subtle)] hover:border-cyan-500/30 hover:bg-[var(--bg-secondary)] transition-all duration-300"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             Keep Browsing
@@ -276,7 +289,7 @@ const Cart = () => {
           <div className="lg:col-span-8 space-y-8">
             {/* Free Shipping Progress */}
             <Card
-              className="!bg-white/5 !rounded-2xl border-white/5 relative overflow-hidden group !border-0"
+              className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] relative overflow-hidden group !border-0"
               styles={{ body: { padding: "2rem" } }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -292,7 +305,7 @@ const Cart = () => {
                     >
                       <Truck className="w-5 h-5" />
                     </div>
-                    <h3 className="font-bold text-white uppercase tracking-widest text-sm">
+                    <h3 className="font-bold text-[var(--text-primary)] uppercase tracking-widest text-sm">
                       {shippingFee === 0
                         ? "Free Shipping Unlocked!"
                         : "Free Shipping Goal"}
@@ -305,7 +318,7 @@ const Cart = () => {
                   </span>
                 </div>
 
-                <div className="h-3 bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/5">
+                <div className="h-3 bg-[var(--bg-glass)] rounded-full overflow-hidden p-0.5 border border-[var(--border-subtle)]">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${shippingProgress}%` }}
@@ -320,7 +333,7 @@ const Cart = () => {
                 {shippingFee > 0 ? (
                   <p className="text-sm text-gray-400">
                     Add{" "}
-                    <span className="text-white font-bold">
+                    <span className="text-[var(--text-primary)] font-bold">
                       {formatCurrency(FREE_SHIPPING_THRESHOLD - subtotal)}
                     </span>{" "}
                     more to qualify for free shipping.
@@ -355,14 +368,15 @@ const Cart = () => {
               ].map((badge, i) => (
                 <Card
                   key={i}
-                  className="!bg-white/[0.02] !border-white/5 hover:!border-cyan-500/20 transition-all duration-300 !rounded-2xl hover:!scale-105 !border-0"
+                  variant="borderless"
+                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!border-cyan-500/20 transition-all duration-300 !rounded-2xl hover:!scale-105 !border-0"
                 >
                   <div className="flex flex-col items-center text-center gap-4">
                     <div className="p-3 bg-cyan-500/10 rounded-xl text-cyan-400">
                       <badge.icon className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-black text-white uppercase tracking-widest mb-1">
+                      <p className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-1">
                         {badge.label}
                       </p>
                       <p className="text-[10px] text-gray-500 uppercase">
@@ -383,18 +397,18 @@ const Cart = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-1000" />
 
                 <Card
-                  className="!bg-[#12121a]/80 !backdrop-blur-2xl !rounded-2xl !border-white/10 overflow-hidden shadow-2xl !border-0"
+                  className="!bg-[var(--bg-secondary)] !backdrop-blur-2xl !rounded-2xl !border-[var(--border-subtle)] overflow-hidden shadow-2xl !border-0"
                   styles={{ body: { padding: 0 } }}
                 >
                   <div className="p-10 space-y-8">
-                    <h3 className="text-3xl font-black text-white tracking-tight pb-6 border-b border-white/5">
+                    <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tight pb-6 border-b border-[var(--border-subtle)]">
                       Order Overview
                     </h3>
 
                     <div className="space-y-6 text-lg">
                       <div className="flex justify-between items-center text-gray-400">
                         <span className="font-medium">Subtotal</span>
-                        <span className="text-white font-bold">
+                        <span className="text-[var(--text-primary)] font-bold">
                           {formatCurrency(subtotal)}
                         </span>
                       </div>
@@ -405,7 +419,7 @@ const Cart = () => {
                           className={
                             shippingFee === 0
                               ? "text-green-400 font-black uppercase tracking-widest text-sm"
-                              : "text-white font-bold"
+                              : "text-[var(--text-primary)] font-bold"
                           }
                         >
                           {shippingFee === 0
@@ -416,7 +430,7 @@ const Cart = () => {
 
                       <div className="flex justify-between items-center text-gray-400">
                         <span className="font-medium">GST (8%)</span>
-                        <span className="text-white font-bold">
+                        <span className="text-[var(--text-primary)] font-bold">
                           {formatCurrency(tax)}
                         </span>
                       </div>
@@ -424,18 +438,27 @@ const Cart = () => {
                       {/* Promo Code */}
                       <div className="pt-4">
                         <div className="relative group/input">
-                          <input
-                            type="text"
+                          <Input.Search
                             placeholder="Promo Code"
-                            className="w-full pl-6 pr-24 py-5 bg-white/5 border border-white/10 rounded-[1.5rem] text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 transition-all"
+                            enterButton={
+                              <Button className="bg-[var(--bg-glass)] text-cyan-400 font-black text-[10px] uppercase tracking-widest border border-[var(--border-subtle)] !h-full !rounded-r-[1.5rem] hover:!bg-cyan-500/10 hover:!border-cyan-500/30">
+                                APPLY
+                              </Button>
+                            }
+                            size="large"
+                            className="w-full bg-transparent promo-input"
+                            variant="borderless"
+                            style={{
+                              backgroundColor: "var(--bg-glass)",
+                              borderRadius: "1.5rem",
+                              border: "1px solid var(--border-subtle)",
+                              padding: "4px",
+                            }}
                           />
-                          <button className="absolute right-2 top-2 bottom-2 px-6 bg-white/5 text-cyan-400 font-black text-[10px] uppercase tracking-widest rounded-xl border border-white/5 hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all">
-                            Apply
-                          </button>
                         </div>
                       </div>
 
-                      <div className="h-px bg-white/5 my-8" />
+                      <div className="h-px bg-[var(--border-subtle)] my-8" />
 
                       <div className="flex justify-between items-end">
                         <div className="space-y-1">
@@ -450,7 +473,7 @@ const Cart = () => {
                             })}
                           </p>
                         </div>
-                        <p className="text-5xl font-black text-white tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
+                        <p className="text-5xl font-black text-[var(--text-primary)] tracking-tighter">
                           {formatCurrency(total)}
                         </p>
                       </div>
@@ -460,7 +483,7 @@ const Cart = () => {
                       <Link
                         to={
                           cartItems.some(
-                            (item) => !item.inStock || item.quantity <= 0
+                            (item) => !item.inStock || item.quantity <= 0,
                           )
                             ? "#"
                             : "/checkout"
@@ -468,18 +491,18 @@ const Cart = () => {
                         onClick={(e) => {
                           if (
                             cartItems.some(
-                              (item) => !item.inStock || item.quantity <= 0
+                              (item) => !item.inStock || item.quantity <= 0,
                             )
                           ) {
                             e.preventDefault();
                             message.error(
-                              "Some items are out of stock. Please remove them to continue."
+                              "Some items are out of stock. Please remove them to continue.",
                             );
                           }
                         }}
                         className={`group relative w-full h-20 rounded-[2rem] flex items-center justify-center gap-4 overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-2xl ${
                           cartItems.some(
-                            (item) => !item.inStock || item.quantity <= 0
+                            (item) => !item.inStock || item.quantity <= 0,
                           )
                             ? "bg-gray-800 cursor-not-allowed grayscale"
                             : "bg-cyan-600 hover:shadow-cyan-500/25"
@@ -488,7 +511,7 @@ const Cart = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="relative z-10 text-xl font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
                           {cartItems.some(
-                            (item) => !item.inStock || item.quantity <= 0
+                            (item) => !item.inStock || item.quantity <= 0,
                           )
                             ? "Fix Out of Stock Items"
                             : "Complete Checkout"}
@@ -509,7 +532,7 @@ const Cart = () => {
 
               {/* Secure Payments Badge */}
               <Card
-                className="!bg-white/[0.02] !border-white/5 !rounded-2xl !border-0"
+                className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-2xl !border-0"
                 styles={{ body: { padding: "2rem" } }}
               >
                 <div className="flex flex-col gap-4">
@@ -519,7 +542,10 @@ const Cart = () => {
                   <div className="flex flex-wrap justify-center gap-6 opacity-40 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
                     {/* Mock Payment Logo Placeholders */}
                     {["Visa", "Master", "Paypal", "MTN", "Airtel"].map((p) => (
-                      <span key={p} className="text-xs font-black text-white">
+                      <span
+                        key={p}
+                        className="text-xs font-black text-[var(--text-primary)]"
+                      >
                         {p}
                       </span>
                     ))}

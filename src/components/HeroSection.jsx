@@ -10,6 +10,7 @@ import {
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Shield, Truck, Monitor } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 /* 3D Model Placeholder - A stylized Laptop composition */
 const LaptopModel = () => {
@@ -39,7 +40,7 @@ const LaptopModel = () => {
       {/* Base */}
       <mesh position={[0, -0.5, 0]}>
         <boxGeometry args={[4, 0.2, 2.5]} />
-        <meshStandardMaterial color="#1a1a2e" metalness={0.8} roughness={0.2} />
+        <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
       </mesh>
 
       {/* Screen */}
@@ -47,9 +48,9 @@ const LaptopModel = () => {
         <mesh>
           <boxGeometry args={[4, 2.5, 0.1]} />
           <meshStandardMaterial
-            color="#1a1a2e"
-            metalness={0.8}
-            roughness={0.2}
+            color="#000000"
+            metalness={0.9}
+            roughness={0.1}
           />
         </mesh>
 
@@ -100,8 +101,10 @@ const AnimatedSphere = () => {
 };
 
 const HeroSection = () => {
+  const { theme: currentTheme } = useTheme();
+
   return (
-    <div className="relative w-full min-h-[85vh] bg-[#0a0a0f] text-white overflow-hidden flex items-center">
+    <div className={`relative w-full min-h-[85vh] bg-[var(--bg-primary)] overflow-hidden flex items-center transition-colors duration-500`}>
       {/* 3D Scene Background */}
       <div className="absolute inset-0 z-0">
         <Canvas gl={{ antialias: true }} dpr={[1, 2]}>
@@ -120,22 +123,24 @@ const HeroSection = () => {
             intensity={2}
             castShadow
           />
-          <Stars
-            radius={100}
-            depth={50}
-            count={3000}
-            factor={4}
-            saturation={0}
-            fade
-            speed={1.5}
-          />
+          {currentTheme === "dark" && (
+            <Stars
+              radius={100}
+              depth={50}
+              count={3000}
+              factor={4}
+              saturation={0}
+              fade
+              speed={1.5}
+            />
+          )}
 
           <Float speed={2.5} rotationIntensity={0.5} floatIntensity={1}>
             <LaptopModel />
           </Float>
 
           <AnimatedSphere />
-          <Environment preset="night" />
+          <Environment preset={currentTheme === "dark" ? "night" : "apartment"} />
         </Canvas>
       </div>
 
@@ -150,10 +155,10 @@ const HeroSection = () => {
               transition={{ duration: 0.6 }}
               className="max-w-3xl text-left"
             >
-              <span className="inline-block px-4 py-2 rounded-full bg-white/5 border border-cyan-500/30 text-cyan-400 font-medium text-sm mb-6 backdrop-blur-sm tracking-wide">
+              <span className="inline-block px-4 py-2 rounded-full bg-[var(--bg-glass)] border border-cyan-500/30 text-cyan-400 font-medium text-sm mb-6 backdrop-blur-sm tracking-wide">
                 Next-Gen Tech is Here
               </span>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-cyan-500 mb-4 tracking-tight">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--text-primary)] via-cyan-200 to-cyan-500 mb-4 tracking-tight">
                 Elevate Your <br className="hidden md:block" />
                 Digital Experience
               </h1>
@@ -163,7 +168,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl text-left"
+              className="text-xl md:text-2xl text-[var(--text-secondary)] leading-relaxed max-w-2xl text-left"
             >
               Discover state-of-the-art laptops, powerful desktops, and premium
               accessories designed for professionals and gamers who demand the
@@ -199,14 +204,14 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="w-full"
           >
-            <div className="bg-gradient-to-r from-cyan-500/10 via-transparent to-cyan-500/10 backdrop-blur-lg border border-white/10 rounded-2xl py-8 px-6">
+            <div className="bg-gradient-to-r from-cyan-500/10 via-[var(--bg-glass)] to-cyan-500/10 backdrop-blur-lg border border-[var(--border-subtle)] rounded-2xl py-8 px-6">
               <div className="flex flex-wrap justify-start md:justify-between items-center gap-8 md:gap-12">
                 <FeatureItem
                   icon={Zap}
                   title="Fast Delivery"
                   desc="Same day shipping"
                 />
-                <div className="hidden md:block h-8 w-px bg-white/20"></div>
+                <div className="hidden md:block h-8 w-px bg-[var(--border-subtle)]"></div>
                 <FeatureItem
                   icon={Shield}
                   title="Secure Payments"
@@ -239,8 +244,8 @@ const FeatureItem = ({ icon: Icon, title, desc }) => (
       <Icon className="w-6 h-6" />
     </div>
     <div>
-      <h4 className="font-semibold text-white text-sm">{title}</h4>
-      <p className="text-gray-400 text-xs">{desc}</p>
+      <h4 className="font-semibold text-[var(--text-primary)] text-sm">{title}</h4>
+      <p className="text-[var(--text-muted)] text-xs">{desc}</p>
     </div>
   </div>
 );

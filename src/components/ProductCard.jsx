@@ -1,6 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import {
   ShoppingCart,
   Star,
@@ -12,7 +18,7 @@ import {
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../utils/currency";
-import { Space, message } from "antd";
+import { Space, message, Card } from "antd";
 
 const ProductCard = ({ product }) => {
   const { addToCart, isInCart } = useCart();
@@ -62,8 +68,8 @@ const ProductCard = ({ product }) => {
   const isDiscounted = product.originalPrice > product.price;
   const discountPercentage = isDiscounted
     ? Math.round(
-      ((product.originalPrice - product.price) / product.originalPrice) * 100
-    )
+        ((product.originalPrice - product.price) / product.originalPrice) * 100,
+      )
     : 0;
 
   // Auto-scroll with pause on hover
@@ -93,18 +99,18 @@ const ProductCard = ({ product }) => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
       restartAutoScroll();
     },
-    [images.length]
+    [images.length],
   );
 
   const goToPrevImage = useCallback(
     (e) => {
       e?.stopPropagation();
       setCurrentImageIndex(
-        (prev) => (prev - 1 + images.length) % images.length
+        (prev) => (prev - 1 + images.length) % images.length,
       );
       restartAutoScroll();
     },
-    [images.length]
+    [images.length],
   );
 
   const restartAutoScroll = useCallback(() => {
@@ -130,7 +136,7 @@ const ProductCard = ({ product }) => {
       // Reset feedback after 2 seconds
       setTimeout(() => setIsAdded(false), 2000);
     },
-    [addToCart, product, user, navigate, location]
+    [addToCart, product, user, navigate, location],
   );
 
   // Handle image click for mobile
@@ -163,7 +169,12 @@ const ProductCard = ({ product }) => {
               </div>
             );
           }
-          return <Star key={i} className="w-4 h-4 text-gray-700" />;
+          return (
+            <Star
+              key={i}
+              className="w-4 h-4 text-[var(--text-muted)] opacity-20"
+            />
+          );
         })}
       </div>
     );
@@ -185,202 +196,229 @@ const ProductCard = ({ product }) => {
         if (images.length > 1) stopAutoScroll();
       }}
       onMouseLeave={handleMouseLeave}
-      className="group relative bg-gradient-to-b from-gray-900 to-black rounded-3xl border border-gray-800 overflow-hidden hover:border-cyan-500/30 transition-all duration-500 h-full flex flex-col"
+      className="h-full"
     >
       {contextHolder}
 
-      {/* Reactive Glow Effect */}
-      <motion.div
-        style={{
-          background: useTransform(
-            [mouseXSpring, mouseYSpring],
-            ([x, y]) => `radial-gradient(600px circle at ${50 + x * 100}% ${50 + y * 100}%, rgba(0, 212, 255, 0.08), transparent)`
-          ),
+      <Card
+        variant="borderless"
+        className="group relative h-full !bg-[var(--bg-card-gradient)] !border-[var(--border-main)] hover:!border-cyan-500/30 transition-all duration-500 overflow-hidden rounded-3xl"
+        styles={{
+          body: {
+            padding: "1rem",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          },
         }}
-        className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-      />
+      >
+        {/* Reactive Glow Effect */}
+        <motion.div
+          style={{
+            background: useTransform(
+              [mouseXSpring, mouseYSpring],
+              ([x, y]) =>
+                `radial-gradient(600px circle at ${50 + x * 100}% ${50 + y * 100}%, rgba(0, 212, 255, 0.08), transparent)`,
+            ),
+          }}
+          className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+        />
 
-      {/* Containerized Content Wrapper */}
-      <div className="relative z-10 flex-1 flex flex-col p-6" style={{ transform: "translateZ(20px)" }}>
-        {/* Image Carousel Container */}
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-900 to-black rounded-2xl mb-6 group/carousel shadow-2xl" style={{ transform: "translateZ(30px)" }}>
-          <Link to={`/products/${product.id}`} className="block w-full h-full">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={currentImageIndex}
-                src={images[currentImageIndex]}
-                alt={`${product.name} - ${currentImageIndex + 1}`}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={handleImageClick}
-              />
-            </AnimatePresence>
-          </Link>
-
-          {/* Image Navigation Arrows */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={goToPrevImage}
-                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/60 backdrop-blur-sm text-white rounded-full hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 z-10"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={goToNextImage}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/60 backdrop-blur-sm text-white rounded-full hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 z-10"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-
-          {/* Carousel Indicators */}
-          {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentImageIndex(idx);
-                    restartAutoScroll();
-                  }}
-                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${currentImageIndex === idx
-                    ? "w-6 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-                    : "w-1.5 bg-white/40 hover:bg-white/60"
-                    }`}
+        {/* Content */}
+        <div
+          className="relative z-10 flex-1 flex flex-col"
+          style={{ transform: "translateZ(20px)" }}
+        >
+          {/* Image Carousel Container */}
+          <div
+            className="relative aspect-square overflow-hidden bg-[var(--bg-secondary)] rounded-2xl mb-4 group/carousel shadow-2xl"
+            style={{ transform: "translateZ(30px)" }}
+          >
+            <Link
+              to={`/products/${product.id}`}
+              className="block w-full h-full"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={images[currentImageIndex]}
+                  alt={`${product.name} - ${currentImageIndex + 1}`}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={handleImageClick}
                 />
-              ))}
-            </div>
-          )}
+              </AnimatePresence>
+            </Link>
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-            {product.featured && (
-              <span className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-lg">
-                Featured
-              </span>
+            {/* Image Navigation Arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrevImage}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/60 backdrop-blur-sm text-white rounded-full hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 z-10 border-0 cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={goToNextImage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/60 backdrop-blur-sm text-white rounded-full hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 z-10 border-0 cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
             )}
-            {isDiscounted && (
-              <span className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-red-500 to-pink-600 rounded-full shadow-lg">
-                -{discountPercentage}%
-              </span>
+
+            {/* Carousel Indicators */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(idx);
+                      restartAutoScroll();
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer border-0 p-0 ${
+                      currentImageIndex === idx
+                        ? "w-6 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                        : "w-1.5 bg-white/40 hover:bg-white/60"
+                    }`}
+                  />
+                ))}
+              </div>
             )}
-          </div>
 
-          {/* Wishlist Button */}
-          <button className="absolute top-4 right-4 p-3 bg-black/60 backdrop-blur-xl text-white rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg border border-white/10 z-10">
-            <Heart className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Product Info */}
-        <div className="flex-1 flex flex-col gap-4 align-center justify-center">
-          {/* Category */}
-          <div className="flex justify-center align-center">
-            <span className="inline-block text-xs font-bold tracking-wider text-cyan-400 uppercase px-3 py-1.5 bg-cyan-500/10 rounded-full border border-cyan-500/20">
-              {product.category?.name ||
-                (typeof product.category === "string"
-                  ? product.category
-                  : "Product")}
-            </span>
-          </div>
-
-          {/* Product Name */}
-          <Link to={`/products/${product.id}`} className="block group/name">
-            <h3 className="text-xl font-bold text-white text-center leading-tight group-hover/name:text-cyan-300 transition-colors duration-300 line-clamp-2">
-              {product.name}
-            </h3>
-          </Link>
-
-          {/* Description */}
-          <p className="text-gray-400 text-sm leading-relaxed text-center line-clamp-2 min-h-[40px]">
-            {product.description}
-          </p>
-
-          {/* Rating */}
-          <div className="flex items-center justify-center gap-2 py-2">
-            <div className="flex items-center gap-1">
-              {renderStars()}
-              <span className="text-sm font-semibold text-white ml-2">
-                {product.rating?.toFixed(1) || "0.0"}
-              </span>
-            </div>
-            <span className="text-xs text-gray-500">
-              ({product.reviewCount || 0})
-            </span>
-          </div>
-
-          {/* Price */}
-          <div className="flex flex-col items-center gap-1 mt-2">
-            {isDiscounted && (
-              <span className="text-sm text-gray-500 line-through font-medium">
-                {formatCurrency(product.originalPrice)}
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-white">
-                {formatCurrency(product.price)}
-              </span>
+            {/* Badges */}
+            <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+              {product.featured && (
+                <span className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-lg">
+                  Featured
+                </span>
+              )}
               {isDiscounted && (
-                <span className="text-sm font-bold text-green-400">
-                  Save {formatCurrency(product.originalPrice - product.price)}
+                <span className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-red-500 to-pink-600 rounded-full shadow-lg">
+                  -{discountPercentage}%
                 </span>
               )}
             </div>
+
+            {/* Wishlist Button */}
+            <button className="absolute top-4 right-4 p-3 bg-black/60 backdrop-blur-xl text-[var(--text-primary)] rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg border border-[var(--border-subtle)] z-10 cursor-pointer">
+              <Heart className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Add to Cart Button */}
-          <div className="mt-6 align-center pt-4 border-t border-gray-800">
-            <div className="flex justify-center">
-              <motion.button
-                onClick={handleAddToCart}
-                whileTap={{ scale: 0.95 }}
-                disabled={isAdded || !product.inStock || product.quantity <= 0}
-                className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 ${isAdded
-                  ? "bg-green-600 hover:bg-green-700"
-                  : !product.inStock || product.quantity <= 0
-                    ? "bg-gray-700 cursor-not-allowed opacity-60"
-                    : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
-                  }`}
-              >
-                <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-
-                {isAdded ? (
-                  <>
-                    <Check className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Added to Cart</span>
-                  </>
-                ) : !product.inStock || product.quantity <= 0 ? (
-                  <>
-                    <ShoppingCart className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Out of Stock</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">
-                      {isInCart?.(product.id) ? "Add More" : "Add to Cart"}
-                    </span>
-                  </>
-                )}
-              </motion.button>
+          {/* Product Info */}
+          <div className="flex-1 flex flex-col gap-3 align-center justify-center">
+            {/* Category */}
+            <div className="flex justify-center align-center">
+              <span className="inline-block text-xs font-bold tracking-wider text-cyan-400 uppercase px-3 py-1.5 bg-cyan-500/10 rounded-full border border-cyan-500/20">
+                {product.category?.name ||
+                  (typeof product.category === "string"
+                    ? product.category
+                    : "Product")}
+              </span>
             </div>
 
-            {/* Quick View */}
-            <Link
-              to={`/products/${product.id}`}
-              className="block w-full h-8 mt-3 py-3 text-center text-lg font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              Quick View
+            {/* Product Name */}
+            <Link to={`/products/${product.id}`} className="block group/name">
+              <h3 className="text-xl font-bold text-[var(--text-primary)] text-center leading-tight group-hover/name:text-cyan-300 transition-colors duration-300 line-clamp-2">
+                {product.name}
+              </h3>
             </Link>
+
+            {/* Description */}
+            <p className="text-gray-400 text-sm leading-relaxed text-center line-clamp-2 min-h-[40px] mb-0">
+              {product.description}
+            </p>
+
+            {/* Rating */}
+            <div className="flex items-center justify-center gap-2 py-2">
+              <div className="flex items-center gap-1">
+                {renderStars()}
+                <span className="text-sm font-semibold text-[var(--text-primary)] ml-2">
+                  {product.rating?.toFixed(1) || "0.0"}
+                </span>
+              </div>
+              <span className="text-xs text-gray-500">
+                ({product.reviewCount || 0})
+              </span>
+            </div>
+
+            {/* Price */}
+            <div className="flex flex-col items-center gap-1 mt-2">
+              {isDiscounted && (
+                <span className="text-sm text-gray-500 line-through font-medium">
+                  {formatCurrency(product.originalPrice)}
+                </span>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-[var(--text-primary)]">
+                  {formatCurrency(product.price)}
+                </span>
+                {isDiscounted && (
+                  <span className="text-sm font-bold text-green-400">
+                    Save {formatCurrency(product.originalPrice - product.price)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Add to Cart Button */}
+            <div className="mt-4 align-center pt-3 border-t border-[var(--border-subtle)]">
+              <div className="flex justify-center">
+                <motion.button
+                  onClick={handleAddToCart}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={
+                    isAdded || !product.inStock || product.quantity <= 0
+                  }
+                  className={`w-[12.5rem] h-12 py-4 rounded-xl text-base font-semibold uppercase tracking-wider flex items-center justify-center align-center gap-3 relative overflow-hidden transition-all duration-300 border-0 cursor-pointer ${
+                    isAdded
+                      ? "bg-green-600 hover:bg-green-700"
+                      : !product.inStock || product.quantity <= 0
+                        ? "bg-gray-700 cursor-not-allowed opacity-60"
+                        : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+                  }`}
+                >
+                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+
+                  {isAdded ? (
+                    <>
+                      <Check className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">Added to Cart</span>
+                    </>
+                  ) : !product.inStock || product.quantity <= 0 ? (
+                    <>
+                      <ShoppingCart className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">Out of Stock</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">
+                        {isInCart?.(product.id) ? "Add More" : "Add to Cart"}
+                      </span>
+                    </>
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Quick View */}
+              <Link
+                to={`/products/${product.id}`}
+                className="block w-full h-8 mt-3 py-3 text-center text-lg font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                Quick View
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
     </motion.div>
   );
 };

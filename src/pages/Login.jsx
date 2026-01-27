@@ -139,7 +139,7 @@ const Login = () => {
           <Link to="/signup">
             <Button
               block
-              className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-cyan-500/50 h-10 rounded-xl"
+              className="bg-[var(--bg-glass)] border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] hover:border-cyan-500/50 h-10 rounded-xl"
             >
               Create Account
             </Button>

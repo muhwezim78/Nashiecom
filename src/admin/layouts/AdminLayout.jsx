@@ -31,8 +31,12 @@ import {
   ChevronLeft,
   BarChart3,
   Star,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
+import { Tooltip } from "antd";
 import "./AdminLayout.css";
 
 const { Header, Sider, Content } = Layout;
@@ -111,6 +115,7 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout, isAdmin } = useAuth();
+  const { theme: currentTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -160,7 +165,7 @@ const AdminLayout = () => {
 
   const renderMenu = () => (
     <Menu
-      theme="dark"
+      theme={currentTheme}
       mode="inline"
       selectedKeys={[getSelectedKey()]}
       className="admin-menu"
@@ -224,7 +229,7 @@ const AdminLayout = () => {
         onClose={() => setMobileOpen(false)}
         width={280}
         className="admin-mobile-drawer"
-        styles={{ body: { padding: 0, background: "#0a0a0f" } }}
+        styles={{ body: { padding: 0, background: "var(--bg-primary)" } }}
       >
         <div className="admin-logo mobile-logo">
           <img
@@ -261,6 +266,15 @@ const AdminLayout = () => {
           </div>
 
           <div className="header-right">
+            <Tooltip title={currentTheme === "dark" ? "Light Mode" : "Dark Mode"}>
+              <Button
+                type="text"
+                icon={currentTheme === "dark" ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
+                onClick={toggleTheme}
+                className="theme-toggle-btn"
+              />
+            </Tooltip>
+
             <NavLink to="/admin/notifications">
               <Button
                 type="text"

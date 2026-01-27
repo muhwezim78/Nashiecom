@@ -35,7 +35,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center bg-[#0a0a0f] text-white">
+      <div className="min-h-screen grid place-items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
         <Spin size="large" />
       </div>
     );
@@ -43,7 +43,7 @@ const ProductDetail = () => {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen grid place-items-center bg-[#0a0a0f] text-white">
+      <div className="min-h-screen grid place-items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
         {error || "Product not found"}
       </div>
     );
@@ -63,7 +63,7 @@ const ProductDetail = () => {
   const mainImage = images[activeImage] || product.image;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pb-20">
+    <div className="min-h-screen bg-[var(--bg-primary)] pb-20">
       <SEO
         title={product.name}
         description={product.description?.substring(0, 160)}
@@ -72,25 +72,30 @@ const ProductDetail = () => {
         schema={{
           "@context": "https://schema.org/",
           "@type": "Product",
-          "name": product.name,
-          "image": images,
-          "description": product.description,
-          "brand": {
+          name: product.name,
+          image: images,
+          description: product.description,
+          brand: {
             "@type": "Brand",
-            "name": "Nashiecom"
+            name: "Nashiecom",
           },
-          "offers": {
+          offers: {
             "@type": "Offer",
-            "url": `https://nashiecom-technologies.web.app/products/${id}`,
-            "priceCurrency": "UGX",
-            "price": product.price,
-            "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+            url: `https://nashiecom-technologies.web.app/products/${id}`,
+            priceCurrency: "UGX",
+            price: product.price,
+            availability: product.inStock
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
           },
-          "aggregateRating": product.reviewCount > 0 ? {
-            "@type": "AggregateRating",
-            "ratingValue": product.rating,
-            "reviewCount": product.reviewCount
-          } : undefined
+          aggregateRating:
+            product.reviewCount > 0
+              ? {
+                  "@type": "AggregateRating",
+                  ratingValue: product.rating,
+                  reviewCount: product.reviewCount,
+                }
+              : undefined,
         }}
       />
       {contextHolder}
@@ -101,7 +106,7 @@ const ProductDetail = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-[#12121a] relative group shadow-2xl"
+              className="aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-secondary)] relative group shadow-2xl"
             >
               <img
                 src={mainImage}
@@ -116,10 +121,11 @@ const ProductDetail = () => {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${activeImage === idx
-                    ? "border-cyan-500"
-                    : "border-white/10 hover:border-white/30"
-                    }`}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
+                    activeImage === idx
+                      ? "border-cyan-500"
+                      : "border-white/10 hover:border-white/30"
+                  }`}
                 >
                   <img
                     src={img}
@@ -158,7 +164,7 @@ const ProductDetail = () => {
                 )}
               </motion.div>
 
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+              <h1 className="text-3xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
                 {product.name}
               </h1>
 
@@ -197,64 +203,64 @@ const ProductDetail = () => {
             {/* Specs */}
             {product.specs && (
               <div className="py-2">
-                <h3 className="font-semibold text-white mb-6 text-lg">
+                <h3 className="font-semibold text-[var(--text-primary)] mb-6 text-lg">
                   Technical Specifications
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {Array.isArray(product.specs)
                     ? product.specs.map((spec, index) => (
-                      <Card
-                        key={spec.id || index}
-                        className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
-                        styles={{ body: { padding: "1.5rem" } }}
-                      >
-                        <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
-                          {spec.name}
-                        </span>
-                        <span className="block text-white font-bold text-lg">
-                          {spec.value}
-                        </span>
-                      </Card>
-                    ))
-                    : typeof product.specs === "object"
-                      ? Object.entries(product.specs).map(([key, value]) => (
                         <Card
-                          key={key}
-                          className="!bg-[#12121a] !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
+                          key={spec.id || index}
+                          className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
                           styles={{ body: { padding: "1.5rem" } }}
                         >
                           <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
-                            {key}
+                            {spec.name}
                           </span>
-                          <span className="block text-white font-bold text-lg">
-                            {typeof value === "object"
-                              ? JSON.stringify(value)
-                              : value}
+                          <span className="block text-[var(--text-primary)] font-bold text-lg">
+                            {spec.value}
                           </span>
                         </Card>
                       ))
+                    : typeof product.specs === "object"
+                      ? Object.entries(product.specs).map(([key, value]) => (
+                          <Card
+                            key={key}
+                            variant="borderless"
+                            className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
+                            styles={{ body: { padding: "1.5rem" } }}
+                          >
+                            <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                              {key}
+                            </span>
+                            <span className="block text-[var(--text-primary)] font-bold text-lg">
+                              {typeof value === "object"
+                                ? JSON.stringify(value)
+                                : value}
+                            </span>
+                          </Card>
+                        ))
                       : null}
                 </div>
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-6 pt-4">
-              <div className="flex items-center bg-white/5 rounded-xl border border-white/10 w-fit p-1">
+              <div className="flex items-center bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] w-fit p-1">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-4 text-gray-400 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
+                  className="p-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-glass)] rounded-lg"
                 >
                   <Minus className="w-5 h-5" />
                 </button>
-                <span className="w-16 text-center text-white font-medium text-xl">
+                <span className="w-16 text-center text-[var(--text-primary)] font-medium text-xl">
                   {quantity}
                 </span>
                 <button
                   onClick={() =>
                     setQuantity((q) => Math.min(q + 1, product.quantity || 100))
                   }
-                  className="p-4 text-gray-400 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
+                  className="p-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-glass)] rounded-lg"
                 >
                   <Plus className="w-5 h-5" />
                 </button>
@@ -269,14 +275,15 @@ const ProductDetail = () => {
                   }
                   addToCart(product, quantity);
                   messageApi.success(
-                    `Added ${quantity} x ${product.name} to cart`
+                    `Added ${quantity} x ${product.name} to cart`,
                   );
                 }}
                 disabled={!product.inStock || product.quantity <= 0}
-                className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${!product.inStock || product.quantity <= 0
-                  ? "opacity-50 cursor-not-allowed grayscale bg-gray-800"
-                  : ""
-                  }`}
+                className={`btn btn-primary flex-1 text-lg font-semibold tracking-wide py-4 rounded-xl ${
+                  !product.inStock || product.quantity <= 0
+                    ? "opacity-50 cursor-not-allowed grayscale bg-gray-800"
+                    : ""
+                }`}
               >
                 <ShoppingCart className="w-6 h-6 mr-2" />
                 {!product.inStock || product.quantity <= 0
@@ -293,7 +300,8 @@ const ProductDetail = () => {
               ].map((badge, i) => (
                 <Card
                   key={i}
-                  className="!bg-[#12121a] !border-white/5 !rounded-2xl shadow-xl !border"
+                  variant="borderless"
+                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-3xl shadow-xl overflow-hidden"
                   styles={{
                     body: {
                       padding: "1.5rem",
@@ -320,7 +328,6 @@ const ProductDetail = () => {
         {/* Reviews Section */}
         <Reviews productId={product.id} />
       </div>
-
     </div>
   );
 };

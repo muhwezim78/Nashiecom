@@ -31,26 +31,28 @@ const Home = () => {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "ElectronicsStore",
-    "name": "Nashiecom Technologies",
-    "url": "https://nashiecom-technologies.web.app",
-    "logo": "https://nashiecom-technologies.web.app/nashiecom.jpeg",
-    "description": "Premium electronics and IT solutions provider. State-of-the-art laptops, desktops, and computing accessories.",
-    "address": {
+    name: "Nashiecom Technologies",
+    url: "https://nashiecom-technologies.web.app",
+    logo: "https://nashiecom-technologies.web.app/nashiecom.jpeg",
+    description:
+      "Premium electronics and IT solutions provider. State-of-the-art laptops, desktops, and computing accessories.",
+    address: {
       "@type": "PostalAddress",
-      "streetAddress": "New Pioneer Mall shop PH-38",
-      "addressLocality": "Kampala",
-      "addressCountry": "UG"
+      streetAddress: "New Pioneer Mall shop PH-38",
+      addressLocality: "Kampala",
+      addressCountry: "UG",
     },
-    "contactPoint": {
+    contactPoint: {
       "@type": "ContactPoint",
-      "telephone": "+256 786 400 713",
-      "contactType": "sales"
+      telephone: "+256 786 400 713",
+      contactType: "sales",
     },
-    "potentialAction": {
+    potentialAction: {
       "@type": "SearchAction",
-      "target": "https://nashiecom-technologies.web.app/products?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+      target:
+        "https://nashiecom-technologies.web.app/products?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
   };
 
   // Fetch Data using Hooks
@@ -71,22 +73,18 @@ const Home = () => {
   const categories = categoriesData?.data?.categories || [];
 
   // Get featured categories from DB or fallback to defaults
-  const highlightCategories =
-    categories.length > 0
-      ? categories.filter((cat) => cat.featured).slice(0, 4)
-      : staticCategories
-        .filter(
-          (cat) =>
-            cat.id !== "all" &&
-            ["laptops", "desktops", "accessories", "gaming"].includes(cat.id)
-        )
-        .slice(0, 4);
+  const apiFeaturedCategories = categories?.filter((cat) => cat.featured) || [];
 
-  // If we have categories from DB but none are featured, just take the first 4
   const finalCategories =
-    highlightCategories.length > 0
-      ? highlightCategories
-      : categories.slice(0, 4);
+    apiFeaturedCategories.length > 0
+      ? apiFeaturedCategories.slice(0, 4)
+      : staticCategories
+          .filter(
+            (cat) =>
+              cat.id !== "all" &&
+              ["laptops", "desktops", "accessories", "gaming"].includes(cat.id),
+          )
+          .slice(0, 4);
 
   const partners = [
     "HP",
@@ -138,7 +136,7 @@ const Home = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black overflow-x-hidden">
+    <div className="relative min-h-screen bg-[var(--bg-primary)] overflow-x-hidden">
       <SEO
         description="Nashiecom Technologies - Your premier destination for high-performance laptops, custom desktops, and professional computing accessories. Engineered for excellence."
         schema={orgSchema}
@@ -148,7 +146,7 @@ const Home = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.05)_0%,rgba(0,0,0,0)_50%)]" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[120px] rounded-full" />
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-600/5 blur-[100px] rounded-full" />
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+        <div className="absolute inset-0 opacity-[0.03] bg-[var(--bg-glass)]" />
       </div>
 
       {/* Main content wrapped in Space with responsive gaps */}
@@ -156,7 +154,7 @@ const Home = () => {
         orientation="vertical"
         size="large"
         className="w-full"
-        style={{ gap: 'var(--space-2xl)' }}
+        style={{ gap: "var(--space-2xl)" }}
       >
         {/* Hero Section */}
         <div className="w-full">
@@ -165,7 +163,7 @@ const Home = () => {
 
         {/* Brand Marquee */}
         <div className="w-full">
-          <section className="relative py-12 border-y border-white/5 bg-white/[0.01] backdrop-blur-sm overflow-hidden">
+          <section className="relative py-12 border-y border-[var(--border-subtle)] bg-[var(--bg-glass)] backdrop-blur-sm overflow-hidden">
             <div className="flex whitespace-nowrap overflow-hidden">
               <motion.div
                 animate={{ x: [0, -1035] }}
@@ -175,7 +173,7 @@ const Home = () => {
                 {[...partners, ...partners].map((partner, i) => (
                   <span
                     key={i}
-                    className="text-2xl font-black text-gray-700 tracking-[0.3em] uppercase hover:text-white transition-colors cursor-default"
+                    className="text-2xl font-black text-gray-700 tracking-[0.3em] uppercase hover:text-[var(--text-primary)] transition-colors cursor-default"
                   >
                     {partner}
                   </span>
@@ -187,13 +185,13 @@ const Home = () => {
 
         {/* Services Section */}
         <div className="w-full">
-          <section className="py-24 bg-white/[0.02] border-y border-white/5">
+          <section className="py-24 bg-[var(--bg-secondary)] border-y border-[var(--border-subtle)]">
             <div className="container mx-auto px-4">
               <div className="text-center mb-16">
                 <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em]">
                   Our Expertise
                 </span>
-                <h2 className="text-4xl md:text-5xl font-black text-white mt-4 tracking-tighter">
+                <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] mt-4 tracking-tighter">
                   COMPREHENSIVE <span className="text-blue-500">SOLUTIONS</span>
                 </h2>
               </div>
@@ -233,15 +231,15 @@ const Home = () => {
                     className="h-full"
                   >
                     <Card
-                      className="h-full !bg-black/20 !border-white/5 hover:!border-cyan-500/30 !rounded-2xl transition-all group !border-0 text-center"
+                      className="h-full !bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!border-cyan-500/30 !rounded-2xl transition-all group !border-0 text-center"
                       styles={{ body: { padding: "2rem" } }}
                     >
                       <div
-                        className={`w-14 h-14 mx-auto mb-6 bg-white/5 rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
+                        className={`w-14 h-14 mx-auto mb-6 bg-[var(--bg-glass)] rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
                       >
                         <service.icon className="w-6 h-6" />
                       </div>
-                      <h3 className="text-white font-bold text-lg mb-1">
+                      <h3 className="text-[var(--text-primary)] font-bold text-lg mb-1">
                         {service.title}
                       </h3>
                       <p className="text-gray-500 text-sm font-medium">
@@ -266,7 +264,7 @@ const Home = () => {
                     System Architecture
                   </span>
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-[0.9]">
+                <h2 className="text-5xl md:text-7xl font-black text-[var(--text-primary)] tracking-tighter mb-8 leading-[0.9]">
                   CHOOSE YOUR <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 font-outline-2">
                     INFRASTRUCTURE
@@ -293,7 +291,7 @@ const Home = () => {
 
         {/* Impact Stats */}
         <div className="w-full">
-          <section className="relative py-20 bg-white/[0.02] border-y border-white/5">
+          <section className="relative py-20 bg-[var(--bg-secondary)] border-y border-[var(--border-subtle)]">
             <div className="container mx-auto px-4">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
                 {stats.map((stat, i) => (
@@ -306,11 +304,11 @@ const Home = () => {
                     className="text-center group"
                   >
                     <div
-                      className={`w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform ${stat.color}`}
+                      className={`w-14 h-14 bg-[var(--bg-glass)] rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform ${stat.color}`}
                     >
                       <stat.icon className="w-6 h-6" />
                     </div>
-                    <div className="text-4xl lg:text-5xl font-black text-white tracking-tighter mb-2">
+                    <div className="text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tighter mb-2">
                       {stat.value}
                     </div>
                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
@@ -334,14 +332,14 @@ const Home = () => {
                   <div className="inline-flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-full border border-blue-500/20 mb-6 font-black uppercase tracking-[0.3em] text-[10px] text-blue-400">
                     <Zap className="w-3 h-3" /> Peak Performance
                   </div>
-                  <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
+                  <h2 className="text-5xl md:text-7xl font-black text-[var(--text-primary)] tracking-tighter leading-none">
                     TRENDING <span className="text-blue-500">CORE</span>
                   </h2>
                 </motion.div>
 
                 <Link
                   to="/products"
-                  className="group relative px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black uppercase tracking-widest text-xs hover:border-blue-500/50 transition-all overflow-hidden"
+                  className="group relative px-8 py-4 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] font-black uppercase tracking-widest text-xs hover:border-blue-500/50 transition-all overflow-hidden"
                 >
                   <div className="relative z-10 flex items-center gap-3">
                     Access All Modules{" "}
@@ -367,7 +365,7 @@ const Home = () => {
                       className={index === 1 ? "lg:-mt-12 lg:mb-12" : ""}
                     >
                       <div className="relative group p-1 rounded-2xl bg-gradient-to-b from-white/10 to-white/0 hover:from-blue-500/30 transition-all duration-500">
-                        <div className="relative bg-[#0a0a0f] rounded-2xl overflow-hidden">
+                        <div className="relative bg-[var(--bg-primary)] rounded-2xl overflow-hidden">
                           <ProductCard product={product} />
                         </div>
                       </div>
@@ -393,7 +391,7 @@ const Home = () => {
                       Gaming Spectrum
                     </span>
                   </div>
-                  <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-10 leading-[0.85]">
+                  <h2 className="text-6xl md:text-8xl font-black text-[var(--text-primary)] tracking-tighter mb-10 leading-[0.85]">
                     LIMITLESS <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                       PLAY
@@ -407,7 +405,7 @@ const Home = () => {
                         className="block group"
                       >
                         <Card
-                          className="!bg-white/[0.02] !border-white/5 hover:!bg-white/[0.05] hover:!border-purple-500/30 !rounded-2xl transition-all !border-0"
+                          className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!bg-[var(--bg-secondary)] hover:!border-purple-500/30 !rounded-2xl transition-all !border-0"
                           styles={{
                             body: {
                               padding: "1.5rem",
@@ -430,7 +428,7 @@ const Home = () => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-white font-bold text-lg">
+                            <h4 className="text-[var(--text-primary)] font-bold text-lg">
                               {product.name}
                             </h4>
                             <div className="flex items-center gap-3 mt-1">
@@ -454,7 +452,7 @@ const Home = () => {
                 >
                   <div className="absolute inset-0 bg-purple-600/20 blur-[100px] animate-pulse rounded-full" />
                   <Card
-                    className="relative w-full max-w-lg aspect-square !bg-[#0a0a0f] !border-white/5 !rounded-2xl overflow-hidden group shadow-2xl !border-0"
+                    className="relative w-full max-w-lg aspect-square !bg-[var(--bg-primary)] !border-white/5 !rounded-2xl overflow-hidden group shadow-2xl !border-0"
                     styles={{
                       body: {
                         padding: "3rem",
@@ -471,7 +469,7 @@ const Home = () => {
 
                     <div className="relative h-full flex flex-col justify-between z-10">
                       <div className="space-y-4">
-                        <h3 className="text-4xl font-black text-white tracking-tight uppercase">
+                        <h3 className="text-4xl font-black text-[var(--text-primary)] tracking-tight uppercase">
                           Special Edition <br />{" "}
                           <span className="text-purple-500">Bundle</span>
                         </h3>
@@ -482,7 +480,7 @@ const Home = () => {
                       </div>
 
                       <Card
-                        className="!bg-white/5 !rounded-2xl backdrop-blur-md !border-white/5 !border"
+                        className="!bg-[var(--bg-glass)] !rounded-2xl backdrop-blur-md !border-[var(--border-subtle)] !border"
                         styles={{ body: { padding: "1.5rem" } }}
                       >
                         <div className="space-y-4">
@@ -505,7 +503,7 @@ const Home = () => {
                               <p className="text-xs text-purple-400 font-black uppercase mb-1">
                                 Bundle Value
                               </p>
-                              <p className="text-4xl font-black text-white">
+                              <p className="text-4xl font-black text-[var(--text-primary)]">
                                 1.29M
                               </p>
                             </div>
@@ -526,7 +524,7 @@ const Home = () => {
 
         {/* CTA Layer */}
         <div className="w-full">
-          <section className="pt-32 pb-40 lg:pt-40 lg:pb-48 relative bg-black overflow-hidden">
+          <section className="pt-32 pb-40 lg:pt-40 lg:pb-48 relative bg-[var(--bg-primary)] overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent pointer-events-none" />
             {/* ... CTA Content ... */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.15),transparent)] pointer-events-none" />
@@ -538,7 +536,7 @@ const Home = () => {
                 viewport={{ once: true }}
                 className="max-w-5xl mx-auto"
               >
-                <h2 className="text-7xl md:text-[9rem] font-black text-white tracking-tighter leading-[0.8] mb-12">
+                <h2 className="text-7xl md:text-[9rem] font-black text-[var(--text-primary)] tracking-tighter leading-[0.8] mb-12">
                   BUILD YOUR <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/10">
                     FUTURE
@@ -557,7 +555,7 @@ const Home = () => {
                   </Link>
                   <Link
                     to="/contact"
-                    className="px-12 py-6 bg-white/5 border border-white/10 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-white/10 transition-colors"
+                    className="px-12 py-6 bg-[var(--bg-glass)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-[var(--bg-secondary)] transition-colors"
                   >
                     Consult Sales
                   </Link>

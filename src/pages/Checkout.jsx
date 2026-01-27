@@ -95,33 +95,40 @@ const Checkout = () => {
 
   if (isCompleted) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="glass-card max-w-xl w-full p-12 text-center rounded-2xl"
+          className="w-full max-w-xl"
         >
-          <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10" />
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Order Confirmed!
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Thank you for your purchase. We've received your order and are
-            processing it. You can track your order in the "My Orders" section.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/my-orders" className="btn btn-primary flex-1">
-              View My Orders
-            </Link>
-            <Link
-              to="/"
-              className="btn bg-white/5 hover:bg-white/10 text-white flex-1"
-            >
-              Back to Home
-            </Link>
-          </div>
+          <Card
+            className="glass-card w-full text-center !rounded-2xl"
+            styles={{ body: { padding: "3rem" } }}
+            variant="borderless"
+          >
+            <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10" />
+            </div>
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
+              Order Confirmed!
+            </h2>
+            <p className="text-[var(--text-muted)] mb-8">
+              Thank you for your purchase. We've received your order and are
+              processing it. You can track your order in the "My Orders"
+              section.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/my-orders" className="btn btn-primary flex-1">
+                View My Orders
+              </Link>
+              <Link
+                to="/"
+                className="btn bg-[var(--bg-glass)] hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] flex-1"
+              >
+                Back to Home
+              </Link>
+            </div>
+          </Card>
         </motion.div>
       </div>
     );
@@ -129,7 +136,7 @@ const Checkout = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen grid place-items-center bg-[#0a0a0f] text-white">
+      <div className="min-h-screen grid place-items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
           <Link to="/products" className="btn btn-primary">
@@ -141,9 +148,11 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pb-12 pt-24">
+    <div className="min-h-screen bg-[var(--bg-primary)] pb-12 pt-24">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">
+          Checkout
+        </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Form */}
@@ -153,8 +162,8 @@ const Checkout = () => {
             </div>
 
             <Card
-              className="bg-[#12121a] border-white/5 rounded-2xl p-4 sm:p-6 !border"
-              bordered={false}
+              className="bg-[var(--bg-secondary)] border-[var(--border-subtle)] rounded-2xl p-4 sm:p-6 !border"
+              variant="borderless"
               styles={{ body: { padding: 0 } }}
             >
               <Form
@@ -169,7 +178,7 @@ const Checkout = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                   >
-                    <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-6 flex items-center gap-2">
                       <MapPin className="text-cyan-400" /> Shipping Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -398,10 +407,10 @@ const Checkout = () => {
                         {loading
                           ? "Processing..."
                           : paymentMethod === "COD"
-                          ? `Place Order - Pay on Delivery`
-                          : paymentMethod === "MOBILE_MONEY"
-                          ? `Pay with Mobile Money`
-                          : `Place Order (${formatCurrency(total)})`}
+                            ? `Place Order - Pay on Delivery`
+                            : paymentMethod === "MOBILE_MONEY"
+                              ? `Pay with Mobile Money`
+                              : `Place Order (${formatCurrency(total)})`}
                       </Button>
                     </div>
                   </motion.div>
@@ -413,16 +422,16 @@ const Checkout = () => {
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <Card
-              className="!bg-[#12121a] !rounded-2xl !border-white/5 !border shadow-2xl sticky top-24 overflow-hidden"
+              className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] !border shadow-2xl sticky top-24 overflow-hidden"
               styles={{ body: { padding: "2.5rem" } }}
             >
-              <h3 className="font-bold text-white mb-8 text-xl text-center md:text-left">
+              <h3 className="font-bold text-[var(--text-primary)] mb-8 text-xl text-center md:text-left">
                 Order Summary
               </h3>
               <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-4 custom-scrollbar">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex gap-6 items-center">
-                    <div className="w-16 h-16 bg-[#1a1a25] rounded-2xl border border-white/5 shrink-0 overflow-hidden shadow-lg">
+                    <div className="w-16 h-16 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--border-subtle)] shrink-0 overflow-hidden shadow-lg">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -430,10 +439,10 @@ const Checkout = () => {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-bold line-clamp-1">
+                      <p className="text-[var(--text-primary)] font-bold line-clamp-1">
                         {item.name}
                       </p>
-                      <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-1">
+                      <p className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wider mt-1">
                         Qty: {item.quantity}
                       </p>
                     </div>
@@ -447,33 +456,35 @@ const Checkout = () => {
               <Divider className="bg-white/10 my-8" />
 
               <div className="space-y-4 text-sm">
-                <div className="flex justify-between text-gray-400 font-medium">
+                <div className="flex justify-between text-[var(--text-muted)] font-medium">
                   <span>Subtotal</span>
-                  <span className="text-white font-bold">
+                  <span className="text-[var(--text-primary)] font-bold">
                     {formatCurrency(subtotal)}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-400 font-medium">
+                <div className="flex justify-between text-[var(--text-muted)] font-medium">
                   <span>Shipping</span>
                   <span className="text-cyan-400 font-bold uppercase tracking-widest text-xs">
                     Free
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-400 font-medium">
+                <div className="flex justify-between text-[var(--text-muted)] font-medium">
                   <span>Tax (8%)</span>
-                  <span className="text-white font-bold">
+                  <span className="text-[var(--text-primary)] font-bold">
                     {formatCurrency(tax)}
                   </span>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-white/10 flex flex-col">
+                <div className="pt-6 mt-6 border-t border-[var(--border-main)] flex flex-col">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-gray-400 font-medium">Total</span>
-                    <span className="text-3xl font-black text-white tracking-tighter">
+                    <span className="text-[var(--text-muted)] font-medium">
+                      Total
+                    </span>
+                    <span className="text-3xl font-black text-[var(--text-primary)] tracking-tighter">
                       {formatCurrency(total)}
                     </span>
                   </div>
-                  <span className="text-[10px] text-gray-500 uppercase tracking-widest text-right">
+                  <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest text-right">
                     Inclusive of all taxes
                   </span>
                 </div>

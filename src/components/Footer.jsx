@@ -20,7 +20,7 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
-import { Card } from "antd";
+import { Card, Input } from "antd";
 
 const Footer = () => {
   // ... (previous state/hooks remain same)
@@ -92,14 +92,14 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-black pt-20 overflow-hidden">
+    <footer className="relative bg-[var(--bg-primary)] mt-20 pt-20 overflow-hidden transition-colors duration-500">
       {/* Visual Accents */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
       <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 bg-cyan-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Top Section: Trust Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-40">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-24">
           {trustBadges.map((badge, i) => (
             <motion.div
               key={i}
@@ -110,8 +110,11 @@ const Footer = () => {
               className="group relative"
             >
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-3xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-              <Card className="!bg-white/[0.02] !border-white/5 backdrop-blur-md !rounded-3xl hover:!bg-white/[0.04] transition-all duration-500 h-full !border-0">
-                <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+              <Card
+                className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] backdrop-blur-md !rounded-3xl hover:!bg-[var(--bg-glass)] transition-all duration-500 h-full !border-0"
+                styles={{ body: { padding: "1.25rem" } }}
+              >
+                <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <badge.icon className="w-6 h-6 text-cyan-400" />
                 </div>
                 <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-2">
@@ -126,7 +129,7 @@ const Footer = () => {
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-20">
+        <div className="mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
           {/* Brand Col */}
           <div className="lg:col-span-4 space-y-10">
             {/* ... Brand Content ... */}
@@ -177,7 +180,7 @@ const Footer = () => {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-500/30 transition-all duration-300 group"
+                    className="w-12 h-12 rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-cyan-500/20 hover:border-cyan-500/30 transition-all duration-300 group"
                   >
                     <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   </a>
@@ -187,13 +190,13 @@ const Footer = () => {
           </div>
 
           {/* Links Col */}
-          <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-6">
             {linkSections.map((section, i) => (
-              <div key={i} className="space-y-8">
+              <div key={i} className="space-y-5">
                 <h5 className="text-white font-black uppercase tracking-[0.2em] text-[10px]">
                   {section.title}
                 </h5>
-                <ul className="space-y-4">
+                <ul className="space-y-3">
                   {section.links.map((link, j) => (
                     <li key={j}>
                       <Link
@@ -213,8 +216,8 @@ const Footer = () => {
           {/* Newsletter Col */}
           <div className="lg:col-span-3">
             <Card
-              className="!bg-white/[0.02] !border-white/5 !rounded-[2.5rem] relative overflow-hidden group !border-0"
-              styles={{ body: { padding: "2rem" } }}
+              className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] !rounded-[2.5rem] relative overflow-hidden group !border-0"
+              styles={{ body: { padding: "1.5rem" } }}
             >
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Mail className="w-16 h-16 text-cyan-500" />
@@ -232,15 +235,16 @@ const Footer = () => {
 
               <form
                 onSubmit={handleSubscribe}
-                className="relative z-10 space-y-4"
+                className="relative z-10 space-y-3"
               >
                 <div className="relative">
-                  <input
+                  <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="visionary@email.com"
-                    className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 transition-all"
+                    className="w-full bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl py-4 pl-6 pr-12 text-sm text-[var(--text-primary)] placeholder-gray-600 h-14"
+                    variant="borderless"
                     required
                   />
                   <button
@@ -268,9 +272,12 @@ const Footer = () => {
         </div>
 
         {/* Contact Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
-            <div className="flex items-center gap-6 group">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
+          <Card
+            className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0"
+            styles={{ body: { padding: "1.25rem" } }}
+          >
+            <div className="flex items-center gap-4 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <MapPin className="w-6 h-6" />
               </div>
@@ -285,7 +292,7 @@ const Footer = () => {
             </div>
           </Card>
 
-          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
+          <Card className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0">
             <div className="flex items-center gap-6 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <Phone className="w-6 h-6" />
@@ -299,7 +306,7 @@ const Footer = () => {
             </div>
           </Card>
 
-          <Card className="!bg-white/[0.01] !border-white/5 !rounded-[2rem] hover:!bg-white/[0.03] transition-colors !border-0">
+          <Card className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0">
             <div className="flex items-center gap-6 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <Shield className="w-6 h-6" />
@@ -320,8 +327,8 @@ const Footer = () => {
         </div>
 
         {/* Footer Bottom */}
-        <div className="py-12 border-t border-white/5">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
+        <div className="mt-16 py-8 border-t border-[var(--border-subtle)]">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             <div className="space-y-4 text-center lg:text-left">
               <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
                 © {currentYear} NASHIECOM TECHNOLOGIES. ENGINEERED FOR
@@ -345,7 +352,7 @@ const Footer = () => {
                 {["Visa", "Master", "Paypal", "MTN", "Airtel"].map((p) => (
                   <span
                     key={p}
-                    className="text-[10px] font-black text-white px-3 py-1 bg-white/5 rounded-lg border border-white/5"
+                    className="text-[10px] font-black text-[var(--text-primary)] px-3 py-1 bg-[var(--bg-glass)] rounded-lg border border-[var(--border-subtle)]"
                   >
                     {p}
                   </span>

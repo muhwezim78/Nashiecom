@@ -23,7 +23,7 @@ const Contact = () => {
     try {
       await api.contact.create(values);
       message.success(
-        "Message sent successfully! We will get back to you soon."
+        "Message sent successfully! We will get back to you soon.",
       );
       form.resetFields();
     } catch (error) {
@@ -85,7 +85,7 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[var(--bg-primary)] transition-colors duration-500">
       {/* Hero Section */}
       <div className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5" />
@@ -93,7 +93,7 @@ const Contact = () => {
         <div className="container mx-auto px-4 py-16 md:py-20">
           <div className="w-full flex flex-col gap-10 items-center">
             <div className="text-center flex flex-col gap-4 items-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--text-primary)]">
                 Contact{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                   Support
@@ -112,14 +112,14 @@ const Contact = () => {
                   {supportFeatures.map((feature, index) => (
                     <Col xs={16} sm={12} key={index}>
                       <Card
-                        className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                        className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all !border"
                         bodyStyle={{ padding: "1rem" }}
                       >
                         <div className="flex flex-col items-center text-center">
                           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 flex items-center justify-center mb-3">
                             <div className="text-cyan-400">{feature.icon}</div>
                           </div>
-                          <h4 className="text-white font-semibold text-sm mb-1">
+                          <h4 className="text-[var(--text-primary)] font-semibold text-sm mb-1">
                             {feature.title}
                           </h4>
                           <p className="text-gray-400 text-xs">
@@ -149,7 +149,7 @@ const Contact = () => {
                   {contactInfo.map((info, index) => (
                     <Card
                       key={index}
-                      className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm hover:border-cyan-500/30 transition-all !rounded-2xl"
+                      className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] backdrop-blur-sm hover:border-cyan-500/30 transition-all !rounded-2xl"
                       bodyStyle={{ padding: "12px" }}
                     >
                       <div className="w-full flex items-start gap-4">
@@ -198,12 +198,12 @@ const Contact = () => {
             {/* Contact Form Column */}
             <Col xs={24} lg={12}>
               <Card
-                className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-white/10 backdrop-blur-sm !rounded-2xl"
+                className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] backdrop-blur-sm !rounded-2xl"
                 bodyStyle={{ padding: "32px" }}
               >
                 <div className="w-full flex flex-col gap-8">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">
+                    <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
                       Send us a Message
                     </h3>
                     <p className="text-gray-400">
@@ -232,7 +232,7 @@ const Contact = () => {
                             <Input
                               size="large"
                               placeholder="John Doe"
-                              className="bg-white/5 border border-white/10 text-white placeholder-gray-500 hover:border-cyan-500/30 focus:border-cyan-500"
+                              className="theme-input"
                             />
                           </Form.Item>
                         </Col>
@@ -253,7 +253,7 @@ const Contact = () => {
                             <Input
                               size="large"
                               placeholder="john@example.com"
-                              className="bg-white/5 border border-white/10 text-white placeholder-gray-500 hover:border-cyan-500/30 focus:border-cyan-500"
+                              className="bg-[var(--bg-glass)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-gray-500 hover:border-cyan-500/30 focus:border-cyan-500"
                             />
                           </Form.Item>
                         </Col>
@@ -271,7 +271,19 @@ const Contact = () => {
                         <Select
                           size="large"
                           placeholder="Select inquiry type"
-                          className="bg-white/5 border border-white/10 text-white hover:border-cyan-500/30 focus:border-cyan-500"
+                          className="custom-glass-select w-full"
+                          popupMatchSelectWidth={false}
+                          variant="borderless"
+                          styles={{
+                            popup: {
+                              root: {
+                                backgroundColor: "var(--bg-secondary)",
+                                border: "1px solid var(--border-subtle)",
+                                borderRadius: "1rem",
+                                padding: "0.5rem",
+                              },
+                            },
+                          }}
                           options={[
                             { value: "general", label: "General Inquiry" },
                             { value: "order", label: "Order Support" },
@@ -335,16 +347,16 @@ const Contact = () => {
 
           {/* FAQ Preview */}
           <div className="w-full flex flex-col gap-6 items-center">
-            <h3 className="text-2xl font-bold text-white text-center">
+            <h3 className="text-2xl font-bold text-[var(--text-primary)] text-center">
               Frequently Asked Questions
             </h3>
             <Row gutter={[16, 16]} className="w-full max-w-4xl">
               <Col xs={24} md={12}>
                 <Card
-                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all !border"
                   bodyStyle={{ padding: "1.5rem" }}
                 >
-                  <h4 className="text-white font-semibold mb-2">
+                  <h4 className="text-[var(--text-primary)] font-semibold mb-2">
                     What is your shipping time?
                   </h4>
                   <p className="text-gray-400 text-sm">
@@ -355,10 +367,10 @@ const Contact = () => {
               </Col>
               <Col xs={24} md={12}>
                 <Card
-                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all !border"
                   bodyStyle={{ padding: "1.5rem" }}
                 >
-                  <h4 className="text-white font-semibold mb-2">
+                  <h4 className="text-[var(--text-primary)] font-semibold mb-2">
                     Do you offer warranties?
                   </h4>
                   <p className="text-gray-400 text-sm">
@@ -369,10 +381,10 @@ const Contact = () => {
               </Col>
               <Col xs={24} md={12}>
                 <Card
-                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all !border"
                   bodyStyle={{ padding: "1.5rem" }}
                 >
-                  <h4 className="text-white font-semibold mb-2">
+                  <h4 className="text-[var(--text-primary)] font-semibold mb-2">
                     Can I return a product?
                   </h4>
                   <p className="text-gray-400 text-sm">
@@ -383,10 +395,10 @@ const Contact = () => {
               </Col>
               <Col xs={24} md={12}>
                 <Card
-                  className="!bg-white/5 !rounded-2xl !border-white/10 hover:!border-cyan-500/30 transition-all !border"
+                  className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all !border"
                   bodyStyle={{ padding: "1.5rem" }}
                 >
-                  <h4 className="text-white font-semibold mb-2">
+                  <h4 className="text-[var(--text-primary)] font-semibold mb-2">
                     Do you ship internationally?
                   </h4>
                   <p className="text-gray-400 text-sm">

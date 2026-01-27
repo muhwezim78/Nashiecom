@@ -5,7 +5,7 @@ import SEO from "../components/SEO";
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       <SEO
         title="Our Story"
         description="Learn about Nashiecom Technologies - Uganda's premier electronic store. Our mission is to provide high-performance tech for creators and gamers."
@@ -14,7 +14,7 @@ const About = () => {
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-blue-900/10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0f]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--bg-primary)]" />
 
         <div className="container mx-auto px-4 relative z-10 text-left">
           <motion.h1
@@ -37,11 +37,11 @@ const About = () => {
       </section>
 
       {/* Mission */}
-      <section className="section bg-[#12121a]">
+      <section className="section bg-[var(--bg-secondary)]">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-xl)] items-center">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-6">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">
                 Our Mission
               </h2>
               <p className="text-gray-400 text-lg leading-relaxed mb-6">
@@ -58,37 +58,37 @@ const About = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Card
-                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
                 bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
                 <Target className="w-8 h-8 text-cyan-400 mb-4" />
-                <h3 className="font-bold text-white mb-2">Innovation</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-2">Innovation</h3>
                 <p className="text-sm text-gray-500">
                   Always ahead of the curve
                 </p>
               </Card>
               <Card
-                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
                 bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
                 <Users className="w-8 h-8 text-purple-400 mb-4" />
-                <h3 className="font-bold text-white mb-2">Community</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-2">Community</h3>
                 <p className="text-sm text-gray-500">Built for enthusiasts</p>
               </Card>
               <Card
-                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
                 bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
                 <Shield className="w-8 h-8 text-green-400 mb-4" />
-                <h3 className="font-bold text-white mb-2">Trust</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-2">Trust</h3>
                 <p className="text-sm text-gray-500">Reliable & secure</p>
               </Card>
               <Card
-                className="!bg-white/5 !rounded-2xl !border-white/10 backdrop-blur-sm !border"
+                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
                 bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
               >
                 <Globe className="w-8 h-8 text-blue-400 mb-4" />
-                <h3 className="font-bold text-white mb-2">Global</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-2">Global</h3>
                 <p className="text-sm text-gray-500">Shipping worldwide</p>
               </Card>
             </div>

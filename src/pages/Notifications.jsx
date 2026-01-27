@@ -131,7 +131,7 @@ const Notifications = () => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] py-8">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-8 pt-32">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -145,14 +145,13 @@ const Notifications = () => {
                 <Bell className="w-6 h-6 text-cyan-400" />
               </div>
               <div>
-                <Title level={2} className="!text-white !mb-0">
+                <Title level={2} className="!text-[var(--text-primary)] !mb-0">
                   Notifications
                 </Title>
                 <Text className="text-gray-400">
                   {unreadCount > 0
-                    ? `${unreadCount} unread notification${
-                        unreadCount > 1 ? "s" : ""
-                      }`
+                    ? `${unreadCount} unread notification${unreadCount > 1 ? "s" : ""
+                    }`
                     : "You're all caught up!"}
                 </Text>
               </div>
@@ -170,7 +169,7 @@ const Notifications = () => {
           </div>
 
           {/* Notifications List */}
-          <Card className="!bg-white/5 !border-white/10 !rounded-2xl">
+          <Card className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] !rounded-2xl">
             {loading && notifications.length === 0 ? (
               <div className="flex justify-center py-12">
                 <Spin size="large" />
@@ -187,27 +186,24 @@ const Notifications = () => {
                 dataSource={notifications}
                 renderItem={(item) => (
                   <List.Item
-                    className={`!border-b !border-white/5 cursor-pointer transition-all hover:bg-white/5 !px-4 !py-4 ${
-                      !item.isRead ? "bg-cyan-500/5" : ""
-                    }`}
+                    className={`!border-b !border-[var(--border-subtle)] cursor-pointer transition-all hover:bg-[var(--bg-glass)] !px-4 !py-4 ${!item.isRead ? "bg-cyan-500/5" : ""
+                      }`}
                     onClick={() => !item.isRead && handleMarkAsRead(item.id)}
                   >
                     <div className="flex items-start gap-4 w-full">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          !item.isRead
-                            ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20"
-                            : "bg-white/5"
-                        }`}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${!item.isRead
+                          ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20"
+                          : "bg-[var(--bg-glass)]"
+                          }`}
                       >
                         {getTypeIcon(item.type)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Text
-                            className={`font-semibold ${
-                              !item.isRead ? "text-white" : "text-gray-300"
-                            }`}
+                            className={`font-semibold ${!item.isRead ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
+                              }`}
                           >
                             {item.title}
                           </Text>

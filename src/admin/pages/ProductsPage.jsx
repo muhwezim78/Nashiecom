@@ -390,7 +390,11 @@ const ProductsPage = () => {
       </div>
 
       {/* Filters */}
-      <Card className="form-card" style={{ marginBottom: 24 }}>
+      <Card
+        className="form-card"
+        variant="borderless"
+        style={{ marginBottom: 24 }}
+      >
         <Row gutter={16} align="middle">
           <Col xs={24} md={8}>
             <Input
@@ -442,7 +446,7 @@ const ProductsPage = () => {
       </Card>
 
       {/* Products Table */}
-      <Card className="admin-table-card">
+      <Card className="admin-table-card" variant="borderless">
         <Table
           className="admin-table"
           columns={columns}

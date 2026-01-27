@@ -19,7 +19,7 @@ const StatCard = ({ title, value, prefix, color, subtext, subtextColor }) => (
   <Card
     className="dashboard-stat-card"
     style={{ height: "100%" }}
-    bordered={false}
+    variant="borderless"
   >
     <div className="text-gray-400 text-sm mb-2 font-medium">{title}</div>
     <div className="flex items-center text-2xl font-bold text-white mb-2">
@@ -141,7 +141,7 @@ const AnalyticsPage = () => {
             value={Math.round(
               stats?.orders?.total > 0
                 ? stats?.revenue?.total / stats?.orders?.total
-                : 0
+                : 0,
             )}
             prefix={<span className="text-sm">UGX</span>}
             color="#f59e0b"
@@ -157,7 +157,7 @@ const AnalyticsPage = () => {
             title="Revenue Trend"
             className="admin-table-card"
             style={{ height: "100%" }}
-            bordered={false}
+            variant="borderless"
           >
             <div style={{ height: 350, marginTop: 16 }}>
               {revenueData.length > 0 ? (
@@ -264,7 +264,7 @@ const AnalyticsPage = () => {
             title="Best Sellers"
             className="admin-table-card"
             style={{ height: "100%" }}
-            bordered={false}
+            variant="borderless"
           >
             <div className="flex flex-col">
               {topProducts.length === 0 ? (

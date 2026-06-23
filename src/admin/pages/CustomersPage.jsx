@@ -1,24 +1,4 @@
-// Admin Customers Management Page
 import { useState, useEffect } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Input,
-  Select,
-  Space,
-  Tag,
-  message,
-  Row,
-  Col,
-  Typography,
-  Avatar,
-  Drawer,
-  Descriptions,
-  Divider,
-  Popconfirm,
-  Statistic,
-} from "antd";
 import {
   Search,
   Eye,
@@ -27,14 +7,12 @@ import {
   Mail,
   Phone,
   Calendar,
+  X,
+  Loader2,
 } from "lucide-react";
 import { usersAPI } from "../../services/api";
-import "../layouts/AdminLayout.css";
+import { message } from "../../utils/toast";
 
-const { Text } = Typography;
-const { Option } = Select;
-
-// Format currency
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-UG", {
     style: "currency",
@@ -43,7 +21,6 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// Format date
 const formatDate = (date) => {
   if (!date) return "Never";
   return new Date(date).toLocaleDateString("en-US", {
@@ -57,36 +34,19 @@ const CustomersPage = () => {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [stats, setStats] = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-  });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
   const [filters, setFilters] = useState({ search: "", status: "" });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Fetch customers
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        ...filters,
-      };
-      Object.keys(params).forEach((key) => {
-        if (params[key] === "" || params[key] === undefined) {
-          delete params[key];
-        }
-      });
-
+      const params = { page: pagination.page, limit: pagination.limit, ...filters };
+      Object.keys(params).forEach((key) => { if (params[key] === "" || params[key] === undefined) delete params[key]; });
       const response = await usersAPI.getAll(params);
       setCustomers(response.data.users);
-      setPagination((prev) => ({
-        ...prev,
-        total: response.data.pagination.total,
-      }));
+      setPagination((prev) => ({ ...prev, total: response.data.pagination.total }));
     } catch (error) {
       message.error("Failed to fetch customers");
     } finally {
@@ -94,7 +54,6 @@ const CustomersPage = () => {
     }
   };
 
-  // Fetch stats
   const fetchStats = async () => {
     try {
       const response = await usersAPI.getStats();
@@ -109,11 +68,6 @@ const CustomersPage = () => {
     fetchStats();
   }, [pagination.page, filters]);
 
-  const handleSearch = (value) => {
-    setFilters((prev) => ({ ...prev, search: value }));
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
-
   const viewCustomer = async (customer) => {
     try {
       const response = await usersAPI.getById(customer.id);
@@ -125,392 +79,282 @@ const CustomersPage = () => {
   };
 
   const toggleStatus = async (id) => {
+    if (!window.confirm("Are you sure you want to toggle this user's status?")) return;
     try {
       await usersAPI.toggleStatus(id);
       message.success("Status updated");
       fetchCustomers();
+      if (selectedCustomer && selectedCustomer.id === id) {
+        setDrawerOpen(false);
+      }
     } catch (error) {
       message.error("Update failed");
     }
   };
 
-  const columns = [
-    {
-      title: "Customer",
-      key: "customer",
-      render: (_, record) => (
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <Avatar
-            size={40}
-            src={record.avatar}
-            style={{ backgroundColor: "#00d4ff" }}
-          >
-            {record.firstName?.[0]}
-          </Avatar>
-          <div>
-            <div style={{ fontWeight: 500, color: "#fff" }}>
-              {record.firstName} {record.lastName}
-            </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {record.email}
-            </Text>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      render: (phone) => phone || "-",
-    },
-    {
-      title: "Orders",
-      key: "orders",
-      render: (_, record) => record._count?.orders || 0,
-    },
-    {
-      title: "Last Login",
-      dataIndex: "lastLoginAt",
-      key: "lastLogin",
-      render: (date) => formatDate(date),
-    },
-    {
-      title: "Joined",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date) => formatDate(date),
-    },
-    {
-      title: "Status",
-      dataIndex: "isActive",
-      key: "status",
-      render: (active) => (
-        <Tag color={active ? "green" : "red"}>
-          {active ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<Eye size={16} />}
-            onClick={() => viewCustomer(record)}
-            className="action-btn"
-          />
-          <Popconfirm
-            title={record.isActive ? "Deactivate user?" : "Activate user?"}
-            onConfirm={() => toggleStatus(record.id)}
-            okText="Yes"
-          >
-            <Button
-              type="text"
-              icon={
-                record.isActive ? <UserX size={16} /> : <UserCheck size={16} />
-              }
-              className="action-btn"
-              danger={record.isActive}
-            />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <div>
-      {/* Header */}
-      <div className="admin-page-header">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="admin-page-title">Customers</h1>
-          <p className="admin-page-subtitle">
-            Manage customer accounts ({pagination.total} customers)
-          </p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Customers</h1>
+          <p className="text-sm text-[var(--text-muted)]">Manage customer accounts ({pagination.total} customers)</p>
         </div>
       </div>
 
-      {/* Stats */}
       {stats && (
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={12} sm={6}>
-            <Card className="form-card">
-              <Statistic
-                title="Total Customers"
-                value={stats.total}
-                valueStyle={{ color: "#00d4ff" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card className="form-card">
-              <Statistic
-                title="Active"
-                value={stats.active}
-                valueStyle={{ color: "#22c55e" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card className="form-card">
-              <Statistic
-                title="Inactive"
-                value={stats.inactive}
-                valueStyle={{ color: "#ef4444" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card className="form-card">
-              <Statistic
-                title="New This Month"
-                value={stats.newThisMonth}
-                valueStyle={{ color: "#8b5cf6" }}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-6 shadow-xl">
+            <h3 className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-2">Total Customers</h3>
+            <p className="text-3xl font-black text-cyan-400">{stats.total}</p>
+          </div>
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-6 shadow-xl">
+            <h3 className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-2">Active</h3>
+            <p className="text-3xl font-black text-green-500">{stats.active}</p>
+          </div>
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-6 shadow-xl">
+            <h3 className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-2">Inactive</h3>
+            <p className="text-3xl font-black text-red-500">{stats.inactive}</p>
+          </div>
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-6 shadow-xl">
+            <h3 className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-2">New This Month</h3>
+            <p className="text-3xl font-black text-purple-400">{stats.newThisMonth}</p>
+          </div>
+        </div>
       )}
 
-      {/* Filters */}
-      <Card className="form-card" style={{ marginBottom: 24 }}>
-        <Row gutter={16} align="middle">
-          <Col xs={24} md={10}>
-            <Input
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-4 shadow-xl">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" size={18} />
+            <input
+              type="text"
               placeholder="Search by name or email..."
-              prefix={<Search size={16} />}
               value={filters.search}
-              onChange={(e) => handleSearch(e.target.value)}
-              allowClear
+              onChange={(e) => { setFilters({ ...filters, search: e.target.value }); setPagination({ ...pagination, page: 1 }); }}
+              className="w-full pl-10 pr-4 py-2 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
             />
-          </Col>
-          <Col xs={12} md={6}>
-            <Select
-              placeholder="Status"
-              value={filters.status || undefined}
-              onChange={(value) => {
-                setFilters((prev) => ({ ...prev, status: value }));
-                setPagination((prev) => ({ ...prev, page: 1 }));
-              }}
-              allowClear
-              style={{ width: "100%" }}
+          </div>
+          <div className="w-full md:w-48">
+            <select
+              value={filters.status}
+              onChange={(e) => { setFilters({ ...filters, status: e.target.value }); setPagination({ ...pagination, page: 1 }); }}
+              className="w-full px-4 py-2 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
             >
-              <Option value="active">Active</Option>
-              <Option value="inactive">Inactive</Option>
-            </Select>
-          </Col>
-          <Col xs={12} md={8} style={{ textAlign: "right" }}>
-            <Button
-              onClick={() => {
-                setFilters({ search: "", status: "" });
-                setPagination((prev) => ({ ...prev, page: 1 }));
-              }}
-            >
-              Clear Filters
-            </Button>
-          </Col>
-        </Row>
-      </Card>
+              <option value="" className="bg-[#1a1a24]">All Statuses</option>
+              <option value="active" className="bg-[#1a1a24]">Active</option>
+              <option value="inactive" className="bg-[#1a1a24]">Inactive</option>
+            </select>
+          </div>
+          <button
+            onClick={() => { setFilters({ search: "", status: "" }); setPagination({ ...pagination, page: 1 }); }}
+            className="px-4 py-2 bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] transition-colors whitespace-nowrap"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
-      {/* Customers Table */}
-      <Card className="admin-table-card">
-        <Table
-          className="admin-table"
-          columns={columns}
-          dataSource={customers}
-          rowKey="id"
-          loading={loading}
-          scroll={{ x: 1000 }}
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.limit,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
-            onChange: (page, pageSize) => {
-              setPagination((prev) => ({ ...prev, page, limit: pageSize }));
-            },
-          }}
-        />
-      </Card>
-
-      {/* Customer Details Drawer */}
-      <Drawer
-        title="Customer Details"
-        placement="right"
-        width={500}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
-        {selectedCustomer && (
-          <div>
-            {/* Customer Profile */}
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <Avatar
-                size={80}
-                src={selectedCustomer.avatar}
-                style={{ backgroundColor: "#00d4ff" }}
-              >
-                {selectedCustomer.firstName?.[0]}
-              </Avatar>
-              <h3 style={{ marginTop: 12, marginBottom: 4 }}>
-                {selectedCustomer.firstName} {selectedCustomer.lastName}
-              </h3>
-              <Tag color={selectedCustomer.isActive ? "green" : "red"}>
-                {selectedCustomer.isActive ? "Active" : "Inactive"}
-              </Tag>
-            </div>
-
-            {/* Contact Info */}
-            <Descriptions title="Contact Information" column={1} size="small">
-              <Descriptions.Item
-                label={
-                  <>
-                    <Mail size={14} /> Email
-                  </>
-                }
-              >
-                {selectedCustomer.email}
-                {selectedCustomer.emailVerified && (
-                  <Tag color="green" style={{ marginLeft: 8 }}>
-                    Verified
-                  </Tag>
-                )}
-              </Descriptions.Item>
-              <Descriptions.Item
-                label={
-                  <>
-                    <Phone size={14} /> Phone
-                  </>
-                }
-              >
-                {selectedCustomer.phone || "Not provided"}
-              </Descriptions.Item>
-              <Descriptions.Item
-                label={
-                  <>
-                    <Calendar size={14} /> Member Since
-                  </>
-                }
-              >
-                {formatDate(selectedCustomer.createdAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Last Login">
-                {formatDate(selectedCustomer.lastLoginAt)}
-              </Descriptions.Item>
-            </Descriptions>
-
-            <Divider />
-
-            {/* Stats */}
-            <Row gutter={16} style={{ marginBottom: 24 }}>
-              <Col span={12}>
-                <Card className="form-card" style={{ textAlign: "center" }}>
-                  <Statistic
-                    title="Total Orders"
-                    value={selectedCustomer._count?.orders || 0}
-                  />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card className="form-card" style={{ textAlign: "center" }}>
-                  <Statistic
-                    title="Reviews"
-                    value={selectedCustomer._count?.reviews || 0}
-                  />
-                </Card>
-              </Col>
-            </Row>
-
-            {/* Recent Orders */}
-            {selectedCustomer.orders?.length > 0 && (
-              <>
-                <Divider />
-                <h4>Recent Orders</h4>
-                {selectedCustomer.orders.map((order) => (
-                  <div
-                    key={order.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "12px 0",
-                      borderBottom: "1px solid rgba(255,255,255,0.06)",
-                    }}
-                  >
-                    <div>
-                      <Text strong>{order.orderNumber}</Text>
-                      <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          {formatDate(order.createdAt)}
-                        </Text>
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
+            <thead>
+              <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Customer</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Phone</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Orders</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Last Login</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Joined</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border-subtle)]">
+              {loading ? (
+                <tr><td colSpan="7" className="p-8 text-center text-[var(--text-muted)]"><Loader2 className="w-8 h-8 animate-spin mx-auto text-cyan-500 mb-2" /> Loading customers...</td></tr>
+              ) : customers.length === 0 ? (
+                <tr><td colSpan="7" className="p-8 text-center text-[var(--text-muted)]">No customers found.</td></tr>
+              ) : (
+                customers.map((record) => (
+                  <tr key={record.id} className="hover:bg-[var(--bg-glass)] transition-colors">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        {record.avatar ? (
+                          <img src={record.avatar} alt={record.firstName} className="w-10 h-10 rounded-full object-cover border border-[var(--border-subtle)]" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-cyan-500/20 text-cyan-500 font-bold flex items-center justify-center border border-cyan-500/30">
+                            {record.firstName?.[0] || "?"}
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-bold text-[var(--text-primary)]">{record.firstName} {record.lastName}</div>
+                          <div className="text-xs text-[var(--text-secondary)]">{record.email}</div>
+                        </div>
                       </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div>{formatCurrency(order.total)}</div>
-                      <Tag
-                        color={order.status === "DELIVERED" ? "green" : "blue"}
-                        style={{ marginTop: 4 }}
-                      >
-                        {order.status}
-                      </Tag>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
+                    </td>
+                    <td className="p-4 text-sm text-[var(--text-secondary)]">{record.phone || "-"}</td>
+                    <td className="p-4 font-bold text-[var(--text-primary)]">{record._count?.orders || 0}</td>
+                    <td className="p-4 text-sm text-[var(--text-secondary)]">{formatDate(record.lastLoginAt)}</td>
+                    <td className="p-4 text-sm text-[var(--text-secondary)]">{formatDate(record.createdAt)}</td>
+                    <td className="p-4">
+                      <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${
+                        record.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                      }`}>
+                        {record.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => viewCustomer(record)} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="View Details"><Eye size={16} /></button>
+                        <button onClick={() => toggleStatus(record.id)} className={`p-2 rounded-lg transition-colors ${record.isActive ? "text-red-500 hover:bg-red-500/10" : "text-green-500 hover:bg-green-500/10"}`} title={record.isActive ? "Deactivate" : "Activate"}>
+                          {record.isActive ? <UserX size={16} /> : <UserCheck size={16} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-            {/* Addresses */}
-            {selectedCustomer.addresses?.length > 0 && (
-              <>
-                <Divider />
-                <h4>Saved Addresses</h4>
-                {selectedCustomer.addresses.map((address, index) => (
-                  <Card
-                    key={address.id}
-                    size="small"
-                    style={{ marginBottom: 12 }}
-                  >
-                    {address.isDefault && <Tag color="blue">Default</Tag>}
-                    <div style={{ marginTop: 8 }}>
-                      {address.firstName} {address.lastName}
-                      <br />
-                      {address.addressLine1}
-                      <br />
-                      {address.city}, {address.state} {address.postalCode}
-                    </div>
-                  </Card>
-                ))}
-              </>
-            )}
-
-            <Divider />
-
-            {/* Actions */}
-            <Space>
-              <Popconfirm
-                title={
-                  selectedCustomer.isActive
-                    ? "Deactivate this customer?"
-                    : "Activate this customer?"
-                }
-                onConfirm={async () => {
-                  await toggleStatus(selectedCustomer.id);
-                  setDrawerOpen(false);
-                }}
-              >
-                <Button danger={selectedCustomer.isActive}>
-                  {selectedCustomer.isActive
-                    ? "Deactivate Account"
-                    : "Activate Account"}
-                </Button>
-              </Popconfirm>
-            </Space>
+        {pagination.total > 0 && (
+          <div className="p-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-sm text-[var(--text-secondary)] bg-[var(--bg-secondary)]">
+            <span>Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries</span>
+            <div className="flex gap-2">
+              <button disabled={pagination.page === 1} onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))} className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50 transition-colors">Previous</button>
+              <button disabled={pagination.page * pagination.limit >= pagination.total} onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))} className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50 transition-colors">Next</button>
+            </div>
           </div>
         )}
-      </Drawer>
+      </div>
+
+      {/* Customer Details Drawer */}
+      {drawerOpen && selectedCustomer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
+          <div className="absolute inset-y-0 right-0 max-w-md w-full bg-[var(--bg-secondary)] shadow-2xl flex flex-col border-l border-[var(--border-subtle)] transform transition-transform">
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-glass)]">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">Customer Details</h2>
+              <button onClick={() => setDrawerOpen(false)} className="p-2 hover:bg-white/10 rounded-xl text-[var(--text-secondary)] transition-colors"><X size={20} /></button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide flex flex-col gap-8">
+              <div className="text-center flex flex-col items-center">
+                {selectedCustomer.avatar ? (
+                  <img src={selectedCustomer.avatar} alt={selectedCustomer.firstName} className="w-24 h-24 rounded-full object-cover border-4 border-[var(--bg-glass)] shadow-lg" />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-cyan-500/20 text-cyan-500 text-3xl font-bold flex items-center justify-center border-4 border-cyan-500/30 shadow-lg">
+                    {selectedCustomer.firstName?.[0] || "?"}
+                  </div>
+                )}
+                <h3 className="mt-4 text-xl font-bold text-[var(--text-primary)]">{selectedCustomer.firstName} {selectedCustomer.lastName}</h3>
+                <span className={`mt-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${selectedCustomer.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                  {selectedCustomer.isActive ? "Active" : "Inactive"}
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Contact Information</h4>
+                <div className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] p-4 flex flex-col gap-3 text-sm">
+                  <div className="flex items-start gap-3">
+                    <Mail size={16} className="text-[var(--text-muted)] mt-0.5 shrink-0" />
+                    <div>
+                      <span className="block text-[var(--text-secondary)] mb-0.5">Email</span>
+                      <span className="text-[var(--text-primary)] font-medium">{selectedCustomer.email}</span>
+                      {selectedCustomer.emailVerified && <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[10px] font-bold uppercase tracking-wider">Verified</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Phone size={16} className="text-[var(--text-muted)] mt-0.5 shrink-0" />
+                    <div>
+                      <span className="block text-[var(--text-secondary)] mb-0.5">Phone</span>
+                      <span className="text-[var(--text-primary)] font-medium">{selectedCustomer.phone || "Not provided"}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Calendar size={16} className="text-[var(--text-muted)] mt-0.5 shrink-0" />
+                    <div>
+                      <span className="block text-[var(--text-secondary)] mb-0.5">Member Since</span>
+                      <span className="text-[var(--text-primary)] font-medium">{formatDate(selectedCustomer.createdAt)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <UserCheck size={16} className="text-[var(--text-muted)] mt-0.5 shrink-0" />
+                    <div>
+                      <span className="block text-[var(--text-secondary)] mb-0.5">Last Login</span>
+                      <span className="text-[var(--text-primary)] font-medium">{formatDate(selectedCustomer.lastLoginAt)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] p-4 text-center">
+                  <h4 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-1">Total Orders</h4>
+                  <p className="text-2xl font-black text-cyan-400">{selectedCustomer._count?.orders || 0}</p>
+                </div>
+                <div className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] p-4 text-center">
+                  <h4 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-1">Reviews</h4>
+                  <p className="text-2xl font-black text-purple-400">{selectedCustomer._count?.reviews || 0}</p>
+                </div>
+              </div>
+
+              {selectedCustomer.orders?.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Recent Orders</h4>
+                  <div className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] divide-y divide-[var(--border-subtle)]">
+                    {selectedCustomer.orders.map(order => (
+                      <div key={order.id} className="p-4 flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-[var(--text-primary)]">{order.orderNumber}</div>
+                          <div className="text-xs text-[var(--text-secondary)] mt-1">{formatDate(order.createdAt)}</div>
+                        </div>
+                        <div className="text-right flex flex-col items-end">
+                          <div className="font-bold text-[var(--text-primary)]">{formatCurrency(order.total)}</div>
+                          <span className={`mt-1 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${order.status === "DELIVERED" ? "bg-green-500/20 text-green-400" : "bg-blue-500/20 text-blue-400"}`}>
+                            {order.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedCustomer.addresses?.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Saved Addresses</h4>
+                  <div className="space-y-3">
+                    {selectedCustomer.addresses.map(address => (
+                      <div key={address.id} className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] p-4 relative">
+                        {address.isDefault && <span className="absolute top-4 right-4 px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold uppercase tracking-wider">Default</span>}
+                        <div className="font-medium text-[var(--text-primary)] mb-1">{address.firstName} {address.lastName}</div>
+                        <div className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                          {address.addressLine1}<br />
+                          {address.city}, {address.state} {address.postalCode}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-[var(--border-subtle)]">
+                <button
+                  onClick={() => toggleStatus(selectedCustomer.id)}
+                  className={`w-full py-3 rounded-xl font-medium shadow-lg transition-colors ${
+                    selectedCustomer.isActive 
+                      ? "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white" 
+                      : "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white"
+                  }`}
+                >
+                  {selectedCustomer.isActive ? "Deactivate Account" : "Activate Account"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

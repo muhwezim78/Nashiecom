@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { Card } from "antd";
+import { Card } from "./ui/Card";
 
 const CategoryCard = ({ category, index }) => {
   return (
@@ -15,20 +15,7 @@ const CategoryCard = ({ category, index }) => {
     >
       <Link to={`/products?category=${category.id}`} className="block h-full">
         <Card
-          hoverable
-          variant="borderless"
-          className="h-full !bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!border-cyan-500/50 backdrop-blur-xl transition-all duration-700 overflow-hidden shadow-xl !rounded-3xl"
-          styles={{
-            body: {
-              padding: "1.5rem",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "1rem",
-            },
-          }}
+          className="h-full bg-[var(--bg-glass)] border-[var(--border-subtle)] hover:border-cyan-500/50 backdrop-blur-xl transition-all duration-700 overflow-hidden shadow-xl rounded-3xl p-6 flex flex-col items-center justify-center gap-4"
         >
           {/* Animated Glow Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -43,7 +30,7 @@ const CategoryCard = ({ category, index }) => {
           </div>
 
           <div className="relative text-center space-y-1">
-            <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors tracking-tighter uppercase line-clamp-1">
+            <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors tracking-tighter uppercase line-clamp-1 m-0">
               {category.name}
             </h3>
             <div className="flex items-center justify-center gap-2 text-cyan-500 opacity-60 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-700">

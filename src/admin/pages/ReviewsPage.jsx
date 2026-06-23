@@ -1,22 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Space,
-  Tag,
-  Rate,
-  message,
-  Popconfirm,
-  Tooltip,
-  Avatar,
-  Select,
-} from "antd";
-import { Trash2, CheckCircle, XCircle, User, Package } from "lucide-react";
+import { Trash2, CheckCircle, XCircle, User, Package, Star } from "lucide-react";
 import { reviewsAPI } from "../../services/api";
-import "../layouts/AdminLayout.css";
-
-const { Option } = Select;
+import { message } from "../../utils/toast";
 
 const ReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
@@ -51,7 +36,7 @@ const ReviewsPage = () => {
   };
 
   useEffect(() => {
-    fetchReviews(1);
+    fetchReviews(1, status);
   }, [status]);
 
   const handleApprove = async (id) => {
@@ -65,6 +50,7 @@ const ReviewsPage = () => {
   };
 
   const handleReject = async (id) => {
+    if (!window.confirm("Reject and delete this audit report?")) return;
     try {
       await reviewsAPI.reject(id);
       message.success("Review rejected and removed");
@@ -74,170 +60,159 @@ const ReviewsPage = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "Auditor",
-      key: "user",
-      render: (_, record) => (
-        <Space>
-          <Avatar
-            size="small"
-            src={record.user?.avatar}
-            icon={<User size={12} />}
-            className="border border-cyan-500/20"
-          />
-          <div>
-            <div className="font-bold text-xs uppercase tracking-tighter text-white">
-              {record.user?.firstName} {record.user?.lastName}
-            </div>
-            <div className="text-[10px] text-gray-500">
-              {record.user?.email}
-            </div>
-          </div>
-        </Space>
-      ),
-    },
-    {
-      title: "Module",
-      key: "product",
-      render: (_, record) => (
-        <Space>
-          <Package size={14} className="text-cyan-400" />
-          <span className="font-bold text-[10px] uppercase tracking-widest text-gray-300">
-            {record.product?.name}
-          </span>
-        </Space>
-      ),
-    },
-    {
-      title: "Audit Detail",
-      key: "detail",
-      width: "30%",
-      render: (_, record) => (
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Rate
-              disabled
-              defaultValue={record.rating}
-              className="text-[10px] custom-rate-mini"
-            />
-            {record.isVerified && (
-              <Tag
-                color="green"
-                className="text-[8px] font-black uppercase tracking-widest py-0 px-1 border-0"
-              >
-                Verified
-              </Tag>
-            )}
-          </div>
-          <div className="font-bold text-white text-[11px] uppercase italic mb-1">
-            {record.title}
-          </div>
-          <div className="text-gray-400 text-xs italic line-clamp-2">
-            "{record.comment}"
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Deployment Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date) => (
-        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-          {new Date(date).toLocaleDateString()}
-        </span>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "isApproved",
-      key: "isApproved",
-      render: (approved) => (
-        <Tag
-          color={approved ? "cyan" : "gold"}
-          className="text-[10px] font-black uppercase tracking-widest border-0"
-        >
-          {approved ? "Approved" : "Pending Audit"}
-        </Tag>
-      ),
-    },
-    {
-      title: "Protocol",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          {!record.isApproved && (
-            <Tooltip title="Approve Audit">
-              <Button
-                type="text"
-                className="text-emerald-500 hover:text-emerald-400"
-                icon={<CheckCircle size={18} />}
-                onClick={() => handleApprove(record.id)}
-              />
-            </Tooltip>
-          )}
-          <Popconfirm
-            title="Reject and delete this audit report?"
-            onConfirm={() => handleReject(record.id)}
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Reject Audit">
-              <Button type="text" danger icon={<XCircle size={18} />} />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <div>
-      <div className="admin-page-header">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="admin-page-title">Intelligence Audits</h1>
-          <p className="admin-page-subtitle">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Intelligence Audits</h1>
+          <p className="text-sm text-[var(--text-muted)]">
             Moderate and verify user intelligence reports
           </p>
         </div>
-        <Select
-          defaultValue="pending"
-          style={{ width: 200 }}
-          onChange={(value) => setStatus(value)}
-          className="admin-select"
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="bg-[var(--bg-glass)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-xl px-4 py-2 outline-none focus:border-cyan-500"
         >
-          <Option value="all">All Logs</Option>
-          <Option value="pending">Pending Validation</Option>
-          <Option value="approved">Verified Data</Option>
-        </Select>
+          <option value="all" className="bg-[#1a1a24]">All Logs</option>
+          <option value="pending" className="bg-[#1a1a24]">Pending Validation</option>
+          <option value="approved" className="bg-[#1a1a24]">Verified Data</option>
+        </select>
       </div>
 
-      <Card className="admin-table-card !border-0 shadow-2xl">
-        <Table
-          dataSource={reviews}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            ...pagination,
-            onChange: (page) => fetchReviews(page),
-          }}
-          scroll={{ x: 800 }}
-          className="admin-table"
-        />
-      </Card>
-
-      <style jsx global>{`
-        .custom-rate-mini .ant-rate-star {
-          margin-inline-end: 2px !important;
-        }
-        .custom-rate-mini .ant-rate-star-second {
-          color: rgba(255, 255, 255, 0.05);
-        }
-        .custom-rate-mini .ant-rate-star-full .ant-rate-star-second {
-          color: #06b6d4;
-        }
-      `}</style>
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Auditor</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Module</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider w-1/3">Audit Detail</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Deployment Date</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Protocol</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border-subtle)]">
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="p-8 text-center text-[var(--text-muted)]">Loading reviews...</td>
+                </tr>
+              ) : reviews.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="p-8 text-center text-[var(--text-muted)]">No reviews found.</td>
+                </tr>
+              ) : (
+                reviews.map((record) => (
+                  <tr key={record.id} className="hover:bg-[var(--bg-glass)] transition-colors">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        {record.user?.avatar ? (
+                          <img src={record.user.avatar} alt="User" className="w-8 h-8 rounded-full border border-cyan-500/20 object-cover" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-[var(--bg-primary)] border border-cyan-500/20 flex items-center justify-center">
+                            <User size={14} className="text-cyan-500" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-bold text-xs uppercase tracking-tighter text-[var(--text-primary)]">
+                            {record.user?.firstName} {record.user?.lastName}
+                          </div>
+                          <div className="text-[10px] text-[var(--text-muted)]">
+                            {record.user?.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Package size={14} className="text-cyan-400" />
+                        <span className="font-bold text-[10px] uppercase tracking-widest text-[var(--text-secondary)]">
+                          {record.product?.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={10} className={i < record.rating ? "fill-cyan-500 text-cyan-500" : "text-gray-600"} />
+                          ))}
+                        </div>
+                        {record.isVerified && (
+                          <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">
+                            Verified
+                          </span>
+                        )}
+                      </div>
+                      <div className="font-bold text-[var(--text-primary)] text-[11px] uppercase italic mb-1">
+                        {record.title}
+                      </div>
+                      <div className="text-[var(--text-secondary)] text-xs italic line-clamp-2">
+                        "{record.comment}"
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">
+                        {new Date(record.createdAt).toLocaleDateString()}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
+                        record.isApproved ? "bg-cyan-500/20 text-cyan-400" : "bg-yellow-500/20 text-yellow-500"
+                      }`}>
+                        {record.isApproved ? "Approved" : "Pending Audit"}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        {!record.isApproved && (
+                          <button
+                            onClick={() => handleApprove(record.id)}
+                            title="Approve Audit"
+                            className="p-1.5 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                          >
+                            <CheckCircle size={18} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleReject(record.id)}
+                          title="Reject Audit"
+                          className="p-1.5 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <XCircle size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        {/* Pagination placeholder */}
+        {pagination.total > pagination.pageSize && (
+          <div className="p-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-sm text-[var(--text-secondary)]">
+            <span>Showing {((pagination.current - 1) * pagination.pageSize) + 1} to {Math.min(pagination.current * pagination.pageSize, pagination.total)} of {pagination.total} entries</span>
+            <div className="flex gap-2">
+              <button 
+                disabled={pagination.current === 1}
+                onClick={() => fetchReviews(pagination.current - 1)}
+                className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button 
+                disabled={pagination.current * pagination.pageSize >= pagination.total}
+                onClick={() => fetchReviews(pagination.current + 1)}
+                className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

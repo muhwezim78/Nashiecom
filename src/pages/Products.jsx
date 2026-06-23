@@ -4,32 +4,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Filter,
   X,
-  SlidersHorizontal,
   Monitor,
   Search,
   Grid,
   List,
-  ChevronDown,
-  TrendingUp,
-  Clock,
-  DollarSign,
-  Star,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 import { formatCurrency } from "../utils/currency";
-import {
-  Space,
-  Menu,
-  Spin,
-  Pagination,
-  Slider,
-  Input,
-  Select,
-  Card,
-} from "antd";
 import SEO from "../components/SEO";
+
+import { Card } from "../components/ui/Card";
+import { Input } from "../components/ui/Input";
+import { Select } from "../components/ui/Select";
+import { Spinner } from "../components/ui/Spinner";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +36,6 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("featured");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
-  const [showSortOptions, setShowSortOptions] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
   // Debounce search update
@@ -154,7 +144,6 @@ const Products = () => {
 
   const handleSearch = useCallback((e) => {
     e.preventDefault();
-    // Triggered by effect via localSearch state
   }, []);
 
   const clearFilters = useCallback(() => {
@@ -165,11 +154,11 @@ const Products = () => {
   }, [setSearchParams]);
 
   const sortOptions = [
-    { value: "featured", label: "Featured", icon: TrendingUp },
-    { value: "newest", label: "Newest", icon: Clock },
-    { value: "price-low", label: "Price: Low to High", icon: DollarSign },
-    { value: "price-high", label: "Price: High to Low", icon: DollarSign },
-    { value: "rating", label: "Top Rated", icon: Star },
+    { value: "featured", label: "Featured" },
+    { value: "newest", label: "Newest" },
+    { value: "price-low", label: "Price: Low to High" },
+    { value: "price-high", label: "Price: High to Low" },
+    { value: "rating", label: "Top Rated" },
   ];
 
   const getCategoryIcon = (categoryId) => {
@@ -177,22 +166,14 @@ const Products = () => {
     return category?.icon || "💻";
   };
 
-  const categoryMenuItems = categories.map((cat) => ({
-    key: cat.id,
-    icon: <span className="text-xl">{cat.icon}</span>,
-    label: (
-      <span className="text-sm font-medium text-[var(--text-primary)]">
-        {cat.name}
-      </span>
-    ),
-  }));
-
   const handlePageChange = (newPage) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
     setSearchParams(params);
     window.scrollTo(0, 0);
   };
+
+  const totalPages = Math.max(1, Math.ceil(totalProducts / 12));
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] transition-colors duration-500">
@@ -206,12 +187,7 @@ const Products = () => {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2306b6d4\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
 
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <Space
-            orientation="vertical"
-            size="large"
-            className="w-full max-w-4xl mx-auto text-center"
-            style={{ gap: "var(--space-xl)" }}
-          >
+          <div className="w-full max-w-4xl mx-auto text-center flex flex-col gap-[var(--space-xl)]">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -224,7 +200,7 @@ const Products = () => {
                 Discover premium technology products curated for excellence
               </p>
             </motion.div>
-          </Space>
+          </div>
         </div>
       </div>
 
@@ -238,7 +214,6 @@ const Products = () => {
                 onChange={(e) => setLocalSearch(e.target.value)}
                 placeholder="Search products by name, category, or description..."
                 className="w-full px-6 py-4 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 h-14 text-base"
-                variant="borderless"
               />
               <button
                 type="submit"
@@ -254,7 +229,7 @@ const Products = () => {
       <div className="container mx-auto px-4 pt-10 pb-20">
         {/* Controls Bar */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="px-3 py-1.5 bg-[var(--bg-glass)] rounded-lg">
               <span className="text-sm font-medium text-[var(--text-primary)]">
                 {totalProducts} Products
@@ -291,9 +266,9 @@ const Products = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             {/* View Mode Toggle */}
-            <div className="hidden md:flex items-center gap-1 bg-[var(--bg-glass)] rounded-lg p-1">
+            <div className="hidden md:flex items-center gap-1 bg-[var(--bg-glass)] rounded-lg p-1 border border-[var(--border-subtle)]">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-colors ${
@@ -319,34 +294,14 @@ const Products = () => {
             {/* Sort Dropdown */}
             <Select
               value={sortBy}
-              onChange={setSortBy}
-              placeholder="Sort By"
-              className="w-48 h-[42px] custom-glass-select"
-              variant="borderless"
-              options={sortOptions.map((opt) => ({
-                value: opt.value,
-                label: (
-                  <div className="flex items-center gap-2">
-                    <opt.icon className="w-4 h-4" />
-                    <span>{opt.label}</span>
-                  </div>
-                ),
-              }))}
-              styles={{
-                popup: {
-                  root: {
-                    backgroundColor: "var(--bg-secondary)",
-                    border: "1px solid var(--border-subtle)",
-                    borderRadius: "1rem",
-                    padding: "0.5rem",
-                  },
-                },
-              }}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-48 h-[42px] bg-[var(--bg-glass)] text-[var(--text-primary)] border-[var(--border-subtle)]"
+              options={sortOptions}
             />
 
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-glass)] rounded-lg border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] transition-colors"
+              className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-glass)] rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-main)] transition-colors"
             >
               <Filter className="w-4 h-4" />
               <span className="text-sm font-medium text-[var(--text-primary)]">
@@ -372,109 +327,95 @@ const Products = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar - Desktop */}
           <aside className="hidden lg:block w-72 shrink-0">
-            <div className="sticky top-[176px]">
-              <Space orientation="vertical" size={24} className="w-full">
-                {/* Categories with Ant Design Menu */}
-                <Card
-                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)]"
-                  styles={{ body: { padding: "1.5rem" } }}
-                >
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4 pb-3 border-b border-[var(--border-subtle)]">
-                    Categories
-                  </h3>
-                  {isCategoriesLoading ? (
-                    <div className="flex justify-center py-4">
-                      <Spin size="small" />
-                    </div>
-                  ) : isCategoriesError ? (
-                    <p className="text-red-400 text-sm">
-                      Failed to load categories
-                    </p>
-                  ) : categories.length > 0 ? (
-                    <Menu
-                      mode="inline"
-                      selectedKeys={[activeCategory]}
-                      onSelect={({ key }) => handleCategoryChange(key)}
-                      items={categoryMenuItems}
-                      className="bg-transparent border-0 custom-menu premium-menu"
-                      style={{ background: "transparent" }}
-                    />
-                  ) : (
-                    <p className="text-[var(--text-muted)] text-sm">
-                      No categories available
-                    </p>
-                  )}
-                </Card>
+            <div className="sticky top-[176px] flex flex-col gap-6">
+              {/* Categories */}
+              <Card className="bg-[var(--bg-secondary)] rounded-2xl border-[var(--border-subtle)] p-6">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4 pb-3 border-b border-[var(--border-subtle)]">
+                  Categories
+                </h3>
+                {isCategoriesLoading ? (
+                  <div className="flex justify-center py-4">
+                    <Spinner size="md" />
+                  </div>
+                ) : isCategoriesError ? (
+                  <p className="text-red-400 text-sm">
+                    Failed to load categories
+                  </p>
+                ) : categories.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleCategoryChange(cat.id)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left ${
+                          activeCategory === cat.id
+                            ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/20"
+                            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] border border-transparent"
+                        }`}
+                      >
+                        <span className="text-xl">{cat.icon}</span>
+                        <span className="text-sm font-medium">{cat.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[var(--text-muted)] text-sm">
+                    No categories available
+                  </p>
+                )}
+              </Card>
 
-                {/* Price Range */}
-                <Card
-                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)]"
-                  styles={{ body: { padding: "1.5rem" } }}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold text-[var(--text-primary)]">
-                      Price Range
-                    </h3>
-                    <span className="text-cyan-400 font-bold">
-                      {formatCurrency(priceRange)}
+              {/* Price Range */}
+              <Card className="bg-[var(--bg-secondary)] rounded-2xl border-[var(--border-subtle)] p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                    Price Range
+                  </h3>
+                  <span className="text-cyan-400 font-bold">
+                    {formatCurrency(priceRange)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={20000000}
+                  step={100000}
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(Number(e.target.value))}
+                  className="w-full accent-cyan-400"
+                />
+                <div className="flex justify-between mt-3 text-sm text-gray-400">
+                  <span>{formatCurrency(0)}</span>
+                  <span>{formatCurrency(20000000)}</span>
+                </div>
+              </Card>
+
+              {/* Stats */}
+              <Card className="bg-[var(--bg-secondary)] rounded-2xl border-[var(--border-subtle)] p-6">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">
+                  Product Stats
+                </h3>
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Total Products</span>
+                    <span className="text-[var(--text-primary)] font-bold">
+                      {totalProducts}
                     </span>
                   </div>
-                  <Slider
-                    min={0}
-                    max={20000000}
-                    step={100000}
-                    value={priceRange}
-                    onChange={(value) => setPriceRange(value)}
-                    tooltip={{ formatter: (val) => formatCurrency(val) }}
-                    trackStyle={{ backgroundColor: "#00d4ff" }}
-                    handleStyle={{
-                      borderColor: "#00d4ff",
-                      backgroundColor: "#00d4ff",
-                    }}
-                  />
-                  <Space
-                    orientation="horizontal"
-                    className="w-full justify-between mt-3"
-                  >
-                    <span className="text-sm text-gray-400">
-                      {formatCurrency(0)}
-                    </span>
-                    <span className="text-sm text-gray-400">
-                      {formatCurrency(20000000)}
-                    </span>
-                  </Space>
-                </Card>
+                </div>
+              </Card>
 
-                {/* Stats */}
-                <Card
-                  className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)]"
-                  styles={{ body: { padding: "1.5rem" } }}
+              {/* Clear Filters Button */}
+              {(activeCategory !== "all" ||
+                searchQuery ||
+                priceRange < 20000000) && (
+                <button
+                  onClick={clearFilters}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-400 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-colors font-medium"
                 >
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">
-                    Product Stats
-                  </h3>
-                  <Space orientation="vertical" size={16} className="w-full">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Total Products</span>
-                      <span className="text-[var(--text-primary)] font-bold">
-                        {totalProducts}
-                      </span>
-                    </div>
-                  </Space>
-                </Card>
-
-                {/* Clear Filters Button */}
-                {(activeCategory !== "all" ||
-                  searchQuery ||
-                  priceRange < 20000000) && (
-                  <button
-                    onClick={clearFilters}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-400 rounded-xl border border-red-500/20 hover:border-red-500/40 transition-colors font-medium"
-                  >
-                    Clear All Filters
-                  </button>
-                )}
-              </Space>
+                  Clear All Filters
+                </button>
+              )}
             </div>
           </aside>
 
@@ -495,7 +436,7 @@ const Products = () => {
                   exit={{ x: "100%" }}
                   className="fixed right-0 top-0 h-full w-full max-w-sm bg-[var(--bg-secondary)] z-50 shadow-2xl overflow-y-auto lg:hidden"
                 >
-                  <Space orientation="vertical" size={24} className="p-6">
+                  <div className="flex flex-col gap-6 p-6">
                     <div className="flex justify-between items-center">
                       <h2 className="text-xl font-bold text-[var(--text-primary)]">
                         Filters
@@ -513,28 +454,24 @@ const Products = () => {
                       <h3 className="font-semibold text-[var(--text-primary)] mb-3">
                         Sort By
                       </h3>
-                      <Space orientation="vertical" size={8} className="w-full">
-                        {sortOptions.map((option) => {
-                          const Icon = option.icon;
-                          return (
-                            <button
-                              key={option.value}
-                              onClick={() => {
-                                setSortBy(option.value);
-                                setIsMobileFilterOpen(false);
-                              }}
-                              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
-                                sortBy === option.value
-                                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/20"
-                                  : "text-[var(--text-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-main)]"
-                              }`}
-                            >
-                              <Icon className="w-4 h-4" />
-                              {option.label}
-                            </button>
-                          );
-                        })}
-                      </Space>
+                      <div className="flex flex-col gap-2">
+                        {sortOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setSortBy(option.value);
+                              setIsMobileFilterOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border ${
+                              sortBy === option.value
+                                ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/20"
+                                : "text-[var(--text-muted)] border-[var(--border-subtle)] hover:border-[var(--border-main)]"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Categories */}
@@ -567,38 +504,23 @@ const Products = () => {
                       <h3 className="font-semibold text-[var(--text-primary)] mb-3">
                         Price: {formatCurrency(priceRange)}
                       </h3>
-                      <Slider
+                      <input
+                        type="range"
                         min={0}
                         max={10000000}
                         step={10000}
                         value={priceRange}
-                        onChange={(value) => setPriceRange(value)}
-                        tooltip={{ formatter: (val) => formatCurrency(val) }}
-                        trackStyle={{ backgroundColor: "#00d4ff" }}
-                        handleStyle={{
-                          borderColor: "#00d4ff",
-                          backgroundColor: "#00d4ff",
-                        }}
+                        onChange={(e) => setPriceRange(Number(e.target.value))}
+                        className="w-full accent-cyan-400"
                       />
-                      <Space
-                        orientation="horizontal"
-                        className="w-full justify-between mt-2"
-                      >
-                        <span className="text-sm text-gray-400">
-                          {formatCurrency(0)}
-                        </span>
-                        <span className="text-sm text-gray-400">
-                          {formatCurrency(20000000)}
-                        </span>
-                      </Space>
+                      <div className="flex justify-between mt-2 text-sm text-gray-400">
+                        <span>{formatCurrency(0)}</span>
+                        <span>{formatCurrency(20000000)}</span>
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <Space
-                      orientation="vertical"
-                      size={12}
-                      className="w-full pt-6 border-t border-gray-800"
-                    >
+                    <div className="flex flex-col gap-3 w-full pt-6 border-t border-[var(--border-subtle)]">
                       {(activeCategory !== "all" ||
                         searchQuery ||
                         priceRange < 20000000) && (
@@ -615,8 +537,8 @@ const Products = () => {
                       >
                         Apply Filters
                       </button>
-                    </Space>
-                  </Space>
+                    </div>
+                  </div>
                 </motion.div>
               </>
             )}
@@ -636,8 +558,7 @@ const Products = () => {
                       transition={{ duration: 0.5, delay: i * 0.1 }}
                     >
                       <Card
-                        loading
-                        className="!bg-[var(--bg-glass)] !rounded-2xl !border-0 h-[500px]"
+                        className="bg-[var(--bg-glass)] rounded-2xl border-0 h-[500px] animate-pulse"
                       />
                     </motion.div>
                   ))}
@@ -663,14 +584,24 @@ const Products = () => {
                   ))}
                 </div>
                 {/* Pagination */}
-                <div className="flex justify-center mt-12">
-                  <Pagination
-                    current={page}
-                    pageSize={12}
-                    total={totalProducts}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                  />
+                <div className="flex items-center gap-4 mt-12 justify-center">
+                  <button 
+                    disabled={page === 1}
+                    onClick={() => handlePageChange(page - 1)}
+                    className="p-3 rounded-lg bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <span className="text-[var(--text-primary)] font-medium px-4">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button 
+                    disabled={page >= totalPages}
+                    onClick={() => handlePageChange(page + 1)}
+                    className="p-3 rounded-lg bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               </>
             ) : (
@@ -680,8 +611,7 @@ const Products = () => {
                 className="w-full"
               >
                 <Card
-                  className="!bg-[var(--bg-glass)] !rounded-3xl !border-[var(--border-subtle)] backdrop-blur-xl text-center py-12"
-                  styles={{ body: { padding: "3rem" } }}
+                  className="bg-[var(--bg-glass)] rounded-3xl border-[var(--border-subtle)] backdrop-blur-xl text-center p-12"
                 >
                   <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center border border-[var(--border-subtle)]">
                     <Monitor className="w-12 h-12 text-[var(--text-muted)]" />

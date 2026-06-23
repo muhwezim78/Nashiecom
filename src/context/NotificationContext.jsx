@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { io } from "socket.io-client";
-import { notification, message as antMessage } from "antd";
+import { notification, message as antMessage } from "../utils/toast";
 import { useAuth } from "./AuthContext";
 import { notificationsAPI, API_BASE_URL } from "../services/api";
 

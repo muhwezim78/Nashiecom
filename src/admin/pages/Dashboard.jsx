@@ -1,17 +1,4 @@
-// Admin Dashboard Home Page
 import { useState, useEffect } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Typography,
-  Spin,
-  Button,
-  Table,
-  Tag,
-  Space,
-  Select,
-} from "antd";
 import {
   Package,
   ShoppingCart,
@@ -25,14 +12,11 @@ import {
   Clock,
   CheckCircle,
   Eye,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { dashboardAPI } from "../../services/api";
-import "../layouts/AdminLayout.css";
 
-const { Title, Text } = Typography;
-
-// Format currency
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-UG", {
     style: "currency",
@@ -42,7 +26,6 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// Format date
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -93,353 +76,269 @@ const Dashboard = () => {
       title: "Total Revenue",
       value: formatCurrency(stats?.revenue?.total || 0),
       change: stats?.revenue?.growth || 0,
-      icon: <DollarSign size={24} color="#fff" />,
-      color: "#22c55e",
-      colorRgb: "34, 197, 94",
+      icon: <DollarSign size={24} className="text-white" />,
+      color: "from-green-500 to-green-600",
+      shadow: "shadow-green-500/20",
     },
     {
       title: "Total Orders",
       value: stats?.orders?.total || 0,
       subValue: `${stats?.orders?.today || 0} today`,
-      icon: <ShoppingCart size={24} color="#fff" />,
-      color: "#3b82f6",
-      colorRgb: "59, 130, 246",
+      icon: <ShoppingCart size={24} className="text-white" />,
+      color: "from-blue-500 to-blue-600",
+      shadow: "shadow-blue-500/20",
     },
     {
       title: "Products",
       value: stats?.products?.total || 0,
       subValue: `${stats?.products?.active || 0} active`,
-      icon: <Package size={24} color="#fff" />,
-      color: "#8b5cf6",
-      colorRgb: "139, 92, 246",
+      icon: <Package size={24} className="text-white" />,
+      color: "from-purple-500 to-purple-600",
+      shadow: "shadow-purple-500/20",
     },
     {
       title: "Customers",
       value: stats?.users || 0,
-      icon: <Users size={24} color="#fff" />,
-      color: "#f59e0b",
-      colorRgb: "245, 158, 11",
-    },
-  ];
-
-  const orderColumns = [
-    {
-      title: "Order",
-      dataIndex: "orderNumber",
-      key: "orderNumber",
-      render: (text, record) => (
-        <Link
-          to={`/admin/orders/${record.id}`}
-          className="text-cyan-400 hover:underline"
-        >
-          {text}
-        </Link>
-      ),
-    },
-    {
-      title: "Customer",
-      dataIndex: "customer",
-      key: "customer",
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      key: "total",
-      render: (value) => formatCurrency(value),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span className={`status-badge status-${status.toLowerCase()}`}>
-          {status}
-        </span>
-      ),
-    },
-    {
-      title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date) => formatDate(date),
+      icon: <Users size={24} className="text-white" />,
+      color: "from-amber-500 to-amber-600",
+      shadow: "shadow-amber-500/20",
     },
   ];
 
   const getActivityIcon = (type) => {
     const icons = {
-      order: <ShoppingCart size={16} />,
-      review: <Eye size={16} />,
-      message: <Clock size={16} />,
-      user: <Users size={16} />,
+      order: <ShoppingCart size={16} className="text-blue-500" />,
+      review: <Eye size={16} className="text-purple-500" />,
+      message: <Clock size={16} className="text-amber-500" />,
+      user: <Users size={16} className="text-green-500" />,
     };
-    return icons[type] || <CheckCircle size={16} />;
+    return icons[type] || <CheckCircle size={16} className="text-white" />;
   };
 
-  const getActivityColor = (type) => {
-    const colors = {
-      order: "rgba(59, 130, 246, 0.2)",
-      review: "rgba(139, 92, 246, 0.2)",
-      message: "rgba(251, 191, 36, 0.2)",
-      user: "rgba(34, 197, 94, 0.2)",
+  const getActivityBg = (type) => {
+    const bgs = {
+      order: "bg-blue-500/10 border-blue-500/20",
+      review: "bg-purple-500/10 border-purple-500/20",
+      message: "bg-amber-500/10 border-amber-500/20",
+      user: "bg-green-500/10 border-green-500/20",
     };
-    return colors[type] || "rgba(255, 255, 255, 0.1)";
+    return bgs[type] || "bg-white/5 border-white/10";
   };
 
   if (loading) {
     return (
-      <div
-        className="flex items-center justify-center"
-        style={{ height: "60vh" }}
-      >
-        <Spin size="large" />
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-cyan-500" />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       {/* Page Header */}
-      <div className="admin-page-header">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="admin-page-title">Dashboard</h1>
-          <p className="admin-page-subtitle">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1>
+          <p className="text-sm text-[var(--text-muted)]">
             Welcome back! Here's what's happening.
           </p>
         </div>
-        <Button icon={<RefreshCw size={16} />} onClick={fetchDashboardData}>
-          Refresh
-        </Button>
+        <button
+          onClick={fetchDashboardData}
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-glass)] hover:bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-xl transition-colors"
+        >
+          <RefreshCw size={16} /> Refresh
+        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards.map((stat, index) => (
           <div
             key={index}
-            className="stat-card"
-            style={{
-              "--stat-color": stat.color,
-              "--stat-color-rgb": stat.colorRgb,
-            }}
+            className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300"
           >
-            <div className="stat-card-header">
-              <div className="stat-icon" style={{ background: stat.color }}>
+            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:opacity-20 transition-opacity`} />
+            
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg ${stat.shadow}`}>
                 {stat.icon}
               </div>
               {stat.change !== undefined && (
-                <span
-                  className={`stat-change ${
-                    stat.change >= 0 ? "positive" : "negative"
-                  }`}
-                >
-                  {stat.change >= 0 ? (
-                    <TrendingUp size={14} />
-                  ) : (
-                    <TrendingDown size={14} />
-                  )}
+                <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg ${
+                  stat.change >= 0 ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                }`}>
+                  {stat.change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                   {Math.abs(stat.change).toFixed(1)}%
-                </span>
+                </div>
               )}
             </div>
-            <div className="stat-value">{stat.value}</div>
-            <div className="stat-label">{stat.title}</div>
-            {stat.subValue && (
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {stat.subValue}
-              </Text>
-            )}
+            
+            <div className="relative z-10">
+              <h3 className="text-3xl font-black text-[var(--text-primary)] mb-1">{stat.value}</h3>
+              <p className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider">{stat.title}</p>
+              {stat.subValue && (
+                <p className="text-xs text-[var(--text-muted)] mt-2">{stat.subValue}</p>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Main Content */}
-      <Row gutter={[24, 24]}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Orders */}
-        <Col xs={24} lg={16}>
-          <Card
-            className="admin-table-card"
-            title={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span>Recent Orders</span>
-                <Link to="/admin/orders">
-                  <Button type="link" size="small">
-                    View All <ArrowRight size={14} />
-                  </Button>
-                </Link>
-              </div>
-            }
-          >
-            <Table
-              className="admin-table"
-              columns={orderColumns}
-              dataSource={recentOrders}
-              rowKey="id"
-              pagination={false}
-              size="small"
-              scroll={{ x: 600 }}
-            />
-          </Card>
-        </Col>
+        <div className="lg:col-span-2 bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-glass)]">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Recent Orders</h2>
+            <Link to="/admin/orders" className="text-sm text-cyan-500 hover:text-cyan-400 flex items-center gap-1 font-medium transition-colors">
+              View All <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="overflow-x-auto flex-1">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-[var(--border-subtle)]">
+                  <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Order</th>
+                  <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Customer</th>
+                  <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Total</th>
+                  <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</th>
+                  <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-subtle)]">
+                {recentOrders.length === 0 ? (
+                  <tr><td colSpan="5" className="p-8 text-center text-[var(--text-muted)]">No recent orders</td></tr>
+                ) : (
+                  recentOrders.map(record => (
+                    <tr key={record.id} className="hover:bg-[var(--bg-glass)] transition-colors">
+                      <td className="p-4">
+                        <Link to={`/admin/orders/${record.id}`} className="font-medium text-cyan-400 hover:underline">
+                          {record.orderNumber}
+                        </Link>
+                      </td>
+                      <td className="p-4 text-sm text-[var(--text-primary)]">{record.customer}</td>
+                      <td className="p-4 font-bold text-[var(--text-primary)]">{formatCurrency(record.total)}</td>
+                      <td className="p-4">
+                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
+                          record.status.toLowerCase() === 'delivered' ? 'bg-green-500/20 text-green-400' :
+                          record.status.toLowerCase() === 'processing' ? 'bg-blue-500/20 text-blue-400' :
+                          record.status.toLowerCase() === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                          'bg-yellow-500/20 text-yellow-500'
+                        }`}>
+                          {record.status}
+                        </span>
+                      </td>
+                      <td className="p-4 text-sm text-[var(--text-muted)]">{formatDate(record.createdAt)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Activity Feed */}
-        <Col xs={24} lg={8}>
-          <Card
-            className="admin-table-card"
-            variant="borderless"
-            title="Recent Activity"
-            style={{ height: "100%" }}
-          >
-            <div style={{ padding: "0 16px" }}>
-              {activity.map((item, index) => (
-                <div key={index} className="activity-item">
-                  <div
-                    className="activity-icon"
-                    style={{ background: getActivityColor(item.type) }}
-                  >
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl shadow-xl overflow-hidden flex flex-col h-full min-h-[400px]">
+          <div className="p-5 border-b border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Recent Activity</h2>
+          </div>
+          <div className="p-5 flex-1 overflow-y-auto space-y-4">
+            {activity.length === 0 ? (
+              <div className="text-center text-[var(--text-muted)] py-8">No recent activity</div>
+            ) : (
+              activity.map((item, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${getActivityBg(item.type)}`}>
                     {getActivityIcon(item.type)}
                   </div>
-                  <div className="activity-content">
-                    <div className="activity-message">{item.message}</div>
-                    <div className="activity-time">
-                      {formatDate(item.timestamp)}
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[var(--text-primary)] mb-1 leading-snug">{item.message}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{formatDate(item.timestamp)}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
+              ))
+            )}
+          </div>
+        </div>
 
         {/* Top Products */}
-        <Col xs={24} lg={12}>
-          <Card
-            className="admin-table-card"
-            title={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span>Top Selling Products</span>
-                <Link to="/admin/products">
-                  <Button type="link" size="small">
-                    View All <ArrowRight size={14} />
-                  </Button>
-                </Link>
-              </div>
-            }
-          >
-            <div style={{ padding: "0 16px" }}>
-              {topProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="activity-item"
-                  style={{ alignItems: "center" }}
-                >
-                  <div
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 6,
-                      background: "rgba(0, 212, 255, 0.1)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: "#00d4ff",
-                    }}
-                  >
+        <div className="lg:col-span-2 bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-glass)]">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Top Selling Products</h2>
+            <Link to="/admin/products" className="text-sm text-cyan-500 hover:text-cyan-400 flex items-center gap-1 font-medium transition-colors">
+              View All <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="p-0">
+            {topProducts.length === 0 ? (
+              <div className="text-center text-[var(--text-muted)] py-8">No products found</div>
+            ) : (
+              topProducts.map((product, index) => (
+                <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-[var(--bg-glass)] transition-colors border-b border-[var(--border-subtle)] last:border-0">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-500 font-bold flex items-center justify-center shrink-0">
                     {index + 1}
                   </div>
-                  {product.image && (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 8,
-                        objectFit: "cover",
-                      }}
-                    />
-                  )}
-                  <div className="activity-content">
-                    <div className="activity-message">{product.name}</div>
-                    <div className="activity-time">
-                      {product.soldCount} sold • {formatCurrency(product.price)}
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <Package size={20} className="text-gray-500" />
                     </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-[var(--text-primary)] truncate">{product.name}</h4>
+                    <p className="text-sm text-[var(--text-muted)] mt-1">
+                      <span className="text-cyan-400 font-medium">{product.soldCount} sold</span> • {formatCurrency(product.price)}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
+              ))
+            )}
+          </div>
+        </div>
 
         {/* Low Stock Alert */}
-        <Col xs={24} lg={12}>
-          <Card
-            className="admin-table-card"
-            title={
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <AlertTriangle size={18} color="#f59e0b" />
-                <span>Low Stock Alert</span>
-              </div>
-            }
-          >
-            <div style={{ padding: "0 16px" }}>
-              {lowStockProducts.length === 0 ? (
-                <div className="empty-state" style={{ padding: "40px 20px" }}>
-                  <CheckCircle size={40} color="#22c55e" />
-                  <p style={{ marginTop: 12, color: "rgba(255,255,255,0.6)" }}>
-                    All products are well stocked!
-                  </p>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[var(--border-subtle)] flex items-center gap-2 bg-[var(--bg-glass)]">
+            <AlertTriangle size={18} className="text-amber-500" />
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Low Stock Alert</h2>
+          </div>
+          <div className="p-0">
+            {lowStockProducts.length === 0 ? (
+              <div className="p-8 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                  <CheckCircle size={32} className="text-green-500" />
                 </div>
-              ) : (
-                lowStockProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="activity-item"
-                    style={{ alignItems: "center" }}
-                  >
-                    {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 8,
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                    <div className="activity-content">
-                      <div className="activity-message">{product.name}</div>
-                      <div className="activity-time">
-                        {typeof product.category === "object"
-                          ? product.category.name
-                          : product.category}
-                      </div>
+                <p className="text-[var(--text-muted)] font-medium">All products are well stocked!</p>
+              </div>
+            ) : (
+              lowStockProducts.map((product) => (
+                <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-[var(--bg-glass)] transition-colors border-b border-[var(--border-subtle)] last:border-0">
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <Package size={20} className="text-gray-500" />
                     </div>
-                    <Tag color={product.quantity <= 0 ? "red" : "orange"}>
-                      {product.quantity} left
-                    </Tag>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-[var(--text-primary)] truncate">{product.name}</h4>
+                    <p className="text-xs text-[var(--text-muted)] mt-1 truncate">
+                      {typeof product.category === "object" ? product.category.name : product.category}
+                    </p>
                   </div>
-                ))
-              )}
-            </div>
-          </Card>
-        </Col>
-      </Row>
+                  <div className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest shrink-0 ${
+                    product.quantity <= 0 ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-500"
+                  }`}>
+                    {product.quantity} left
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

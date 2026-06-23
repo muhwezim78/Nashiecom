@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../utils/currency";
-import { Card, Input, Button } from "antd";
+import { Card } from "../components/ui/Card";
+import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { message } from "../utils/toast";
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } =
@@ -33,7 +36,6 @@ const Cart = () => {
 
   const EmptyCart = () => (
     <div className="min-h-[85vh] flex flex-col items-center justify-center text-center p-8 bg-[var(--bg-primary)]">
-      {/* ... Empty Cart Content (no cards usually needed here, or maybe one big one) ... */}
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -62,7 +64,7 @@ const Cart = () => {
         <h2 className="text-5xl font-black text-[var(--text-primary)] tracking-tight">
           Your Cart is <span className="text-cyan-400">Empty</span>
         </h2>
-        <p className="text-gray-400 text-xl leading-relaxed">
+        <p className="text-[var(--text-muted)] text-xl leading-relaxed">
           Looks like you haven't discovered your next tech companion yet. Our
           latest collections are waiting for you.
         </p>
@@ -76,10 +78,7 @@ const Cart = () => {
       >
         <Link to="/products" className="flex-1">
           <Card
-            hoverable
-            variant="borderless"
-            className="group relative !bg-cyan-600 !rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.3)] transition-all duration-300 hover:scale-[1.02]"
-            styles={{ body: { padding: "24px" } }}
+            className="group relative bg-cyan-600 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.3)] transition-all duration-300 hover:scale-[1.02] border-0 p-6"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10 flex items-center justify-center gap-3 text-white font-black uppercase tracking-wider">
@@ -90,10 +89,7 @@ const Cart = () => {
         </Link>
         <Link to="/products?featured=true" className="flex-1">
           <Card
-            hoverable
-            variant="borderless"
-            className="!bg-[var(--bg-glass)] !text-[var(--text-primary)] !rounded-2xl border border-[var(--border-subtle)] hover:!border-cyan-500/30 hover:!bg-[var(--bg-secondary)] transition-all duration-300 hover:scale-[1.02]"
-            styles={{ body: { padding: "24px" } }}
+            className="bg-[var(--bg-glass)] text-[var(--text-primary)] rounded-2xl border-[var(--border-subtle)] hover:border-cyan-500/30 hover:bg-[var(--bg-secondary)] transition-all duration-300 hover:scale-[1.02] p-6"
           >
             <div className="text-center font-bold uppercase tracking-wider">
               View Trending
@@ -113,9 +109,7 @@ const Cart = () => {
       className="group relative"
     >
       <Card
-        variant="borderless"
-        className="!bg-gradient-to-br !from-white/[0.03] !to-white/[0.01] !backdrop-blur-md !rounded-2xl !border-white/5 hover:!border-cyan-500/30 transition-all duration-500 overflow-hidden !border-0"
-        styles={{ body: { padding: 0 } }}
+        className="bg-gradient-to-br from-white/[0.03] to-white/[0.01] backdrop-blur-md rounded-2xl hover:border-cyan-500/30 transition-all duration-500 overflow-hidden border-0 p-0"
       >
         <div className="absolute inset-0 bg-cyan-500/0 group-hover:bg-cyan-500/[0.02] transition-colors duration-500" />
 
@@ -168,7 +162,7 @@ const Cart = () => {
                       </span>
                     ))}
                   </div>
-                  <span className="text-xs text-gray-500 font-bold tracking-widest">
+                  <span className="text-xs text-[var(--text-muted)] font-bold tracking-widest">
                     ({item.rating})
                   </span>
                 </div>
@@ -176,7 +170,7 @@ const Cart = () => {
 
               <button
                 onClick={() => removeFromCart(item.id)}
-                className="p-3 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300 border border-transparent hover:border-red-500/20"
+                className="p-3 text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300 border border-transparent hover:border-red-500/20"
                 aria-label="Remove item"
               >
                 <Trash2 className="w-5 h-5" />
@@ -189,7 +183,7 @@ const Cart = () => {
                 <div className="flex items-center gap-1 bg-[var(--bg-glass)] rounded-2xl border border-[var(--border-subtle)] p-1.5 shadow-inner">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group/btn"
+                    className="w-11 h-11 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group/btn"
                     disabled={item.quantity <= 1}
                   >
                     <Minus className="w-5 h-5 group-active/btn:scale-75 transition-transform" />
@@ -201,15 +195,15 @@ const Cart = () => {
                   </div>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all group/btn"
+                    className="w-11 h-11 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)] rounded-xl transition-all group/btn"
                   >
                     <Plus className="w-5 h-5 group-active/btn:scale-125 transition-transform" />
                   </button>
                 </div>
                 {item.quantity > 1 && (
-                  <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                  <p className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-widest">
                     {formatCurrency(item.price)}{" "}
-                    <span className="text-gray-600 font-medium">ea.</span>
+                    <span className="text-[var(--text-muted)] font-medium">ea.</span>
                   </p>
                 )}
               </div>
@@ -217,7 +211,7 @@ const Cart = () => {
               <div className="text-right">
                 <div className="space-y-1">
                   {item.originalPrice > item.price && (
-                    <p className="text-sm text-gray-500 line-through font-bold">
+                    <p className="text-sm text-[var(--text-muted)] line-through font-bold">
                       {formatCurrency(item.originalPrice * item.quantity)}
                     </p>
                   )}
@@ -257,14 +251,14 @@ const Cart = () => {
             <h1 className="text-5xl md:text-7xl font-black text-[var(--text-primary)] tracking-tighter">
               Shopping <span className="text-cyan-400">Bag</span>
             </h1>
-            <div className="flex items-center gap-6 text-gray-400">
+            <div className="flex items-center gap-6 text-[var(--text-muted)]">
               <p className="text-lg">
                 <span className="text-[var(--text-primary)] font-black">
                   {totalItems}
                 </span>{" "}
                 {totalItems === 1 ? "item" : "items"} selected
               </p>
-              <div className="w-1 h-1 bg-gray-800 rounded-full" />
+              <div className="w-1 h-1 bg-[var(--bg-glass)] rounded-full" />
               <button
                 onClick={clearCart}
                 className="text-sm font-bold hover:text-red-400 transition-colors uppercase tracking-widest flex items-center gap-2"
@@ -289,8 +283,7 @@ const Cart = () => {
           <div className="lg:col-span-8 space-y-8">
             {/* Free Shipping Progress */}
             <Card
-              className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] relative overflow-hidden group !border-0"
-              styles={{ body: { padding: "2rem" } }}
+              className="bg-[var(--bg-secondary)] rounded-2xl border-0 relative overflow-hidden group p-8"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10 space-y-4">
@@ -331,7 +324,7 @@ const Cart = () => {
                 </div>
 
                 {shippingFee > 0 ? (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-[var(--text-muted)]">
                     Add{" "}
                     <span className="text-[var(--text-primary)] font-bold">
                       {formatCurrency(FREE_SHIPPING_THRESHOLD - subtotal)}
@@ -368,8 +361,7 @@ const Cart = () => {
               ].map((badge, i) => (
                 <Card
                   key={i}
-                  variant="borderless"
-                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!border-cyan-500/20 transition-all duration-300 !rounded-2xl hover:!scale-105 !border-0"
+                  className="bg-[var(--bg-glass)] border-[var(--border-subtle)] hover:border-cyan-500/20 transition-all duration-300 rounded-2xl hover:scale-105 border-0 p-6"
                 >
                   <div className="flex flex-col items-center text-center gap-4">
                     <div className="p-3 bg-cyan-500/10 rounded-xl text-cyan-400">
@@ -379,7 +371,7 @@ const Cart = () => {
                       <p className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest mb-1">
                         {badge.label}
                       </p>
-                      <p className="text-[10px] text-gray-500 uppercase">
+                      <p className="text-[10px] text-[var(--text-muted)] uppercase">
                         {badge.desc}
                       </p>
                     </div>
@@ -397,8 +389,7 @@ const Cart = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-1000" />
 
                 <Card
-                  className="!bg-[var(--bg-secondary)] !backdrop-blur-2xl !rounded-2xl !border-[var(--border-subtle)] overflow-hidden shadow-2xl !border-0"
-                  styles={{ body: { padding: 0 } }}
+                  className="bg-[var(--bg-secondary)] backdrop-blur-2xl rounded-2xl border-[var(--border-subtle)] overflow-hidden shadow-2xl border-0 p-0"
                 >
                   <div className="p-10 space-y-8">
                     <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tight pb-6 border-b border-[var(--border-subtle)]">
@@ -406,14 +397,14 @@ const Cart = () => {
                     </h3>
 
                     <div className="space-y-6 text-lg">
-                      <div className="flex justify-between items-center text-gray-400">
+                      <div className="flex justify-between items-center text-[var(--text-muted)]">
                         <span className="font-medium">Subtotal</span>
                         <span className="text-[var(--text-primary)] font-bold">
                           {formatCurrency(subtotal)}
                         </span>
                       </div>
 
-                      <div className="flex justify-between items-center text-gray-400">
+                      <div className="flex justify-between items-center text-[var(--text-muted)]">
                         <span className="font-medium">Shipping</span>
                         <span
                           className={
@@ -428,7 +419,7 @@ const Cart = () => {
                         </span>
                       </div>
 
-                      <div className="flex justify-between items-center text-gray-400">
+                      <div className="flex justify-between items-center text-[var(--text-muted)]">
                         <span className="font-medium">GST (8%)</span>
                         <span className="text-[var(--text-primary)] font-bold">
                           {formatCurrency(tax)}
@@ -437,24 +428,14 @@ const Cart = () => {
 
                       {/* Promo Code */}
                       <div className="pt-4">
-                        <div className="relative group/input">
-                          <Input.Search
+                        <div className="flex items-stretch">
+                          <Input
                             placeholder="Promo Code"
-                            enterButton={
-                              <Button className="bg-[var(--bg-glass)] text-cyan-400 font-black text-[10px] uppercase tracking-widest border border-[var(--border-subtle)] !h-full !rounded-r-[1.5rem] hover:!bg-cyan-500/10 hover:!border-cyan-500/30">
-                                APPLY
-                              </Button>
-                            }
-                            size="large"
-                            className="w-full bg-transparent promo-input"
-                            variant="borderless"
-                            style={{
-                              backgroundColor: "var(--bg-glass)",
-                              borderRadius: "1.5rem",
-                              border: "1px solid var(--border-subtle)",
-                              padding: "4px",
-                            }}
+                            className="flex-1 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-l-[1.5rem] rounded-r-none focus:border-cyan-500"
                           />
+                          <Button className="rounded-r-[1.5rem] rounded-l-none bg-[var(--bg-glass)] hover:bg-cyan-500/10 text-cyan-400 font-black text-[10px] uppercase tracking-widest border border-l-0 border-[var(--border-subtle)]">
+                            APPLY
+                          </Button>
                         </div>
                       </div>
 
@@ -462,10 +443,10 @@ const Cart = () => {
 
                       <div className="flex justify-between items-end">
                         <div className="space-y-1">
-                          <span className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+                          <span className="text-[var(--text-muted)] font-bold uppercase tracking-widest text-xs">
                             Final Total
                           </span>
-                          <p className="text-xl text-gray-500 font-medium">
+                          <p className="text-xl text-[var(--text-muted)] font-medium">
                             USD Equivalent:{" "}
                             {(total / 3800).toLocaleString("en-US", {
                               style: "currency",
@@ -519,7 +500,7 @@ const Cart = () => {
                         </span>
                       </Link>
 
-                      <div className="flex items-center justify-center gap-3 text-gray-500">
+                      <div className="flex items-center justify-center gap-3 text-[var(--text-muted)]">
                         <Lock className="w-4 h-4" />
                         <span className="text-[10px] font-bold uppercase tracking-widest">
                           SSL Encrypted Checkout
@@ -532,11 +513,10 @@ const Cart = () => {
 
               {/* Secure Payments Badge */}
               <Card
-                className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-2xl !border-0"
-                styles={{ body: { padding: "2rem" } }}
+                className="bg-[var(--bg-glass)] border-[var(--border-subtle)] rounded-2xl border-0 p-8"
               >
                 <div className="flex flex-col gap-4">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] text-center mb-2">
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.3em] text-center mb-2">
                     Partnered With
                   </p>
                   <div className="flex flex-wrap justify-center gap-6 opacity-40 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">

@@ -20,7 +20,6 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
-import { Card, Input } from "antd";
 
 const Footer = () => {
   // ... (previous state/hooks remain same)
@@ -110,10 +109,7 @@ const Footer = () => {
               className="group relative"
             >
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-3xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-              <Card
-                className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] backdrop-blur-md !rounded-3xl hover:!bg-[var(--bg-glass)] transition-all duration-500 h-full !border-0"
-                styles={{ body: { padding: "1.25rem" } }}
-              >
+              <div className="relative bg-[var(--bg-secondary)] border-[var(--border-subtle)] backdrop-blur-md rounded-3xl hover:bg-[var(--bg-glass)] transition-all duration-500 h-full border-0 p-5">
                 <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <badge.icon className="w-6 h-6 text-cyan-400" />
                 </div>
@@ -123,7 +119,7 @@ const Footer = () => {
                 <p className="text-gray-500 text-xs uppercase font-medium">
                   {badge.desc}
                 </p>
-              </Card>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -215,10 +211,7 @@ const Footer = () => {
 
           {/* Newsletter Col */}
           <div className="lg:col-span-3">
-            <Card
-              className="!bg-[var(--bg-secondary)] !border-[var(--border-subtle)] !rounded-[2.5rem] relative overflow-hidden group !border-0"
-              styles={{ body: { padding: "1.5rem" } }}
-            >
+            <div className="bg-[var(--bg-secondary)] border-[var(--border-subtle)] rounded-[2.5rem] relative overflow-hidden group border-0 p-6">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Mail className="w-16 h-16 text-cyan-500" />
               </div>
@@ -238,13 +231,12 @@ const Footer = () => {
                 className="relative z-10 space-y-3"
               >
                 <div className="relative">
-                  <Input
+                  <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="visionary@email.com"
-                    className="w-full bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl py-4 pl-6 pr-12 text-sm text-[var(--text-primary)] placeholder-gray-600 h-14"
-                    variant="borderless"
+                    className="w-full bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl py-4 pl-6 pr-12 text-sm text-[var(--text-primary)] placeholder-gray-600 h-14 focus:outline-none focus:border-cyan-500 transition-colors"
                     required
                   />
                   <button
@@ -267,16 +259,13 @@ const Footer = () => {
                   )}
                 </AnimatePresence>
               </form>
-            </Card>
+            </div>
           </div>
         </div>
 
         {/* Contact Strip */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
-          <Card
-            className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0"
-            styles={{ body: { padding: "1.25rem" } }}
-          >
+          <div className="bg-[var(--bg-glass)] border-[var(--border-subtle)] rounded-[2rem] hover:bg-[var(--bg-secondary)] transition-colors border-0 p-5">
             <div className="flex items-center gap-4 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <MapPin className="w-6 h-6" />
@@ -290,9 +279,9 @@ const Footer = () => {
                 </p>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0">
+          <div className="bg-[var(--bg-glass)] border-[var(--border-subtle)] rounded-[2rem] hover:bg-[var(--bg-secondary)] transition-colors border-0 p-5">
             <div className="flex items-center gap-6 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <Phone className="w-6 h-6" />
@@ -304,9 +293,9 @@ const Footer = () => {
                 <p className="text-sm font-bold text-white">+256 786 400 713</p>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-[2rem] hover:!bg-[var(--bg-secondary)] transition-colors !border-0">
+          <div className="bg-[var(--bg-glass)] border-[var(--border-subtle)] rounded-[2rem] hover:bg-[var(--bg-secondary)] transition-colors border-0 p-5">
             <div className="flex items-center gap-6 group">
               <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-cyan-400 border border-white/5 group-hover:border-cyan-500/30 transition-all shadow-inner">
                 <Shield className="w-6 h-6" />
@@ -323,7 +312,7 @@ const Footer = () => {
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Footer Bottom */}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle2, Sparkles } from "lucide-react";
-import { Card, Input } from "antd";
+import { Card } from "./ui/Card";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -21,8 +21,7 @@ const Newsletter = () => {
 
   return (
     <Card
-      className="!rounded-2xl !bg-[var(--bg-secondary)] !border-[var(--border-subtle)] shadow-2xl overflow-hidden !border"
-      styles={{ body: { padding: 0 } }}
+      className="rounded-2xl bg-[var(--bg-secondary)] border-[var(--border-subtle)] shadow-2xl overflow-hidden border p-0"
     >
       <div className="relative p-8 md:p-16">
         {/* Background Decorative Elements */}
@@ -75,14 +74,13 @@ const Newsletter = () => {
                   className="flex flex-col gap-4"
                 >
                   <div className="relative group">
-                    <Input
+                    <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="w-full px-6 py-5 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder-gray-500 h-16 text-lg"
-                      variant="borderless"
+                      className="w-full px-6 py-5 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder-gray-500 h-16 text-lg focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                     <div className="absolute inset-0 rounded-2xl bg-cyan-500/0 group-hover:bg-cyan-500/5 pointer-events-none transition-colors" />
                   </div>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Target, Users, Globe, Shield } from "lucide-react";
-import { Card } from "antd";
+import { Card } from "../components/ui/Card";
 import SEO from "../components/SEO";
 
 const About = () => {
@@ -58,8 +58,7 @@ const About = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Card
-                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
+                className="bg-[var(--bg-glass)] rounded-2xl border-[var(--border-subtle)] backdrop-blur-sm border p-6 text-left"
               >
                 <Target className="w-8 h-8 text-cyan-400 mb-4" />
                 <h3 className="font-bold text-[var(--text-primary)] mb-2">Innovation</h3>
@@ -68,24 +67,21 @@ const About = () => {
                 </p>
               </Card>
               <Card
-                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
+                className="bg-[var(--bg-glass)] rounded-2xl border-[var(--border-subtle)] backdrop-blur-sm border p-6 text-left"
               >
                 <Users className="w-8 h-8 text-purple-400 mb-4" />
                 <h3 className="font-bold text-[var(--text-primary)] mb-2">Community</h3>
                 <p className="text-sm text-gray-500">Built for enthusiasts</p>
               </Card>
               <Card
-                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
+                className="bg-[var(--bg-glass)] rounded-2xl border-[var(--border-subtle)] backdrop-blur-sm border p-6 text-left"
               >
                 <Shield className="w-8 h-8 text-green-400 mb-4" />
                 <h3 className="font-bold text-[var(--text-primary)] mb-2">Trust</h3>
                 <p className="text-sm text-gray-500">Reliable & secure</p>
               </Card>
               <Card
-                className="!bg-[var(--bg-glass)] !rounded-2xl !border-[var(--border-subtle)] backdrop-blur-sm !border"
-                bodyStyle={{ padding: "1.5rem", textAlign: "left" }}
+                className="bg-[var(--bg-glass)] rounded-2xl border-[var(--border-subtle)] backdrop-blur-sm border p-6 text-left"
               >
                 <Globe className="w-8 h-8 text-blue-400 mb-4" />
                 <h3 className="font-bold text-[var(--text-primary)] mb-2">Global</h3>

@@ -21,64 +21,46 @@ import {
   Calendar,
   Award,
 } from "lucide-react";
-import {
-  Form,
-  Input,
-  Button,
-  Avatar,
-  Card,
-  App,
-  Tag,
-  Tabs,
-  Space,
-  Typography,
-  Row,
-  Col,
-  Divider,
-  Tooltip,
-  Descriptions,
-  Layout,
-  Menu,
-  Badge,
-  Result,
-} from "antd";
+
 import { useAuth } from "../context/AuthContext";
 import SEO from "../components/SEO";
 import { formatCurrency } from "../utils/currency";
-
-const { Title, Text, Paragraph } = Typography;
-const { Content, Sider } = Layout;
+import { Card } from "../components/ui/Card";
+import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { message } from "../utils/toast";
 
 const UserProfile = () => {
   const { user, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
-  const { message } = App.useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
-  const [form] = Form.useForm();
+  const [formData, setFormData] = useState({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    phone: user?.phone || "",
+  });
 
   if (!user) {
     return (
       <div className="min-h-screen grid place-items-center bg-[var(--bg-primary)]">
-        <Result
-          status="403"
-          title="Access Denied"
-          subTitle="Please login to view your profile."
-          extra={
-            <Button type="primary" onClick={() => navigate("/login")}>
-              Login Now
-            </Button>
-          }
-        />
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">Access Denied</h2>
+          <p className="text-[var(--text-muted)] mb-6">Please login to view your profile.</p>
+          <Button onClick={() => navigate("/login")}>
+            Login Now
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const handleUpdate = async (values) => {
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     setLoading(true);
     try {
-      await updateProfile(values);
+      await updateProfile(formData);
       message.success("Profile updated successfully");
       setIsEditing(false);
     } catch (error) {
@@ -89,31 +71,10 @@ const UserProfile = () => {
   };
 
   const sideMenuItems = [
-    {
-      key: "info",
-      icon: <User size={18} />,
-      label: "Personal Profile",
-    },
-    {
-      key: "activity",
-      icon: <ShoppingBag size={18} />,
-      label: "Activity Hub",
-    },
-    {
-      key: "security",
-      icon: <Shield size={18} />,
-      label: "Security & Safety",
-    },
-    {
-      key: "notifications",
-      icon: (
-        <Badge dot offset={[2, 0]}>
-          <Bell size={18} />
-        </Badge>
-      ),
-      label: "Dispatches",
-      onClick: () => navigate("/notifications"),
-    },
+    { key: "info", icon: User, label: "Personal Profile" },
+    { key: "activity", icon: ShoppingBag, label: "Activity Hub" },
+    { key: "security", icon: Shield, label: "Security & Safety" },
+    { key: "notifications", icon: Bell, label: "Dispatches", badge: true, onClick: () => navigate("/notifications") },
   ];
 
   return (
@@ -130,80 +91,71 @@ const UserProfile = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-32 relative z-10">
-        <Layout className="!bg-transparent gap-8 flex-col lg:flex-row">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* LEFT SIDER - Compact Identity Card */}
           <div className="w-full lg:w-[300px] flex-shrink-0 lg:sticky lg:top-32 h-fit">
-            <Card
-              className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2rem] shadow-2xl overflow-hidden"
-              styles={{ body: { padding: "2.5rem 1.5rem" } }}
-            >
+            <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2rem] shadow-2xl overflow-hidden p-10 border-0">
               <div className="flex flex-col items-center text-center">
                 <div className="relative group mb-6">
                   <div className="absolute -inset-2 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-full blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-1000" />
-                  <Avatar
-                    size={120}
-                    src={user.avatar}
-                    className="border-4 border-[var(--bg-secondary)] shadow-xl relative z-10"
-                    icon={<User size={48} />}
-                  >
-                    {user.firstName?.[0]}
-                  </Avatar>
-                  <Tooltip title="Update Photo">
-                    <button className="absolute bottom-0 right-0 p-2.5 bg-cyan-600 text-white rounded-xl hover:scale-110 transition-all shadow-lg border-2 border-[var(--bg-secondary)] z-20">
-                      <Camera size={16} />
-                    </button>
-                  </Tooltip>
+                  <div className="w-32 h-32 rounded-full border-4 border-[var(--bg-secondary)] shadow-xl relative z-10 flex items-center justify-center bg-[var(--bg-tertiary)] overflow-hidden">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={48} className="text-[var(--text-muted)]" />
+                    )}
+                  </div>
+                  <button className="absolute bottom-0 right-0 p-2.5 bg-cyan-600 text-white rounded-xl hover:scale-110 transition-all shadow-lg border-2 border-[var(--bg-secondary)] z-20" title="Update Photo">
+                    <Camera size={16} />
+                  </button>
                 </div>
 
                 <div className="space-y-1 mb-6">
-                  <Title
-                    level={4}
-                    className="!text-[var(--text-primary)] !font-black !m-0 !tracking-tight"
-                  >
+                  <h4 className="text-[var(--text-primary)] text-xl font-black m-0 tracking-tight">
                     {user.firstName} {user.lastName}
-                  </Title>
-                  <Tag
-                    color="cyan"
-                    className="rounded-full border-none bg-cyan-500/10 text-cyan-400 font-bold uppercase tracking-widest text-[9px]"
-                  >
+                  </h4>
+                  <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 font-bold uppercase tracking-widest text-[9px] mt-2">
                     {user.role} Module
-                  </Tag>
+                  </span>
                 </div>
 
-                <Menu
-                  mode="inline"
-                  selectedKeys={[activeTab]}
-                  onClick={({ key }) => {
-                    if (key === "notifications") return;
-                    setActiveTab(key);
-                  }}
-                  items={sideMenuItems}
-                  className="w-full !border-none !bg-transparent premium-menu"
-                />
+                <div className="w-full flex flex-col gap-2 mb-6">
+                  {sideMenuItems.map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => item.onClick ? item.onClick() : setActiveTab(item.key)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-semibold text-sm ${
+                        activeTab === item.key && !item.onClick
+                          ? "bg-cyan-500/10 text-cyan-400"
+                          : "text-[var(--text-secondary)] hover:bg-[var(--bg-glass)] hover:text-[var(--text-primary)]"
+                      }`}
+                    >
+                      <item.icon size={18} />
+                      {item.label}
+                      {item.badge && (
+                        <span className="w-2 h-2 rounded-full bg-red-500 ml-auto animate-pulse" />
+                      )}
+                    </button>
+                  ))}
+                </div>
 
-                <Divider className="!border-[var(--border-subtle)]/50 !my-6" />
+                <div className="w-full h-px bg-[var(--border-subtle)]/50 my-6" />
 
-                <Button
-                  block
-                  type="text"
-                  danger
-                  className="h-12 rounded-xl hover:bg-red-500/10 font-bold uppercase tracking-widest text-[10px]"
+                <button
+                  className="w-full h-12 rounded-xl text-red-400 hover:bg-red-500/10 font-bold uppercase tracking-widest text-[10px] transition-colors"
                   onClick={logout}
                 >
                   Terminate Session
-                </Button>
+                </button>
               </div>
             </Card>
           </div>
 
           {/* MAIN CONTENT AREA */}
-          <Content className="flex-1">
+          <div className="flex-1">
             <div className="space-y-8">
               {/* Hero Banner Area */}
-              <Card
-                className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2.5rem] shadow-xl overflow-hidden relative"
-                styles={{ body: { padding: 0 } }}
-              >
+              <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2.5rem] shadow-xl overflow-hidden relative border-0 p-0">
                 <div className="h-32 bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-blue-600/20 relative">
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
                 </div>
@@ -215,21 +167,18 @@ const UserProfile = () => {
                       </div>
                     </div>
                     <div className="pb-2">
-                      <Title
-                        level={2}
-                        className="!text-[var(--text-primary)] !font-black !m-0 !tracking-tighter"
-                      >
+                      <h2 className="text-3xl text-[var(--text-primary)] font-black m-0 tracking-tighter">
                         Control <span className="text-cyan-400">Center</span>
-                      </Title>
+                      </h2>
                       <div className="flex gap-4 mt-2">
-                        <Space className="text-[var(--text-muted)] text-xs">
+                        <span className="flex items-center gap-1 text-[var(--text-muted)] text-xs">
                           <Calendar size={14} className="text-cyan-500" />
                           Joined 2024
-                        </Space>
-                        <Space className="text-[var(--text-muted)] text-xs">
+                        </span>
+                        <span className="flex items-center gap-1 text-[var(--text-muted)] text-xs">
                           <Award size={14} className="text-purple-500" />
                           Verified Node
-                        </Space>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -237,34 +186,35 @@ const UserProfile = () => {
                   {activeTab === "info" && (
                     <div className="pb-2">
                       {!isEditing ? (
-                        <Button
-                          type="primary"
-                          icon={<Edit2 size={16} />}
+                        <button
                           onClick={() => setIsEditing(true)}
-                          className="bg-cyan-600 hover:bg-cyan-500 border-none h-11 px-8 rounded-xl font-bold transition-all shadow-lg hover:shadow-cyan-500/25"
+                          className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white h-11 px-8 rounded-xl font-bold transition-all shadow-lg hover:shadow-cyan-500/25"
                         >
-                          Edit Module
-                        </Button>
+                          <Edit2 size={16} /> Edit Module
+                        </button>
                       ) : (
-                        <Space>
-                          <Button
-                            className="h-11 px-6 rounded-xl border-[var(--border-subtle)] text-[var(--text-primary)]"
+                        <div className="flex gap-4">
+                          <button
+                            className="h-11 px-6 rounded-xl border border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--bg-glass)]"
                             onClick={() => {
                               setIsEditing(false);
-                              form.resetFields();
+                              setFormData({
+                                firstName: user?.firstName || "",
+                                lastName: user?.lastName || "",
+                                phone: user?.phone || "",
+                              });
                             }}
                           >
                             Cancel
-                          </Button>
-                          <Button
-                            type="primary"
-                            loading={loading}
-                            className="bg-green-600 hover:bg-green-500 border-none h-11 px-8 rounded-xl font-bold"
-                            onClick={() => form.submit()}
+                          </button>
+                          <button
+                            disabled={loading}
+                            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white h-11 px-8 rounded-xl font-bold shadow-lg"
+                            onClick={handleUpdate}
                           >
                             Save Changes
-                          </Button>
-                        </Space>
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}
@@ -281,116 +231,69 @@ const UserProfile = () => {
                   transition={{ duration: 0.3 }}
                 >
                   {activeTab === "info" && (
-                    <Card className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2.5rem] shadow-xl">
+                    <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2.5rem] shadow-xl border-0 p-8">
                       {isEditing ? (
-                        <Form
-                          form={form}
-                          layout="vertical"
-                          initialValues={user}
-                          onFinish={handleUpdate}
-                          className="max-w-3xl"
-                        >
-                          <Row gutter={24}>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                name="firstName"
-                                label={
-                                  <Text
-                                    strong
-                                    className="text-[var(--text-secondary)] uppercase tracking-widest text-[10px]"
-                                  >
-                                    First Name
-                                  </Text>
-                                }
-                                rules={[{ required: true }]}
-                              >
-                                <Input className="theme-input" />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                name="lastName"
-                                label={
-                                  <Text
-                                    strong
-                                    className="text-[var(--text-secondary)] uppercase tracking-widest text-[10px]"
-                                  >
-                                    Last Name
-                                  </Text>
-                                }
-                                rules={[{ required: true }]}
-                              >
-                                <Input className="theme-input" />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24}>
-                              <Form.Item
-                                name="email"
-                                label={
-                                  <Text
-                                    strong
-                                    className="text-[var(--text-secondary)] uppercase tracking-widest text-[10px]"
-                                  >
-                                    Email Identity
-                                  </Text>
-                                }
-                              >
-                                <Input
-                                  disabled
-                                  className="theme-input opacity-50"
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24}>
-                              <Form.Item
-                                name="phone"
-                                label={
-                                  <Text
-                                    strong
-                                    className="text-[var(--text-secondary)] uppercase tracking-widest text-[10px]"
-                                  >
-                                    Contact Sync
-                                  </Text>
-                                }
-                              >
-                                <Input
-                                  className="theme-input"
-                                  placeholder="+256..."
-                                />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        </Form>
+                        <form onSubmit={handleUpdate} className="max-w-3xl flex flex-col gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-2">
+                              <label className="font-bold text-[var(--text-secondary)] uppercase tracking-widest text-[10px]">
+                                First Name
+                              </label>
+                              <Input
+                                required
+                                value={formData.firstName}
+                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <label className="font-bold text-[var(--text-secondary)] uppercase tracking-widest text-[10px]">
+                                Last Name
+                              </label>
+                              <Input
+                                required
+                                value={formData.lastName}
+                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2 col-span-1 md:col-span-2">
+                              <label className="font-bold text-[var(--text-secondary)] uppercase tracking-widest text-[10px]">
+                                Email Identity
+                              </label>
+                              <Input disabled value={user.email} className="opacity-50 cursor-not-allowed" />
+                            </div>
+                            <div className="flex flex-col gap-2 col-span-1 md:col-span-2">
+                              <label className="font-bold text-[var(--text-secondary)] uppercase tracking-widest text-[10px]">
+                                Contact Sync
+                              </label>
+                              <Input
+                                placeholder="+256..."
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                        </form>
                       ) : (
-                        <Descriptions
-                          column={{ xxl: 2, xl: 2, lg: 1, md: 2, sm: 1, xs: 1 }}
-                          className="custom-descriptions"
-                          size="large"
-                        >
-                          <Descriptions.Item label="Identity Path">
-                            <Text strong className="text-[var(--text-primary)]">
-                              {user.firstName} {user.lastName}
-                            </Text>
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Email Node">
-                            <Text className="text-[var(--text-primary)]">
-                              {user.email}
-                            </Text>
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Contact Link">
-                            <Text className="text-[var(--text-primary)]">
-                              {user.phone || "Not Logged"}
-                            </Text>
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Current Role">
-                            <Tag
-                              color="blue"
-                              className="border-none bg-blue-500/10 text-blue-400 capitalize"
-                            >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[var(--text-muted)] text-sm">Identity Path</span>
+                            <span className="text-[var(--text-primary)] font-bold text-lg">{user.firstName} {user.lastName}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[var(--text-muted)] text-sm">Email Node</span>
+                            <span className="text-[var(--text-primary)] text-lg">{user.email}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[var(--text-muted)] text-sm">Contact Link</span>
+                            <span className="text-[var(--text-primary)] text-lg">{user.phone || "Not Logged"}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[var(--text-muted)] text-sm">Current Role</span>
+                            <span className="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 capitalize w-max font-bold text-sm">
                               {user.role}
-                            </Tag>
-                          </Descriptions.Item>
-                        </Descriptions>
+                            </span>
+                          </div>
+                        </div>
                       )}
                     </Card>
                   )}
@@ -398,74 +301,59 @@ const UserProfile = () => {
                   {activeTab === "activity" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Link to="/my-orders">
-                        <Card className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2rem] hover:scale-[1.02] transition-all group overflow-hidden">
-                          <div className="p-2">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl">
-                                <ShoppingBag size={24} />
-                              </div>
-                              <div className="flex -space-x-2">
-                                {[1, 2].map((i) => (
-                                  <div
-                                    key={i}
-                                    className="w-8 h-8 rounded-full bg-gray-800 border-2 border-[#12121a] flex items-center justify-center text-[10px]"
-                                  >
-                                    📦
-                                  </div>
-                                ))}
-                              </div>
+                        <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2rem] hover:scale-[1.02] transition-all group overflow-hidden border-0 p-8">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl">
+                              <ShoppingBag size={24} />
                             </div>
-                            <Title
-                              level={4}
-                              className="!text-[var(--text-primary)] !m-0"
-                            >
-                              Order History
-                            </Title>
-                            <Paragraph className="text-[var(--text-muted)] text-sm mb-4">
-                              Track your hardware modules.
-                            </Paragraph>
-                            <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
-                              View Log{" "}
-                              <ChevronRight
-                                size={14}
-                                className="group-hover:translate-x-1 transition-transform"
-                              />
+                            <div className="flex -space-x-2">
+                              {[1, 2].map((i) => (
+                                <div
+                                  key={i}
+                                  className="w-8 h-8 rounded-full bg-gray-800 border-2 border-[var(--bg-primary)] flex items-center justify-center text-[10px]"
+                                >
+                                  📦
+                                </div>
+                              ))}
                             </div>
+                          </div>
+                          <h4 className="text-[var(--text-primary)] text-xl font-bold m-0 mb-2">
+                            Order History
+                          </h4>
+                          <p className="text-[var(--text-muted)] text-sm mb-6">
+                            Track your hardware modules.
+                          </p>
+                          <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
+                            View Log{" "}
+                            <ChevronRight
+                              size={14}
+                              className="group-hover:translate-x-1 transition-transform"
+                            />
                           </div>
                         </Card>
                       </Link>
                       <Link to="/notifications">
-                        <Card className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2rem] hover:scale-[1.02] transition-all group overflow-hidden">
-                          <div className="p-2">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl">
-                                <Bell size={24} />
-                              </div>
-                              <Badge
-                                status="processing"
-                                text={
-                                  <Text className="text-xs text-amber-500">
-                                    Live Sync
-                                  </Text>
-                                }
-                              />
+                        <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2rem] hover:scale-[1.02] transition-all group overflow-hidden border-0 p-8">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl">
+                              <Bell size={24} />
                             </div>
-                            <Title
-                              level={4}
-                              className="!text-[var(--text-primary)] !m-0"
-                            >
-                              System Alerts
-                            </Title>
-                            <Paragraph className="text-[var(--text-muted)] text-sm mb-4">
-                              Stay updated on grid status.
-                            </Paragraph>
-                            <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-widest">
-                              Enter Dispatches{" "}
-                              <ChevronRight
-                                size={14}
-                                className="group-hover:translate-x-1 transition-transform"
-                              />
-                            </div>
+                            <span className="flex items-center gap-2 text-xs text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full font-bold">
+                              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" /> Live Sync
+                            </span>
+                          </div>
+                          <h4 className="text-[var(--text-primary)] text-xl font-bold m-0 mb-2">
+                            System Alerts
+                          </h4>
+                          <p className="text-[var(--text-muted)] text-sm mb-6">
+                            Stay updated on grid status.
+                          </p>
+                          <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-widest">
+                            Enter Dispatches{" "}
+                            <ChevronRight
+                              size={14}
+                              className="group-hover:translate-x-1 transition-transform"
+                            />
                           </div>
                         </Card>
                       </Link>
@@ -473,26 +361,23 @@ const UserProfile = () => {
                   )}
 
                   {activeTab === "security" && (
-                    <Card className="!bg-[var(--bg-secondary)]/50 backdrop-blur-2xl !border-[var(--border-subtle)] !rounded-[2.5rem] shadow-xl">
+                    <Card className="bg-[var(--bg-secondary)]/50 backdrop-blur-2xl border-[var(--border-subtle)] rounded-[2.5rem] shadow-xl border-0 p-8">
                       <div className="max-w-2xl space-y-10">
                         <div className="flex items-start gap-6">
                           <div className="p-4 bg-cyan-500/10 text-cyan-400 rounded-3xl">
                             <Shield size={32} />
                           </div>
                           <div>
-                            <Title
-                              level={4}
-                              className="!text-[var(--text-primary)] !mb-1"
-                            >
+                            <h4 className="text-[var(--text-primary)] text-xl font-bold mb-2">
                               Authentication Layer
-                            </Title>
-                            <Paragraph className="text-[var(--text-muted)]">
+                            </h4>
+                            <p className="text-[var(--text-muted)] mb-4">
                               Enhance your security module with dual-factor
                               encryption.
-                            </Paragraph>
-                            <Button className="mt-2 rounded-xl border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 h-10 px-6 font-bold uppercase tracking-widest text-[9px]">
+                            </p>
+                            <button className="rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 h-10 px-6 font-bold uppercase tracking-widest text-[9px] transition-colors">
                               Initialize Encryption
-                            </Button>
+                            </button>
                           </div>
                         </div>
 
@@ -501,29 +386,23 @@ const UserProfile = () => {
                             <CreditCard size={32} />
                           </div>
                           <div>
-                            <Title
-                              level={4}
-                              className="!text-[var(--text-primary)] !mb-1"
-                            >
+                            <h4 className="text-[var(--text-primary)] text-xl font-bold mb-2">
                               Payment Protocol
-                            </Title>
-                            <Paragraph className="text-[var(--text-muted)]">
+                            </h4>
+                            <p className="text-[var(--text-muted)]">
                               Securely manage your financial nodes and wallet
                               credits.
-                            </Paragraph>
-                            <div className="flex items-center gap-4 mt-4">
+                            </p>
+                            <div className="flex items-center gap-4 mt-6">
                               <div className="flex items-center gap-2 bg-[var(--bg-primary)] px-4 py-2 rounded-full border border-[var(--border-subtle)]">
                                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                                <Text className="text-xs font-bold">
+                                <span className="text-xs font-bold text-[var(--text-primary)]">
                                   Standard MM Active
-                                </Text>
+                                </span>
                               </div>
-                              <Button
-                                type="text"
-                                className="text-purple-400 font-bold text-xs uppercase tracking-widest p-0 h-auto"
-                              >
+                              <button className="text-purple-400 font-bold text-xs uppercase tracking-widest hover:text-purple-300 transition-colors">
                                 Update Wallet
-                              </Button>
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -533,8 +412,8 @@ const UserProfile = () => {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </Content>
-        </Layout>
+          </div>
+        </div>
       </div>
     </div>
   );

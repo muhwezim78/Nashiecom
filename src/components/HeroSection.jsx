@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Space } from "antd";
+
 import {
   Float,
   Environment,
@@ -146,7 +146,7 @@ const HeroSection = () => {
 
       {/* Content Overlay */}
       <div className="relative z-10 w-full container mx-auto px-4">
-        <Space orientation="vertical" size={80} align="start" className="w-full">
+        <div className="flex flex-col gap-20 items-start w-full">
           {/* Main Content */}
           <div className="flex flex-col items-start">
             <motion.div
@@ -232,7 +232,7 @@ const HeroSection = () => {
               </div>
             </div>
           </motion.div>
-        </Space>
+        </div>
       </div>
     </div>
   );

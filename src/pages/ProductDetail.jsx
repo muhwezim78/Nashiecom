@@ -14,7 +14,10 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
-import { message, Spin, Card, Rate } from "antd";
+import { Spinner } from "../components/ui/Spinner";
+import { Card } from "../components/ui/Card";
+import { Rate } from "../components/ui/Rate";
+import { message } from "../utils/toast";
 import { formatCurrency } from "../utils/currency";
 import Reviews from "../components/Reviews";
 import SEO from "../components/SEO";
@@ -25,7 +28,7 @@ const ProductDetail = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [messageApi, contextHolder] = message.useMessage();
+
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
 
@@ -36,7 +39,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen grid place-items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
-        <Spin size="large" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -98,7 +101,7 @@ const ProductDetail = () => {
               : undefined,
         }}
       />
-      {contextHolder}
+
       <div className="container mx-auto px-4 pt-[var(--navbar-clearance)]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--space-xl)] mb-[var(--space-2xl)]">
           {/* Images */}
@@ -172,8 +175,7 @@ const ProductDetail = () => {
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Rate
                     disabled
-                    allowHalf
-                    defaultValue={parseFloat(product.rating || 0)}
+                    value={parseFloat(product.rating || 0)}
                     className="custom-rate-small"
                   />
                   <span className="text-gray-400 font-bold ml-2">
@@ -211,10 +213,9 @@ const ProductDetail = () => {
                     ? product.specs.map((spec, index) => (
                         <Card
                           key={spec.id || index}
-                          className="!bg-[var(--bg-secondary)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
-                          styles={{ body: { padding: "1.5rem" } }}
+                          className="bg-[var(--bg-secondary)] rounded-2xl border-[var(--border-subtle)] hover:border-cyan-500/30 transition-all duration-500 shadow-lg border p-6"
                         >
-                          <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                          <span className="block text-[10px] text-[var(--text-muted)] uppercase mb-2 tracking-[0.2em] font-bold">
                             {spec.name}
                           </span>
                           <span className="block text-[var(--text-primary)] font-bold text-lg">
@@ -226,11 +227,9 @@ const ProductDetail = () => {
                       ? Object.entries(product.specs).map(([key, value]) => (
                           <Card
                             key={key}
-                            variant="borderless"
-                            className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-2xl !border-[var(--border-subtle)] hover:!border-cyan-500/30 transition-all duration-500 shadow-lg !border"
-                            styles={{ body: { padding: "1.5rem" } }}
+                            className="bg-[var(--bg-glass)] rounded-2xl border-[var(--border-subtle)] hover:border-cyan-500/30 transition-all duration-500 shadow-lg border p-6"
                           >
-                            <span className="block text-[10px] text-gray-400 uppercase mb-2 tracking-[0.2em] font-bold">
+                            <span className="block text-[10px] text-[var(--text-muted)] uppercase mb-2 tracking-[0.2em] font-bold">
                               {key}
                             </span>
                             <span className="block text-[var(--text-primary)] font-bold text-lg">
@@ -269,12 +268,12 @@ const ProductDetail = () => {
               <button
                 onClick={() => {
                   if (!user) {
-                    messageApi.info("Please login to add to cart");
+                    message.info("Please login to add to cart");
                     navigate("/login", { state: { from: location.pathname } });
                     return;
                   }
                   addToCart(product, quantity);
-                  messageApi.success(
+                  message.success(
                     `Added ${quantity} x ${product.name} to cart`,
                   );
                 }}
@@ -300,23 +299,12 @@ const ProductDetail = () => {
               ].map((badge, i) => (
                 <Card
                   key={i}
-                  variant="borderless"
-                  className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] !rounded-3xl shadow-xl overflow-hidden"
-                  styles={{
-                    body: {
-                      padding: "1.5rem",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      textAlign: "center",
-                      gap: "0.75rem",
-                    },
-                  }}
+                  className="bg-[var(--bg-glass)] border-[var(--border-subtle)] rounded-3xl shadow-xl overflow-hidden p-6 flex flex-col items-center text-center gap-3"
                 >
                   <div className="p-3 bg-cyan-500/10 rounded-xl">
                     <badge.icon className="w-6 h-6 text-cyan-400" />
                   </div>
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                  <span className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-3 block text-center">
                     {badge.label}
                   </span>
                 </Card>

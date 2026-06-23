@@ -17,18 +17,6 @@ import {
   Layers,
   ChevronRight,
 } from "lucide-react";
-import {
-  Badge,
-  Button,
-  Avatar,
-  Dropdown,
-  message,
-  Drawer,
-  Menu,
-  Tooltip,
-  Input,
-  Card,
-} from "antd";
 import api from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useNotification } from "../context/NotificationContext";
@@ -40,6 +28,8 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
   const { user, logout, isAdmin } = useAuth();
   const { cartItems, getCartCount } = useCart();
   const { unreadCount } = useNotification();
@@ -55,10 +45,11 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu and search when route changes
+  // Close menus when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
+    setIsUserMenuOpen(false);
   }, [location]);
 
   // Handle global keyboard shortcuts (ESC to close, Ctrl+K to open)
@@ -66,6 +57,7 @@ const Navbar = () => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         setIsSearchOpen(false);
+        setIsUserMenuOpen(false);
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
@@ -76,38 +68,23 @@ const Navbar = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isUserMenuOpen && !e.target.closest('.user-menu-container')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isUserMenuOpen]);
+
   const menuItems = [
-    { key: "/", label: <Link to="/">Home</Link> },
-    { key: "/products", label: <Link to="/products">Products</Link> },
-    {
-      key: "/my-orders",
-      label: <Link to="/my-orders">My Orders</Link>,
-      icon: <ShoppingCart size={16} />,
-    },
-    { key: "/about", label: <Link to="/about">About</Link> },
-    { key: "/contact", label: <Link to="/contact">Contact</Link> },
-    ...(user
-      ? [
-          {
-            key: "/profile",
-            label: <Link to="/profile">My Profile</Link>,
-            icon: <User size={16} />,
-          },
-          {
-            key: "logout",
-            label: "Sign Out",
-            icon: <LogOut size={16} />,
-            danger: true,
-            onClick: logout,
-          },
-        ]
-      : [
-          {
-            key: "/login",
-            label: <Link to="/login">Sign In</Link>,
-            icon: <User size={16} />,
-          },
-        ]),
+    { key: "/", label: "Home" },
+    { key: "/products", label: "Products" },
+    { key: "/my-orders", label: "My Orders", icon: <ShoppingCart size={16} /> },
+    { key: "/about", label: "About" },
+    { key: "/contact", label: "Contact" },
   ];
 
   return (
@@ -165,24 +142,17 @@ const Navbar = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <Tooltip
-              title={
-                currentTheme === "dark"
-                  ? "Switch to Light Mode"
-                  : "Switch to Dark Mode"
-              }
+            <button
+              onClick={toggleTheme}
+              className="p-2 hover:bg-white/10 dark:hover:bg-white/10 rounded-full transition-all duration-300 text-gray-300 hover:text-white"
+              title={currentTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              <button
-                onClick={toggleTheme}
-                className="p-2 hover:bg-white/10 dark:hover:bg-white/10 rounded-full transition-all duration-300 text-gray-300 hover:text-white"
-              >
-                {currentTheme === "dark" ? (
-                  <Sun className="w-5 h-5 text-amber-400" />
-                ) : (
-                  <Moon className="w-5 h-5 text-gray-400" />
-                )}
-              </button>
-            </Tooltip>
+              {currentTheme === "dark" ? (
+                <Sun className="w-5 h-5 text-amber-400" />
+              ) : (
+                <Moon className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
 
             <button
               onClick={() => setIsSearchOpen(true)}
@@ -198,66 +168,67 @@ const Navbar = () => {
               to="/cart"
               className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-gray-300 hover:text-white group"
             >
-              <Badge count={getCartCount()} offset={[0, 0]} color="#00d4ff">
-                <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </Badge>
+              {getCartCount() > 0 && (
+                <span className="absolute top-0 right-0 w-4 h-4 bg-cyan-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full transform translate-x-1/4 -translate-y-1/4 z-10 border border-[var(--bg-primary)]">
+                  {getCartCount()}
+                </span>
+              )}
+              <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </Link>
 
             <Link
               to="/notifications"
               className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-gray-300 hover:text-white group"
             >
-              <Badge
-                count={unreadCount}
-                offset={[0, 0]}
-                color="#f5222d"
-                size="small"
-              >
-                <Bell className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </Badge>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full transform translate-x-1/4 -translate-y-1/4 z-10 border border-[var(--bg-primary)]">
+                  {unreadCount}
+                </span>
+              )}
+              <Bell className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </Link>
 
             {user ? (
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: "profile",
-                      label: "My Profile",
-                      icon: <User size={16} />,
-                      onClick: () => navigate("/profile"),
-                    },
-                    {
-                      key: "orders",
-                      label: "My Orders",
-                      icon: <ShoppingCart size={16} />,
-                      onClick: () => navigate("/my-orders"),
-                    },
-                    { type: "divider" },
-                    {
-                      key: "logout",
-                      label: "Sign Out",
-                      icon: <LogOut size={16} />,
-                      danger: true,
-                      onClick: logout,
-                    },
-                  ],
-                }}
-                placement="bottomRight"
-                arrow={{ pointAtCenter: true }}
-              >
-                <button className="flex items-center gap-2 p-1 pr-3 hover:bg-white/10 rounded-full transition-all group">
-                  <Avatar
-                    src={user.avatar}
-                    className="border border-white/20 group-hover:border-cyan-500 transition-colors"
-                  >
-                    {user.firstName?.[0]}
-                  </Avatar>
+              <div className="relative user-menu-container">
+                <button 
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 p-1 pr-3 hover:bg-white/10 rounded-full transition-all group"
+                >
+                  {user.avatar ? (
+                    <img src={user.avatar} className="w-8 h-8 rounded-full object-cover border border-white/20 group-hover:border-cyan-500 transition-colors" alt="" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center text-white text-sm font-bold border border-white/20 group-hover:border-cyan-500 transition-colors">
+                      {user.firstName?.[0]}
+                    </div>
+                  )}
                   <span className="hidden lg:block text-sm font-bold text-gray-300 group-hover:text-white">
                     {user.firstName}
                   </span>
                 </button>
-              </Dropdown>
+
+                <AnimatePresence>
+                  {isUserMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-48 bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-xl shadow-2xl py-2 z-50 origin-top-right"
+                    >
+                      <Link to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-glass)] transition-colors">
+                        <User size={16} className="text-[var(--text-muted)]" /> My Profile
+                      </Link>
+                      <Link to="/my-orders" className="flex items-center gap-3 px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-glass)] transition-colors">
+                        <ShoppingCart size={16} className="text-[var(--text-muted)]" /> My Orders
+                      </Link>
+                      <div className="my-2 h-px bg-[var(--border-subtle)]" />
+                      <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                        <LogOut size={16} /> Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -268,39 +239,90 @@ const Navbar = () => {
               </Link>
             )}
 
-            <Button
-              type="text"
-              className="md:hidden text-white hover:text-cyan-400"
-              icon={<MenuIcon className="w-6 h-6" />}
+            <button
+              className="md:hidden text-white hover:text-cyan-400 p-2"
               onClick={() => setIsMobileMenuOpen(true)}
-            />
+            >
+              <MenuIcon className="w-6 h-6" />
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu Drawer */}
-        <Drawer
-          title="Menu"
-          placement="right"
-          onClose={() => setIsMobileMenuOpen(false)}
-          open={isMobileMenuOpen}
-          size="default"
-          styles={{
-            body: { padding: 0, backgroundColor: "var(--bg-secondary)" },
-            header: {
-              backgroundColor: "var(--bg-secondary)",
-              borderBottom: "1px solid var(--border-subtle)",
-            },
-            wrapper: { width: 280 },
-          }}
-        >
-          <Menu
-            mode="vertical"
-            selectedKeys={[location.pathname]}
-            items={menuItems}
-            className="premium-menu"
-            theme={currentTheme}
-          />
-        </Drawer>
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+              />
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "tween", duration: 0.3 }}
+                className="fixed inset-y-0 right-0 w-72 bg-[var(--bg-secondary)] border-l border-[var(--border-subtle)] shadow-2xl z-50 md:hidden flex flex-col"
+              >
+                <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+                  <span className="font-bold text-[var(--text-primary)] text-lg">Menu</span>
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-[var(--text-muted)] hover:text-white transition-colors">
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto py-4">
+                  <div className="flex flex-col px-4 gap-2">
+                    {menuItems.map(item => (
+                      <Link
+                        key={item.key}
+                        to={item.key}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                          location.pathname === item.key 
+                            ? "bg-cyan-500/10 text-cyan-400 font-medium border border-cyan-500/20" 
+                            : "text-[var(--text-primary)] hover:bg-[var(--bg-glass)]"
+                        }`}
+                      >
+                        {item.icon}
+                        {item.label}
+                      </Link>
+                    ))}
+                    
+                    {!user && (
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-[var(--text-primary)] hover:bg-[var(--bg-glass)] mt-2"
+                      >
+                        <User size={16} /> Sign In
+                      </Link>
+                    )}
+                  </div>
+                </div>
+                {user && (
+                  <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+                    <div className="flex items-center gap-3 mb-4">
+                      {user.avatar ? (
+                        <img src={user.avatar} className="w-10 h-10 rounded-full object-cover border border-white/20" alt="" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold">
+                          {user.firstName?.[0]}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-[var(--text-primary)] truncate">{user.firstName} {user.lastName}</div>
+                        <div className="text-xs text-[var(--text-muted)] truncate">{user.email}</div>
+                      </div>
+                    </div>
+                    <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors font-medium text-sm">
+                      <LogOut size={16} /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
 
       <SearchOverlay
@@ -373,36 +395,34 @@ const SearchOverlay = ({ isOpen, onClose }) => {
             initial={{ scale: 0.95, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: -20 }}
-            className="w-full max-w-3xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-none shadow-2xl overflow-hidden"
+            className="w-full max-w-3xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
           >
             {/* Search Input Area */}
-            <div className="mt-10 mx-6 md:mx-10 mb-6">
+            <div className="p-6 border-b border-[var(--border-subtle)] shrink-0">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-[2rem] blur opacity-0 group-within:opacity-100 transition duration-500" />
-                <Input
-                  ref={inputRef}
-                  prefix={
-                    <Search className="text-cyan-500/50 group-within:text-cyan-400 w-5 h-5 mr-3 transition-colors" />
-                  }
-                  suffix={
-                    <button
-                      onClick={onClose}
-                      className="p-2 hover:bg-white/10 rounded-xl transition-all text-gray-400 hover:text-white hover:rotate-90"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  }
-                  placeholder="Search products, categories, specs..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full bg-[var(--bg-glass)] border-2 border-white/5 group-within:border-cyan-500/30 rounded-none py-4 px-6 text-[var(--text-primary)] placeholder-gray-500 focus:ring-0 shadow-2xl h-16 text-lg transition-all"
-                  variant="borderless"
-                />
+                <div className="relative flex items-center w-full bg-[var(--bg-glass)] border-2 border-white/5 group-within:border-cyan-500/30 rounded-2xl px-4 text-[var(--text-primary)] shadow-inner transition-all h-16">
+                  <Search className="text-cyan-500/50 group-within:text-cyan-400 w-6 h-6 mr-3 shrink-0 transition-colors" />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Search products, categories, specs..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-gray-500 h-full w-full"
+                  />
+                  <button
+                    onClick={onClose}
+                    className="p-2 hover:bg-white/10 rounded-xl transition-all text-gray-400 hover:text-white hover:rotate-90 shrink-0 ml-2"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Results Area */}
-            <div className="max-h-[60vh] overflow-y-auto p-6 custom-scrollbar">
+            <div className="overflow-y-auto p-6 flex-1 scrollbar-hide">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
                   <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
@@ -432,7 +452,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4 flex items-center gap-2">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-4 flex items-center gap-2">
                         <Layers className="w-3 h-3" /> Categories
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -443,21 +463,9 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.05 }}
                           >
-                            <Card
-                              hoverable
-                              onClick={() =>
-                                handleResultClick("category", cat.slug)
-                              }
-                              className="!bg-white/[0.03] hover:!bg-white/[0.08] !border-white/5 hover:!border-cyan-500/30 !rounded-2xl transition-all group backdrop-blur-sm"
-                              styles={{
-                                body: {
-                                  padding: "12px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "16px",
-                                },
-                              }}
-                              variant="borderless"
+                            <div
+                              onClick={() => handleResultClick("category", cat.slug)}
+                              className="bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-cyan-500/30 rounded-2xl transition-all group backdrop-blur-sm p-3 flex items-center gap-4 cursor-pointer"
                             >
                               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center border border-white/10 shrink-0">
                                 {cat.image ? (
@@ -478,8 +486,8 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                   {cat.productCount} Products
                                 </p>
                               </div>
-                              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-400 transition-colors shrink-0 translate-x-0 group-hover:translate-x-1 transition-transform" />
-                            </Card>
+                              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-400 transition-colors shrink-0 translate-x-0 group-hover:translate-x-1" />
+                            </div>
                           </motion.div>
                         ))}
                       </div>
@@ -493,7 +501,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.1 }}
                     >
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4 flex items-center gap-2">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-4 flex items-center gap-2">
                         <Package className="w-3 h-3" /> Products
                       </h3>
                       <div className="space-y-3">
@@ -504,21 +512,9 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.05 + 0.1 }}
                           >
-                            <Card
-                              hoverable
-                              onClick={() =>
-                                handleResultClick("product", product.slug)
-                              }
-                              className="!bg-white/[0.03] hover:!bg-white/[0.08] !border-white/5 hover:!border-cyan-500/30 !rounded-2xl transition-all group backdrop-blur-sm"
-                              styles={{
-                                body: {
-                                  padding: "12px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "16px",
-                                },
-                              }}
-                              variant="borderless"
+                            <div
+                              onClick={() => handleResultClick("product", product.slug)}
+                              className="bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-cyan-500/30 rounded-2xl transition-all group backdrop-blur-sm p-3 flex items-center gap-4 cursor-pointer"
                             >
                               <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 overflow-hidden shrink-0">
                                 {product.image ? (
@@ -536,7 +532,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                   {product.name}
                                 </h4>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-xs px-2 py-0.5 rounded-md bg-white/5 text-gray-400 border border-white/5 font-medium">
+                                  <span className="text-xs px-2 py-0.5 rounded-md bg-white/5 text-[var(--text-secondary)] border border-white/5 font-medium">
                                     {typeof product.category === "object"
                                       ? product.category.name
                                       : product.category}
@@ -546,8 +542,8 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                   </span>
                                 </div>
                               </div>
-                              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-400 transition-colors shrink-0 translate-x-0 group-hover:translate-x-1 transition-transform" />
-                            </Card>
+                              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-400 transition-colors shrink-0 translate-x-0 group-hover:translate-x-1" />
+                            </div>
                           </motion.div>
                         ))}
                       </div>
@@ -558,11 +554,10 @@ const SearchOverlay = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-white/5 border-t border-white/10 flex justify-between items-center text-[10px] text-gray-500 uppercase tracking-widest px-8">
+            <div className="p-4 bg-[var(--bg-glass)] border-t border-[var(--border-subtle)] flex justify-between items-center text-[10px] text-[var(--text-muted)] uppercase tracking-widest shrink-0 hidden sm:flex">
               <div className="flex gap-4">
                 <span>ESC to close</span>
-                <span>↑↓ to navigate</span>
-                <span>ENTER to select</span>
+                <span>Type to search</span>
               </div>
               <div className="flex items-center gap-1">
                 Powered by Nashiecom Core
@@ -579,7 +574,7 @@ const NavLink = ({ to, children, isActive }) => (
   <Link
     to={to}
     className={`relative text-sm font-medium transition-colors hover:text-cyan-400 ${
-      isActive ? "text-white" : "text-gray-400"
+      isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
     }`}
   >
     {children}

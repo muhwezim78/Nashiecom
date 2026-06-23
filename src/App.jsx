@@ -5,7 +5,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
-import { ConfigProvider, theme, App as AntdApp } from "antd";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -13,7 +13,6 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
-import "./App.css";
 
 // Customer Pages
 import Home from "./pages/Home";
@@ -58,7 +57,7 @@ const CustomerLayout = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-grow">{children}</main>
+      <div className="customer-main flex-grow">{children}</div>
       <Footer />
     </div>
   );
@@ -68,26 +67,14 @@ const AppContent = () => {
   const { theme: currentTheme } = useTheme();
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm:
-          currentTheme === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: {
-          colorPrimary: "#00d4ff",
-          colorBgBase: currentTheme === "dark" ? "#0a0a0f" : "#ffffff",
-          colorBgContainer: currentTheme === "dark" ? "#12121a" : "#f1f5f9",
-          borderRadius: 8,
-          colorTextBase: currentTheme === "dark" ? "#ffffff" : "#0f172a",
-        },
-      }}
-    >
-      <AntdApp>
-        <Router>
-          <AuthProvider>
-            <CartProvider>
-              <NotificationProvider>
-                <ScrollToTop />
-                <Routes>
+    <>
+      <Toaster position="top-right" />
+      <Router>
+        <AuthProvider>
+          <CartProvider>
+            <NotificationProvider>
+              <ScrollToTop />
+              <Routes>
                   {/* Customer Routes */}
                   <Route
                     path="/"
@@ -207,8 +194,7 @@ const AppContent = () => {
             </CartProvider>
           </AuthProvider>
         </Router>
-      </AntdApp>
-    </ConfigProvider>
+    </>
   );
 };
 

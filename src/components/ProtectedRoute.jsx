@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Spin } from "antd";
+import { Spinner } from "./ui/Spinner";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, loading, isAdmin } = useAuth();
@@ -9,8 +9,8 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
-        <Spin size="large" tip="Loading..." />
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
+        <Spinner size="lg" />
       </div>
     );
   }

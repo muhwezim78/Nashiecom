@@ -1,26 +1,4 @@
-// Admin Orders Management Page
 import { useState, useEffect } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Input,
-  Select,
-  Space,
-  Tag,
-  Modal,
-  Descriptions,
-  Timeline,
-  message,
-  Row,
-  Col,
-  Typography,
-  Drawer,
-  Form,
-  Divider,
-  Badge,
-  Tooltip,
-} from "antd";
 import {
   Search,
   Eye,
@@ -29,19 +7,15 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Filter,
   RefreshCw,
   MessageSquare,
+  X,
+  Loader2,
 } from "lucide-react";
 import ChatWindow from "../../components/chat/ChatWindow";
 import { ordersAPI } from "../../services/api";
-import "../layouts/AdminLayout.css";
+import { message } from "../../utils/toast";
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
-
-// Format currency
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-UG", {
     style: "currency",
@@ -50,7 +24,6 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// Format date
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -62,92 +35,41 @@ const formatDate = (date) => {
 };
 
 const orderStatuses = [
-  {
-    value: "PENDING",
-    label: "Pending",
-    color: "gold",
-    icon: <Clock size={14} />,
-  },
-  {
-    value: "CONFIRMED",
-    label: "Confirmed",
-    color: "blue",
-    icon: <CheckCircle size={14} />,
-  },
-  {
-    value: "PROCESSING",
-    label: "Processing",
-    color: "cyan",
-    icon: <Package size={14} />,
-  },
-  {
-    value: "SHIPPED",
-    label: "Shipped",
-    color: "purple",
-    icon: <Truck size={14} />,
-  },
-  {
-    value: "DELIVERED",
-    label: "Delivered",
-    color: "green",
-    icon: <CheckCircle size={14} />,
-  },
-  {
-    value: "CANCELLED",
-    label: "Cancelled",
-    color: "red",
-    icon: <XCircle size={14} />,
-  },
+  { value: "PENDING", label: "Pending", color: "text-yellow-500 bg-yellow-500/20", icon: <Clock size={14} /> },
+  { value: "CONFIRMED", label: "Confirmed", color: "text-blue-400 bg-blue-500/20", icon: <CheckCircle size={14} /> },
+  { value: "PROCESSING", label: "Processing", color: "text-cyan-400 bg-cyan-500/20", icon: <Package size={14} /> },
+  { value: "SHIPPED", label: "Shipped", color: "text-purple-400 bg-purple-500/20", icon: <Truck size={14} /> },
+  { value: "DELIVERED", label: "Delivered", color: "text-green-400 bg-green-500/20", icon: <CheckCircle size={14} /> },
+  { value: "CANCELLED", label: "Cancelled", color: "text-red-400 bg-red-500/20", icon: <XCircle size={14} /> },
 ];
 
 const paymentStatuses = [
-  { value: "PENDING", label: "Pending", color: "gold" },
-  { value: "PAID", label: "Paid", color: "green" },
-  { value: "FAILED", label: "Failed", color: "red" },
-  { value: "REFUNDED", label: "Refunded", color: "purple" },
+  { value: "PENDING", label: "Pending", color: "text-yellow-500 bg-yellow-500/20" },
+  { value: "PAID", label: "Paid", color: "text-green-400 bg-green-500/20" },
+  { value: "FAILED", label: "Failed", color: "text-red-400 bg-red-500/20" },
+  { value: "REFUNDED", label: "Refunded", color: "text-purple-400 bg-purple-500/20" },
 ];
 
 const OrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-  });
-  const [filters, setFilters] = useState({
-    search: "",
-    status: "",
-    paymentStatus: "",
-  });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
+  const [filters, setFilters] = useState({ search: "", status: "", paymentStatus: "" });
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [statusForm] = Form.useForm();
+  const [statusFormData, setStatusFormData] = useState({ status: "", note: "" });
   const [activeChatOrder, setActiveChatOrder] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Fetch orders
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        ...filters,
-      };
-      Object.keys(params).forEach((key) => {
-        if (params[key] === "" || params[key] === undefined) {
-          delete params[key];
-        }
-      });
-
+      const params = { page: pagination.page, limit: pagination.limit, ...filters };
+      Object.keys(params).forEach(key => { if (params[key] === "" || params[key] === undefined) delete params[key]; });
       const response = await ordersAPI.getAll(params);
       setOrders(response.data.orders);
-      setPagination((prev) => ({
-        ...prev,
-        total: response.data.pagination.total,
-      }));
+      setPagination(prev => ({ ...prev, total: response.data.pagination.total }));
     } catch (error) {
       message.error("Failed to fetch orders");
     } finally {
@@ -158,16 +80,6 @@ const OrdersPage = () => {
   useEffect(() => {
     fetchOrders();
   }, [pagination.page, filters]);
-
-  const handleSearch = (value) => {
-    setFilters((prev) => ({ ...prev, search: value }));
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
-
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
 
   const viewOrder = async (order) => {
     try {
@@ -181,20 +93,14 @@ const OrdersPage = () => {
 
   const openStatusModal = (order) => {
     setSelectedOrder(order);
-    statusForm.setFieldsValue({
-      status: order.status,
-      note: "",
-    });
+    setStatusFormData({ status: order.status, note: "" });
     setStatusModalOpen(true);
   };
 
-  const handleStatusUpdate = async (values) => {
+  const handleStatusUpdate = async (e) => {
+    e.preventDefault();
     try {
-      await ordersAPI.updateStatus(
-        selectedOrder.id,
-        values.status,
-        values.note,
-      );
+      await ordersAPI.updateStatus(selectedOrder.id, statusFormData.status, statusFormData.note);
       message.success("Order status updated");
       setStatusModalOpen(false);
       fetchOrders();
@@ -223,526 +129,293 @@ const OrdersPage = () => {
     }
   };
 
-  const openChat = (order) => {
-    setActiveChatOrder(order);
-    setIsChatOpen(true);
-  };
-
-  const getStatusInfo = (status) => {
-    return (
-      orderStatuses.find((s) => s.value === status) || {
-        label: status,
-        color: "default",
-      }
-    );
-  };
-
-  const getPaymentStatusInfo = (status) => {
-    return (
-      paymentStatuses.find((s) => s.value === status) || {
-        label: status,
-        color: "default",
-      }
-    );
-  };
-
-  const columns = [
-    {
-      title: "Order",
-      dataIndex: "orderNumber",
-      key: "orderNumber",
-      render: (text, record) => (
-        <div>
-          <Text
-            strong
-            style={{ color: "#00d4ff", cursor: "pointer" }}
-            onClick={() => viewOrder(record)}
-          >
-            {text}
-          </Text>
-          <div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {formatDate(record.createdAt)}
-            </Text>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Customer",
-      key: "customer",
-      render: (_, record) => (
-        <div>
-          <div>
-            {record.user?.firstName} {record.user?.lastName}
-          </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {record.user?.email}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: "Products",
-      key: "products",
-      width: 200,
-      render: (_, record) => (
-        <div style={{ maxWidth: 200 }}>
-          {record.items?.slice(0, 2).map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                fontSize: 12,
-                marginBottom: 2,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.productName}
-            </div>
-          ))}
-          {record.items?.length > 2 && (
-            <Text type="secondary" style={{ fontSize: 11 }}>
-              + {record.items.length - 2} more...
-            </Text>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: "Qty",
-      key: "total_quantity",
-      width: 80,
-      align: "center",
-      render: (_, record) => {
-        const total =
-          record.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-        return (
-          <Badge
-            count={total}
-            showZero
-            color="#00d4ff"
-            style={{
-              backgroundColor: "rgba(0, 212, 255, 0.1)",
-              color: "#00d4ff",
-              boxShadow: "none",
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      key: "total",
-      render: (value) => <Text strong>{formatCurrency(value)}</Text>,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => {
-        const statusInfo = getStatusInfo(status);
-        return (
-          <Tag
-            color={statusInfo.color}
-            style={{ cursor: "pointer" }}
-            onClick={() => openStatusModal(record)}
-          >
-            {statusInfo.icon} {statusInfo.label}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: "Payment",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      render: (status, record) => {
-        const statusInfo = getPaymentStatusInfo(status);
-        return (
-          <Select
-            value={status}
-            size="small"
-            style={{ width: 110 }}
-            onChange={(value) => handlePaymentStatusUpdate(record.id, value)}
-          >
-            {paymentStatuses.map((ps) => (
-              <Option key={ps.value} value={ps.value}>
-                <Tag color={ps.color} style={{ margin: 0 }}>
-                  {ps.label}
-                </Tag>
-              </Option>
-            ))}
-          </Select>
-        );
-      },
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="View Details">
-            <Button
-              type="text"
-              icon={<Eye size={16} />}
-              onClick={() => viewOrder(record)}
-              className="action-btn"
-            />
-          </Tooltip>
-          <Tooltip title="Chat with Client">
-            <Button
-              type="primary"
-              size="small"
-              icon={<MessageSquare size={14} />}
-              onClick={() => openChat(record)}
-              className="bg-cyan-600 border-none flex items-center justify-center"
-            />
-          </Tooltip>
-          {record.status === "SHIPPED" && !record.adminConfirmedDelivery && (
-            <Tooltip title="Confirm Delivery">
-              <Button
-                type="primary"
-                size="small"
-                icon={<CheckCircle size={14} />}
-                onClick={() => handleConfirmDelivery(record.id)}
-                className="bg-green-600 border-none flex items-center justify-center"
-              />
-            </Tooltip>
-          )}
-        </Space>
-      ),
-    },
-  ];
+  const getStatusInfo = (status) => orderStatuses.find(s => s.value === status) || { label: status, color: "text-gray-400 bg-gray-500/20" };
+  const getPaymentStatusInfo = (status) => paymentStatuses.find(s => s.value === status) || { label: status, color: "text-gray-400 bg-gray-500/20" };
 
   return (
-    <div>
-      {/* Header */}
-      <div className="admin-page-header">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="admin-page-title">Orders</h1>
-          <p className="admin-page-subtitle">
-            Manage customer orders ({pagination.total} orders)
-          </p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Orders</h1>
+          <p className="text-sm text-[var(--text-muted)]">Manage customer orders ({pagination.total} orders)</p>
         </div>
-        <Button icon={<RefreshCw size={16} />} onClick={fetchOrders}>
-          Refresh
-        </Button>
+        <button onClick={fetchOrders} className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-glass)] hover:bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-xl transition-colors">
+          <RefreshCw size={16} /> Refresh
+        </button>
       </div>
 
       {/* Filters */}
-      <Card
-        className="form-card"
-        variant="borderless"
-        style={{ marginBottom: 24 }}
-      >
-        <Row gutter={16} align="middle">
-          <Col xs={24} md={8}>
-            <Input
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl p-4 shadow-xl">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" size={18} />
+            <input
+              type="text"
               placeholder="Search by order # or customer..."
-              prefix={<Search size={16} />}
               value={filters.search}
-              onChange={(e) => handleSearch(e.target.value)}
-              allowClear
+              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              className="w-full pl-10 pr-4 py-2 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
             />
-          </Col>
-          <Col xs={12} md={5}>
-            <Select
-              placeholder="Order Status"
-              value={filters.status || undefined}
-              onChange={(value) => handleFilterChange("status", value)}
-              allowClear
-              style={{ width: "100%" }}
+          </div>
+          <div className="w-full md:w-48">
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+              className="w-full px-4 py-2 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
             >
-              {orderStatuses.map((status) => (
-                <Option key={status.value} value={status.value}>
-                  <Tag color={status.color}>{status.label}</Tag>
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={12} md={5}>
-            <Select
-              placeholder="Payment Status"
-              value={filters.paymentStatus || undefined}
-              onChange={(value) => handleFilterChange("paymentStatus", value)}
-              allowClear
-              style={{ width: "100%" }}
+              <option value="" className="bg-[#1a1a24]">All Statuses</option>
+              {orderStatuses.map(s => <option key={s.value} value={s.value} className="bg-[#1a1a24]">{s.label}</option>)}
+            </select>
+          </div>
+          <div className="w-full md:w-48">
+            <select
+              value={filters.paymentStatus}
+              onChange={(e) => setFilters(prev => ({ ...prev, paymentStatus: e.target.value }))}
+              className="w-full px-4 py-2 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
             >
-              {paymentStatuses.map((status) => (
-                <Option key={status.value} value={status.value}>
-                  <Tag color={status.color}>{status.label}</Tag>
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} md={6} style={{ textAlign: "right" }}>
-            <Button
-              onClick={() => {
-                setFilters({ search: "", status: "", paymentStatus: "" });
-                setPagination((prev) => ({ ...prev, page: 1 }));
-              }}
-            >
-              Clear Filters
-            </Button>
-          </Col>
-        </Row>
-      </Card>
+              <option value="" className="bg-[#1a1a24]">All Payments</option>
+              {paymentStatuses.map(s => <option key={s.value} value={s.value} className="bg-[#1a1a24]">{s.label}</option>)}
+            </select>
+          </div>
+          <button
+            onClick={() => { setFilters({ search: "", status: "", paymentStatus: "" }); setPagination(prev => ({ ...prev, page: 1 })); }}
+            className="px-4 py-2 bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] transition-colors whitespace-nowrap"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
       {/* Orders Table */}
-      <Card className="admin-table-card" variant="borderless">
-        <Table
-          className="admin-table"
-          columns={columns}
-          dataSource={orders}
-          rowKey="id"
-          loading={loading}
-          scroll={{ x: 1000 }}
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.limit,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
-            onChange: (page, pageSize) => {
-              setPagination((prev) => ({ ...prev, page, limit: pageSize }));
-            },
-          }}
-        />
-      </Card>
-
-      {/* Order Details Drawer */}
-      <Drawer
-        title={`Order ${selectedOrder?.orderNumber}`}
-        placement="right"
-        width={640}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
-        {selectedOrder && (
-          <div>
-            {/* Order Status */}
-            <div style={{ marginBottom: 24 }}>
-              <Space size="middle">
-                <Tag
-                  color={getStatusInfo(selectedOrder.status).color}
-                  style={{ fontSize: 14, padding: "4px 12px" }}
-                >
-                  {getStatusInfo(selectedOrder.status).label}
-                </Tag>
-                <Tag
-                  color={
-                    getPaymentStatusInfo(selectedOrder.paymentStatus).color
-                  }
-                >
-                  Payment:{" "}
-                  {getPaymentStatusInfo(selectedOrder.paymentStatus).label}
-                </Tag>
-              </Space>
-            </div>
-
-            {/* Order Details */}
-            <Descriptions
-              title="Order Details"
-              column={2}
-              size="small"
-              bordered
-            >
-              <Descriptions.Item label="Order Date">
-                {formatDate(selectedOrder.createdAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Payment Method">
-                {selectedOrder.paymentMethod}
-              </Descriptions.Item>
-              <Descriptions.Item label="Subtotal">
-                {formatCurrency(selectedOrder.subtotal)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Shipping">
-                {formatCurrency(selectedOrder.shippingCost)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Tax">
-                {formatCurrency(selectedOrder.tax)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Discount">
-                {formatCurrency(selectedOrder.discount)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Total" span={2}>
-                <Text strong style={{ fontSize: 18, color: "#00d4ff" }}>
-                  {formatCurrency(selectedOrder.total)}
-                </Text>
-              </Descriptions.Item>
-            </Descriptions>
-
-            <Divider />
-
-            {/* Customer Info */}
-            <Descriptions title="Customer" column={1} size="small">
-              <Descriptions.Item label="Name">
-                {selectedOrder.user?.firstName} {selectedOrder.user?.lastName}
-              </Descriptions.Item>
-              <Descriptions.Item label="Email">
-                {selectedOrder.user?.email}
-              </Descriptions.Item>
-              <Descriptions.Item label="Phone">
-                {selectedOrder.user?.phone || "-"}
-              </Descriptions.Item>
-            </Descriptions>
-
-            {/* Shipping Address */}
-            {selectedOrder.address && (
-              <>
-                <Divider />
-                <Descriptions title="Shipping Address" column={1} size="small">
-                  <Descriptions.Item>
-                    {selectedOrder.address.firstName}{" "}
-                    {selectedOrder.address.lastName}
-                    <br />
-                    {selectedOrder.address.addressLine1}
-                    <br />
-                    {selectedOrder.address.addressLine2 && (
-                      <>
-                        {selectedOrder.address.addressLine2}
-                        <br />
-                      </>
-                    )}
-                    {selectedOrder.address.city}, {selectedOrder.address.state}{" "}
-                    {selectedOrder.address.postalCode}
-                    <br />
-                    {selectedOrder.address.country}
-                  </Descriptions.Item>
-                </Descriptions>
-              </>
-            )}
-
-            <Divider />
-
-            {/* Order Items */}
-            <Title level={5}>Items ({selectedOrder.items?.length})</Title>
-            <div style={{ marginBottom: 24 }}>
-              {selectedOrder.items?.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    padding: "12px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
-                  }}
-                >
-                  {item.productImage && (
-                    <img
-                      src={item.productImage}
-                      alt={item.productName}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 8,
-                        objectFit: "cover",
-                      }}
-                    />
-                  )}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: "#fff" }}>
-                      {item.productName}
-                    </div>
-                    {item.sku && (
-                      <div
-                        style={{
-                          fontSize: 11,
-                          color: "rgba(255,255,255,0.45)",
-                          marginTop: 2,
-                        }}
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
+            <thead>
+              <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-glass)]">
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Order</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Customer</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Products</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-center">Qty</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Total</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Payment</th>
+                <th className="p-4 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border-subtle)]">
+              {loading ? (
+                <tr><td colSpan="8" className="p-8 text-center text-[var(--text-muted)]"><Loader2 className="w-8 h-8 animate-spin mx-auto text-cyan-500 mb-2" /> Loading orders...</td></tr>
+              ) : orders.length === 0 ? (
+                <tr><td colSpan="8" className="p-8 text-center text-[var(--text-muted)]">No orders found.</td></tr>
+              ) : (
+                orders.map((record) => (
+                  <tr key={record.id} className="hover:bg-[var(--bg-glass)] transition-colors">
+                    <td className="p-4">
+                      <button onClick={() => viewOrder(record)} className="font-bold text-cyan-400 hover:underline">{record.orderNumber}</button>
+                      <div className="text-xs text-[var(--text-muted)] mt-1">{formatDate(record.createdAt)}</div>
+                    </td>
+                    <td className="p-4 text-[var(--text-primary)] text-sm">
+                      <div className="font-medium">{record.user?.firstName} {record.user?.lastName}</div>
+                      <div className="text-xs text-[var(--text-muted)] mt-1">{record.user?.email}</div>
+                    </td>
+                    <td className="p-4 text-xs text-[var(--text-secondary)]">
+                      {record.items?.slice(0, 2).map((item, idx) => (
+                        <div key={idx} className="truncate max-w-[200px] mb-0.5">{item.productName}</div>
+                      ))}
+                      {record.items?.length > 2 && <div className="text-[var(--text-muted)] mt-1">+ {record.items.length - 2} more...</div>}
+                    </td>
+                    <td className="p-4 text-center">
+                      <span className="bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded font-bold text-xs">
+                        {record.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+                      </span>
+                    </td>
+                    <td className="p-4 font-bold text-[var(--text-primary)]">{formatCurrency(record.total)}</td>
+                    <td className="p-4">
+                      <button onClick={() => openStatusModal(record)} className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-1 ${getStatusInfo(record.status).color}`}>
+                        {getStatusInfo(record.status).icon} {getStatusInfo(record.status).label}
+                      </button>
+                    </td>
+                    <td className="p-4">
+                      <select
+                        value={record.paymentStatus}
+                        onChange={(e) => handlePaymentStatusUpdate(record.id, e.target.value)}
+                        className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest outline-none ${getPaymentStatusInfo(record.paymentStatus).color} cursor-pointer`}
                       >
-                        SKU: {item.sku}
-                      </div>
-                    )}
-                    <Text
-                      type="secondary"
-                      style={{ fontSize: 12, display: "block", marginTop: 4 }}
-                    >
-                      {formatCurrency(item.price)} × {item.quantity}
-                    </Text>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <Text strong>{formatCurrency(item.subtotal)}</Text>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Status History */}
-            {selectedOrder.statusHistory?.length > 0 && (
-              <>
-                <Title level={5}>Status History</Title>
-                <Timeline
-                  items={selectedOrder.statusHistory.map((history) => ({
-                    color: getStatusInfo(history.status).color,
-                    children: (
-                      <div>
-                        <Tag color={getStatusInfo(history.status).color}>
-                          {getStatusInfo(history.status).label}
-                        </Tag>
-                        {history.note && (
-                          <div style={{ marginTop: 4 }}>{history.note}</div>
+                        {paymentStatuses.map(ps => <option key={ps.value} value={ps.value} className="bg-[#1a1a24] text-white font-medium">{ps.label}</option>)}
+                      </select>
+                    </td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => viewOrder(record)} className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors" title="View Details"><Eye size={16} /></button>
+                        <button onClick={() => { setActiveChatOrder(record); setIsChatOpen(true); }} className="p-1.5 bg-cyan-600/20 text-cyan-400 hover:bg-cyan-600/40 rounded transition-colors" title="Chat"><MessageSquare size={16} /></button>
+                        {record.status === "SHIPPED" && !record.adminConfirmedDelivery && (
+                          <button onClick={() => handleConfirmDelivery(record.id)} className="p-1.5 bg-green-500/20 text-green-400 hover:bg-green-500/40 rounded transition-colors" title="Confirm Delivery"><CheckCircle size={16} /></button>
                         )}
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          {formatDate(history.createdAt)}
-                        </Text>
                       </div>
-                    ),
-                  }))}
-                />
-              </>
-            )}
-
-            {/* Action Buttons */}
-            <Divider />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  openStatusModal(selectedOrder);
-                }}
-              >
-                Update Status
-              </Button>
-            </Space>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination placeholder */}
+        {pagination.total > 0 && (
+          <div className="p-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-sm text-[var(--text-secondary)] bg-[var(--bg-secondary)]">
+            <span>Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries</span>
+            <div className="flex gap-2">
+              <button disabled={pagination.page === 1} onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))} className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50 transition-colors">Previous</button>
+              <button disabled={pagination.page * pagination.limit >= pagination.total} onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))} className="px-3 py-1 rounded-lg bg-[var(--bg-glass)] hover:bg-[var(--bg-primary)] disabled:opacity-50 transition-colors">Next</button>
+            </div>
           </div>
         )}
-      </Drawer>
+      </div>
+
+      {/* Order Details Drawer */}
+      {drawerOpen && selectedOrder && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
+          <div className="absolute inset-y-0 right-0 max-w-2xl w-full bg-[var(--bg-secondary)] shadow-2xl flex flex-col border-l border-[var(--border-subtle)] transform transition-transform">
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-glass)]">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">Order {selectedOrder.orderNumber}</h2>
+              <button onClick={() => setDrawerOpen(false)} className="p-2 hover:bg-white/10 rounded-xl text-[var(--text-secondary)] transition-colors"><X size={20} /></button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide flex flex-col gap-8">
+              <div className="flex gap-4">
+                <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest ${getStatusInfo(selectedOrder.status).color}`}>
+                  {getStatusInfo(selectedOrder.status).label}
+                </span>
+                <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest ${getPaymentStatusInfo(selectedOrder.paymentStatus).color}`}>
+                  Payment: {getPaymentStatusInfo(selectedOrder.paymentStatus).label}
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Order Details</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm bg-[var(--bg-glass)] p-4 rounded-xl border border-[var(--border-subtle)]">
+                  <div><span className="text-[var(--text-muted)] block mb-1">Date</span> <span className="text-[var(--text-primary)] font-medium">{formatDate(selectedOrder.createdAt)}</span></div>
+                  <div><span className="text-[var(--text-muted)] block mb-1">Payment Method</span> <span className="text-[var(--text-primary)] font-medium">{selectedOrder.paymentMethod}</span></div>
+                  <div><span className="text-[var(--text-muted)] block mb-1">Subtotal</span> <span className="text-[var(--text-primary)] font-medium">{formatCurrency(selectedOrder.subtotal)}</span></div>
+                  <div><span className="text-[var(--text-muted)] block mb-1">Shipping</span> <span className="text-[var(--text-primary)] font-medium">{formatCurrency(selectedOrder.shippingCost)}</span></div>
+                  <div><span className="text-[var(--text-muted)] block mb-1">Tax</span> <span className="text-[var(--text-primary)] font-medium">{formatCurrency(selectedOrder.tax)}</span></div>
+                  <div><span className="text-[var(--text-muted)] block mb-1">Discount</span> <span className="text-[var(--text-primary)] font-medium">{formatCurrency(selectedOrder.discount)}</span></div>
+                  <div className="col-span-2 pt-2 border-t border-[var(--border-subtle)] flex justify-between items-center mt-2">
+                    <span className="font-bold text-[var(--text-primary)]">Total</span>
+                    <span className="text-xl font-black text-cyan-400">{formatCurrency(selectedOrder.total)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Customer Info</h3>
+                <div className="bg-[var(--bg-glass)] p-4 rounded-xl border border-[var(--border-subtle)] text-sm space-y-2">
+                  <div><span className="text-[var(--text-muted)] inline-block w-20">Name:</span> <span className="text-[var(--text-primary)] font-medium">{selectedOrder.user?.firstName} {selectedOrder.user?.lastName}</span></div>
+                  <div><span className="text-[var(--text-muted)] inline-block w-20">Email:</span> <span className="text-[var(--text-primary)] font-medium">{selectedOrder.user?.email}</span></div>
+                  <div><span className="text-[var(--text-muted)] inline-block w-20">Phone:</span> <span className="text-[var(--text-primary)] font-medium">{selectedOrder.user?.phone || "-"}</span></div>
+                </div>
+              </div>
+
+              {selectedOrder.address && (
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Shipping Address</h3>
+                  <div className="bg-[var(--bg-glass)] p-4 rounded-xl border border-[var(--border-subtle)] text-sm text-[var(--text-secondary)] leading-relaxed">
+                    <span className="font-medium text-[var(--text-primary)] block mb-1">{selectedOrder.address.firstName} {selectedOrder.address.lastName}</span>
+                    {selectedOrder.address.addressLine1}<br />
+                    {selectedOrder.address.addressLine2 && <>{selectedOrder.address.addressLine2}<br /></>}
+                    {selectedOrder.address.city}, {selectedOrder.address.state} {selectedOrder.address.postalCode}<br />
+                    {selectedOrder.address.country}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Items ({selectedOrder.items?.length})</h3>
+                <div className="bg-[var(--bg-glass)] rounded-xl border border-[var(--border-subtle)] divide-y divide-[var(--border-subtle)]">
+                  {selectedOrder.items?.map((item) => (
+                    <div key={item.id} className="p-4 flex gap-4 items-center">
+                      <img src={item.productImage || "https://placehold.co/60"} alt={item.productName} className="w-16 h-16 rounded-xl object-cover bg-[var(--bg-primary)] border border-[var(--border-subtle)]" />
+                      <div className="flex-1">
+                        <h4 className="font-bold text-[var(--text-primary)]">{item.productName}</h4>
+                        {item.sku && <p className="text-xs text-[var(--text-muted)] mt-1">SKU: {item.sku}</p>}
+                        <p className="text-sm text-[var(--text-secondary)] mt-1">{formatCurrency(item.price)} × {item.quantity}</p>
+                      </div>
+                      <div className="font-bold text-[var(--text-primary)] text-right">
+                        {formatCurrency(item.subtotal)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedOrder.statusHistory?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-4">Status History</h3>
+                  <div className="space-y-6 ml-2 border-l-2 border-[var(--border-subtle)] pl-6 relative">
+                    {selectedOrder.statusHistory.map((history, idx) => (
+                      <div key={idx} className="relative">
+                        <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-cyan-500 ring-4 ring-[var(--bg-secondary)]" />
+                        <span className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest mb-2 ${getStatusInfo(history.status).color}`}>
+                          {getStatusInfo(history.status).label}
+                        </span>
+                        {history.note && <p className="text-sm text-[var(--text-primary)] mb-1 bg-[var(--bg-glass)] p-3 rounded-lg border border-[var(--border-subtle)]">{history.note}</p>}
+                        <p className="text-xs text-[var(--text-muted)]">{formatDate(history.createdAt)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="px-6 py-4 border-t border-[var(--border-subtle)] bg-[var(--bg-glass)] flex justify-end gap-3">
+              <button onClick={() => { setDrawerOpen(false); openStatusModal(selectedOrder); }} className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium shadow-lg shadow-cyan-500/20 transition-colors">
+                Update Status
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Status Update Modal */}
-      <Modal
-        title="Update Order Status"
-        open={statusModalOpen}
-        onCancel={() => setStatusModalOpen(false)}
-        onOk={() => statusForm.submit()}
-        okText="Update"
-      >
-        <Form form={statusForm} layout="vertical" onFinish={handleStatusUpdate}>
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-            <Select>
-              {orderStatuses.map((status) => (
-                <Option key={status.value} value={status.value}>
-                  <Space>
-                    {status.icon}
-                    <span>{status.label}</span>
-                  </Space>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item name="note" label="Note (optional)">
-            <TextArea
-              rows={3}
-              placeholder="Add a note about this status change"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {statusModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-glass)]">
+              <h3 className="font-bold text-lg text-[var(--text-primary)]">Update Order Status</h3>
+              <button onClick={() => setStatusModalOpen(false)} className="text-[var(--text-muted)] hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleStatusUpdate} className="p-6 flex flex-col gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-[var(--text-secondary)]">Status</label>
+                <select
+                  required
+                  value={statusFormData.status}
+                  onChange={(e) => setStatusFormData({...statusFormData, status: e.target.value})}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none"
+                >
+                  <option value="" disabled className="bg-[#1a1a24]">Select Status</option>
+                  {orderStatuses.map(s => <option key={s.value} value={s.value} className="bg-[#1a1a24]">{s.label}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-[var(--text-secondary)]">Note (optional)</label>
+                <textarea
+                  rows={3}
+                  value={statusFormData.note}
+                  onChange={(e) => setStatusFormData({...statusFormData, note: e.target.value})}
+                  placeholder="Add a note about this status change"
+                  className="w-full px-4 py-2.5 bg-[var(--bg-glass)] border border-[var(--border-subtle)] rounded-xl text-[var(--text-primary)] focus:border-cyan-500 outline-none resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-2">
+                <button type="button" onClick={() => setStatusModalOpen(false)} className="px-5 py-2 rounded-xl text-[var(--text-secondary)] hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
+                <button type="submit" className="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium shadow-lg transition-colors">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Floating Chat Window */}
       {isChatOpen && activeChatOrder && (

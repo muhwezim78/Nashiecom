@@ -18,14 +18,14 @@ import {
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../utils/currency";
-import { Space, message, Card } from "antd";
+import { Card } from "./ui/Card";
+import { message } from "../utils/toast";
 
 const ProductCard = ({ product }) => {
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [messageApi, contextHolder] = message.useMessage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -125,7 +125,7 @@ const ProductCard = ({ product }) => {
       e.stopPropagation();
 
       if (!user) {
-        messageApi.info("Please login or sign up to add items to your cart");
+        message.info("Please login or sign up to add items to your cart");
         navigate("/login", { state: { from: location.pathname } });
         return;
       }
@@ -198,19 +198,8 @@ const ProductCard = ({ product }) => {
       onMouseLeave={handleMouseLeave}
       className="h-full"
     >
-      {contextHolder}
-
       <Card
-        variant="borderless"
-        className="group relative h-full !bg-[var(--bg-card-gradient)] !border-[var(--border-main)] hover:!border-cyan-500/30 transition-all duration-500 overflow-hidden rounded-3xl"
-        styles={{
-          body: {
-            padding: "1rem",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-          },
-        }}
+        className="group relative h-full bg-[var(--bg-card-gradient)] border-[var(--border-main)] hover:border-cyan-500/30 transition-all duration-500 overflow-hidden rounded-3xl p-4 flex flex-col"
       >
         {/* Reactive Glow Effect */}
         <motion.div

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import sitemap from 'vite-plugin-sitemap'
+import tailwindcss from '@tailwindcss/vite'
 
 // Function to fetch dynamic routes from the live API
 const getDynamicRoutes = async () => {
@@ -46,6 +47,7 @@ export default defineConfig(async () => {
 
   return {
     plugins: [
+      tailwindcss(),
       react(),
       sitemap({
         hostname: 'https://nashiecom-technologies.web.app',

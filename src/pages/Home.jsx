@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Space, Spin, Card } from "antd";
+import { Spinner } from "../components/ui/Spinner";
+import { Card } from "../components/ui/Card";
 import HeroSection from "../components/HeroSection";
 import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
@@ -149,13 +150,8 @@ const Home = () => {
         <div className="absolute inset-0 opacity-[0.03] bg-[var(--bg-glass)]" />
       </div>
 
-      {/* Main content wrapped in Space with responsive gaps */}
-      <Space
-        orientation="vertical"
-        size="large"
-        className="w-full"
-        style={{ gap: "var(--space-2xl)" }}
-      >
+      {/* Main content wrapped in flex column with responsive gaps */}
+      <div className="flex flex-col w-full" style={{ gap: "var(--space-2xl)" }}>
         {/* Hero Section */}
         <div className="w-full">
           <HeroSection />
@@ -231,8 +227,7 @@ const Home = () => {
                     className="h-full"
                   >
                     <Card
-                      className="h-full !bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!border-cyan-500/30 !rounded-2xl transition-all group !border-0 text-center"
-                      styles={{ body: { padding: "2rem" } }}
+                      className="h-full bg-[var(--bg-glass)] border-[var(--border-subtle)] hover:border-cyan-500/30 rounded-2xl transition-all group text-center p-8"
                     >
                       <div
                         className={`w-14 h-14 mx-auto mb-6 bg-[var(--bg-glass)] rounded-2xl flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform`}
@@ -351,7 +346,7 @@ const Home = () => {
 
               {loading ? (
                 <div className="flex justify-center py-20">
-                  <Spin size="large" />
+                  <Spinner size="lg" />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -405,15 +400,7 @@ const Home = () => {
                         className="block group"
                       >
                         <Card
-                          className="!bg-[var(--bg-glass)] !border-[var(--border-subtle)] hover:!bg-[var(--bg-secondary)] hover:!border-purple-500/30 !rounded-2xl transition-all !border-0"
-                          styles={{
-                            body: {
-                              padding: "1.5rem",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "1.5rem",
-                            },
-                          }}
+                          className="bg-[var(--bg-glass)] border-[var(--border-subtle)] hover:bg-[var(--bg-secondary)] hover:border-purple-500/30 rounded-2xl transition-all p-6 flex items-center gap-6"
                         >
                           <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
                             {/* Use image instead of icon if available */}
@@ -452,16 +439,7 @@ const Home = () => {
                 >
                   <div className="absolute inset-0 bg-purple-600/20 blur-[100px] animate-pulse rounded-full" />
                   <Card
-                    className="relative w-full max-w-lg aspect-square !bg-[var(--bg-primary)] !border-white/5 !rounded-2xl overflow-hidden group shadow-2xl !border-0"
-                    styles={{
-                      body: {
-                        padding: "3rem",
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                      },
-                    }}
+                    className="relative w-full max-w-lg aspect-square bg-[var(--bg-primary)] border-white/5 rounded-2xl overflow-hidden group shadow-2xl p-12 flex flex-col justify-between"
                   >
                     <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 group-hover:rotate-0 transition-transform duration-1000">
                       <Play className="w-64 h-64 text-purple-500" />
@@ -480,8 +458,7 @@ const Home = () => {
                       </div>
 
                       <Card
-                        className="!bg-[var(--bg-glass)] !rounded-2xl backdrop-blur-md !border-[var(--border-subtle)] !border"
-                        styles={{ body: { padding: "1.5rem" } }}
+                        className="bg-[var(--bg-glass)] rounded-2xl backdrop-blur-md border-[var(--border-subtle)] border p-6"
                       >
                         <div className="space-y-4">
                           <div className="flex justify-between items-center pb-4 border-b border-white/10 uppercase tracking-widest text-[10px] font-black">
@@ -569,7 +546,7 @@ const Home = () => {
         <div className="w-full">
           <Newsletter />
         </div>
-      </Space>
+      </div>
     </div>
   );
 };
